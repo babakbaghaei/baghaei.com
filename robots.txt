@@ -1,0 +1,10 @@
+# robots.txt for Baghaei Tech Group
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://baghaei.com/sitemap.xml
+
+# Crawl-delay (optional)
+Crawl-delay: 1

@@ -1,0 +1,45 @@
+{
+  "name": "گروه فناوری بقایی | Baghaei Tech Group",
+  "short_name": "Baghaei Tech",
+  "description": "گروه فناوری بقایی - ارائه دهنده راهکارهای جامع نرم‌افزاری در مقیاس سازمانی",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f5f7",
+  "theme_color": "#1d1d1f",
+  "orientation": "portrait-primary",
+  "dir": "rtl",
+  "lang": "fa",
+  "icons": [
+    {
+      "src": "assets/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "technology"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "دپارتمان‌ها",
+      "short_name": "دپارتمان‌ها",
+      "description": "مشاهده دپارتمان‌های تخصصی",
+      "url": "/#expertise",
+      "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "تماس با ما",
+      "short_name": "تماس",
+      "description": "ارتباط با واحد فروش",
+      "url": "/#contact",
+      "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
+
