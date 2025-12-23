@@ -29,7 +29,7 @@ export function Counter({ value }: CounterProps) {
           } else {
             formatted = Math.floor(latest).toString();
           }
-          setDisplayValue(formatted.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
+          setDisplayValue(formatted.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]));
         },
       });
       return () => controls.stop();
