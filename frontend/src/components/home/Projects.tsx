@@ -4,7 +4,24 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { ArrowLeft, Hammer, Box } from 'lucide-react';
 import ProjectModal from './ProjectModal';
 
-const staticProjects = [
+interface Metric {
+  label: string;
+  value: string;
+}
+
+interface Project {
+  id: number;
+  title: string;
+  category: string;
+  role: string;
+  desc: string;
+  metrics: Metric[];
+  color: string;
+  borderColor: string;
+  isLocked: boolean;
+}
+
+const staticProjects: Project[] = [
   { id: 2, title: 'پلتفرم راورو', category: 'امنیت سایبری', role: 'طراح ارشد رابط کاربری', desc: 'توسعه پلتفرم باگ‌بانتی با هدف شناسایی شکاف‌های امنیتی توسط هکرهای کلاه سفید در مقیاس ملی.', metrics: [{ label: 'باگ کشف شده', value: '۱K+' }, { label: 'شرکت فعال', value: '۵۰+' }], color: 'rgba(245, 158, 11, 0.3)', borderColor: 'rgba(245, 158, 11, 0.8)', isLocked: false },
   { id: 4, title: 'پیکسل بال', category: 'سرگرمی و بازی', role: 'طراح بازی و صداساز', desc: 'طراحی و توسعه بازی موبایل پیکسلی با تمرکز بر تجربه کاربری رقابتی و صداسازی منحصر به فرد.', metrics: [{ label: 'دانلود فعال', value: '۱۰۰K+' }, { label: 'امتیاز کاربر', value: '۴.۸/۵' }], color: 'rgba(34, 197, 94, 0.3)', borderColor: 'rgba(34, 197, 94, 0.8)', isLocked: false },
   { id: 5, title: 'پلتفرم مالاتا', category: 'تجارت الکترونیک', role: 'بنیان‌گذار فنی و معمار نرم‌افزار', desc: 'اولین بازار آنلاین محصولات تازه دریایی با هدف حذف واسطه‌ها و اتصال مستقیم صیاد به مشتری.', metrics: [{ label: 'فروشنده فعال', value: '۵۰۰+' }, { label: 'رضایت مشتری', value: '۹۵٪' }], color: 'rgba(14, 165, 233, 0.3)', borderColor: 'rgba(14, 165, 233, 0.8)', isLocked: false },

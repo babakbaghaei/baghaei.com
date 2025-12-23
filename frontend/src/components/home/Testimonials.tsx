@@ -32,11 +32,11 @@ export default function Testimonials() {
       </div>
 
       <div className="relative flex overflow-hidden group/marquee">
-        <div className="flex whitespace-nowrap gap-6 animate-scroll-infinite group-hover/marquee:[animation-play-state:paused] py-10 px-6 w-fit">
+        <div className="flex whitespace-nowrap animate-scroll-infinite group-hover/marquee:[animation-play-state:paused] py-10 px-6 w-fit">
           {list.map((t, i) => (
             <div 
               key={`${t.id}-${i}`}
-              className="testimonial-card shrink-0 w-[300px] md:w-[350px] flex flex-col p-8 rounded-[2rem] border border-zinc-800 shadow-sm transition-all duration-500 hover:border-zinc-600 hover:bg-zinc-900/50"
+              className="testimonial-card shrink-0 w-[300px] md:w-[350px] ml-6 flex flex-col p-8 rounded-[2rem] border border-zinc-800 shadow-sm transition-all duration-500 hover:border-zinc-600 hover:bg-zinc-900/50"
               style={{ backgroundColor: 'var(--card)', whiteSpace: 'normal' }}
             >
               <p className="text-sm md:text-base font-medium font-sans leading-relaxed mb-6 text-zinc-300 text-right line-clamp-4">

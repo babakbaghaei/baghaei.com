@@ -1,30 +1,23 @@
 import React from 'react';
-import { headers } from 'next/headers';
+import dynamic from 'next/dynamic';
 import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 import Hero from '@/components/home/Hero';
-import Philosophy from '@/components/home/Philosophy';
-import Projects from '@/components/home/Projects';
-import Services from '@/components/home/Services';
-import Testimonials from '@/components/home/Testimonials';
-import Careers from '@/components/home/Careers';
-import Contact from '@/components/home/Contact';
-import Maintenance from '@/components/layout/Maintenance';
 
-export default async function Home() {
-  const headersList = await headers();
-  const host = headersList.get('host') || '';
-  const isBeta = host.startsWith('beta.') || host.includes('localhost');
+// Lazy load components to improve initial load time (Bundle Phobia optimization)
+const Philosophy = dynamic(() => import('@/components/home/Philosophy'), { ssr: true });
+const Projects = dynamic(() => import('@/components/home/Projects'), { ssr: true });
+const Services = dynamic(() => import('@/components/home/Services'), { ssr: true });
+const Testimonials = dynamic(() => import('@/components/home/Testimonials'), { ssr: true });
+const Careers = dynamic(() => import('@/components/home/Careers'), { ssr: true });
+const Contact = dynamic(() => import('@/components/home/Contact'), { ssr: true });
+const Footer = dynamic(() => import('@/components/layout/Footer'), { ssr: true });
 
-  if (!isBeta) {
-    return <Maintenance />;
-  }
-
+export default function Home() {
   return (
-    <main className="min-h-screen selection:bg-zinc-200 dark:selection:bg-zinc-800">
+    <main className="min-h-screen">
       <Navbar />
       <Hero />
-      <div className="space-y-16 pb-32">
+      <div className="space-y-0">
         <Philosophy />
         <Projects />
         <Services />

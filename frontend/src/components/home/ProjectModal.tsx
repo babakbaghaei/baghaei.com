@@ -23,15 +23,16 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
             <div className="absolute top-0 right-0 w-[600px] h-[600px] opacity-20 blur-[120px] pointer-events-none" style={{ background: project.color }} />
             
             {/* Scrollable Content Container */}
-            <div className="overflow-y-auto h-full p-8 md:p-12 lg:p-20 pt-10 custom-scrollbar">
-              <div className="flex justify-start mb-12 sticky top-0 z-50">
-                <button onClick={onClose} className="flex items-center gap-4 py-3 px-8 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all" style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', backdropFilter: 'blur(10px)' }}>
-                  <ArrowLeft className="w-4 h-4 text-white rotate-180" />
-                  <span className="font-display text-white">بازگشت به پروژه‌ها</span>
-                </button>
-              </div>
+            <div className="overflow-y-auto h-full p-8 md:p-12 lg:p-20 pt-10 custom-scrollbar" dir="ltr">
+              <div dir="rtl">
+                <div className="flex justify-start mb-12 sticky top-0 z-50">
+                  <button onClick={onClose} className="flex items-center gap-4 py-3 px-8 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all" style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', backdropFilter: 'blur(10px)' }}>
+                    <ArrowLeft className="w-4 h-4 text-white rotate-180" />
+                    <span className="font-display text-white">بازگشت به پروژه‌ها</span>
+                  </button>
+                </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 relative z-10 pb-20">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 relative z-10 pb-20">
               <div className="lg:col-span-8 space-y-16 order-1 md:order-1 text-right">
                 <div className="space-y-8">
                   <h2 className="text-6xl md:text-8xl font-bold weight-plus-1 font-display text-white leading-none tracking-tighter">{project.title}</h2>
@@ -64,6 +65,7 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                 <div className="space-y-4"><div className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em]">Key Metrics</div><div className="grid grid-cols-1 gap-8">{project.metrics.map((metric: any, i: number) => (<div key={i} className="space-y-2"><div className="text-[9px] text-zinc-400 font-bold uppercase">{metric.label}</div><div className="text-3xl font-bold text-white font-en">{metric.value}</div></div>))}</div></div>
                 <div className="pt-12"><Logo className="w-16 h-16" /></div>
               </div>
+            </div>
             </div>
             </div>
           </motion.div>
