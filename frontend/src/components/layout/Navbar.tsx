@@ -15,8 +15,8 @@ const navLinks = [
 ];
 
 const menuVariants = {
-  closed: { opacity: 0, y: "-100%", transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
-  open: { opacity: 1, y: "0%", transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
+  closed: { opacity: 0, y: "-100%", transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as any } },
+  open: { opacity: 1, y: "0%", transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as any } }
 };
 
 export default function Navbar() {

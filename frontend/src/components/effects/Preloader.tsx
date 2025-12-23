@@ -22,7 +22,7 @@ export default function Preloader() {
         <motion.div
           initial={{ y: 0 }}
           exit={{ y: "-100%" }}
-          transition={{ duration: 1, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
+          transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] as any, delay: 0.2 }}
           className="fixed inset-0 z-[1000] bg-black flex items-center justify-center pointer-events-none"
         >
           <div className="flex flex-col items-center gap-8">
@@ -39,7 +39,7 @@ export default function Preloader() {
               <motion.div
                 initial={{ x: "-100%" }}
                 animate={{ x: "0%" }}
-                transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] as any }}
                 className="h-full bg-white w-full rounded-full"
               />
             </div>
