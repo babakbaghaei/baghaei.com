@@ -1,42 +1,96 @@
 @import "tailwindcss";
 
+/* DARK MODE ONLY - GLOBAL VARIABLES */
+:root {
+  --bg: #000000;
+  --fg: #ffffff;
+  --card: #09090b;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #a1a1aa;
+  --grid: rgba(255, 255, 255, 0.05);
+}
+
 @theme {
-  --color-primary: #000000;
-  --color-secondary: #666666;
-  --color-accent: #0071e3; /* Apple Blue */
-  --color-surface: #f5f5f7;
-  
-  --font-sans: var(--font-iransans), "Poppins", sans-serif;
-  --font-display: var(--font-yekanbakh), "Poppins", sans-serif;
-  --font-english: "Poppins", sans-serif;
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --font-sans: var(--font-iransans), sans-serif;
+  --font-display: var(--font-yekanbakh), sans-serif;
+}
+
+/* Global Reset */
+html, body {
+  background-color: var(--bg) !important;
+  color: var(--fg) !important;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  scroll-behavior: smooth;
 }
 
 @layer base {
   body {
-    @apply bg-white text-black antialiased font-sans;
-    font-family: var(--font-iransans), "Poppins", sans-serif !important;
+    @apply antialiased;
+    font-family: var(--font-iransans), sans-serif !important;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Permanent Grid Background */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: -1;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display {
-    @apply text-black;
-    font-family: var(--font-yekanbakh), "Poppins", sans-serif !important;
-    letter-spacing: -0.02em;
+    color: var(--fg) !important;
+    font-family: var(--font-yekanbakh), sans-serif !important;
+    line-height: 1.1;
   }
 
-  /* Force Poppins for English numbers and text if needed */
-  .font-en {
-    font-family: "Poppins", sans-serif !important;
-  }
+  .font-en { font-family: "Poppins", sans-serif !important; }
+  .weight-plus-1 { -webkit-text-stroke: 2px currentColor; }
+  .weight-plus-2 { -webkit-text-stroke: 4px currentColor; }
 }
 
-.minimal-card {
-  @apply bg-surface rounded-[2.5rem] p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-zinc-200/50 hover:scale-[1.01];
+section, main {
+  background-color: transparent !important;
+}
+
+.project-card, .testimonial-card, .service-card {
+  background-color: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 3rem;
+  transition: background-color 0.5s ease, border-color 0.5s ease;
 }
 
 .btn-primary {
-  @apply bg-black text-white px-8 py-3 rounded-full font-bold transition-all hover:bg-zinc-800 active:scale-95;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  @apply px-10 py-4 rounded-full font-bold transition-all duration-300 hover:scale-105 active:scale-95;
 }
 
 .btn-secondary {
-  @apply bg-transparent text-black border border-zinc-200 px-8 py-3 rounded-full font-bold transition-all hover:bg-zinc-50 active:scale-95;
+  border: 1px solid var(--border) !important;
+  color: #ffffff !important;
+  @apply px-10 py-4 rounded-full font-bold transition-all duration-300 hover:bg-zinc-900 active:scale-95;
+}
+
+.glass {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.noise-bg {
+  position: fixed;
+  inset: 0;
+  opacity: 0.012;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }

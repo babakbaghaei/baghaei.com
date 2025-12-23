@@ -1,120 +1,89 @@
 "use client";
-import React, { useState } from 'react';
-import { Reveal } from '@/components/effects/Reveal';
+import React, { useState, useTransition } from 'react';
+import { motion } from 'framer-motion';
+import { submitContactForm } from '@/app/actions';
+import Magnetic from '@/components/effects/Magnetic';
+import { Mail } from 'lucide-react';
 
 export default function Contact() {
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
-  const [status, setStatus] = useState('');
+  const [isPending, startTransition] = useTransition();
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus('sending');
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
+    const formData = new FormData(e.currentTarget);
+    
+    startTransition(async () => {
+      const result = await submitContactForm(formData);
+      if (result.success) {
         setStatus('success');
-        setFormData({ name: '', email: '', phone: '', message: '' });
+        (e.target as HTMLFormElement).reset();
       } else {
         setStatus('error');
       }
-    } catch (error) {
-      setStatus('error');
-    }
+    });
   };
 
   return (
-    <section id="contact" className="py-40 bg-zinc-50/30 border-t border-zinc-100">
-      <div className="max-w-7xl mx-auto px-6 lg:px-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-24">
+    <section id="contact" className="py-40 relative overflow-hidden transition-colors duration-700">
+      {/* Background Icon */}
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0">
+        <Mail className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 md:px-16 relative z-10 text-center">
+        <div className="flex flex-col items-center gap-20">
           
-          <div className="lg:col-span-5 space-y-12">
-            <Reveal>
-              <div className="space-y-6">
-                <h2 className="text-4xl md:text-6xl font-black tracking-tight font-display text-black uppercase">شروع همکاری</h2>
-                <p className="text-zinc-400 font-sans text-lg md:text-xl leading-relaxed">
-                  تیم ما آماده است تا پیچیده‌ترین چالش‌های فنی شما را به راهکارهایی هوشمند تبدیل کند. با ما در تماس باشید.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="space-y-10 pt-6">
-                <div className="group">
-                  <div className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.3em] mb-2">ارتباط مستقیم</div>
-                  <a href="mailto:business@baghaei.group" className="text-2xl md:text-4xl font-en font-black text-black hover:text-zinc-400 transition-colors tracking-tighter">business@baghaei.group</a>
-                </div>
-                <div className="group">
-                  <div className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.3em] mb-2">تلفن تماس</div>
-                  <a href="tel:+989115790013" className="text-2xl md:text-4xl font-en font-black text-black hover:text-zinc-400 transition-colors tracking-tighter">+98 911 579 0013</a>
-                </div>
-              </div>
-            </Reveal>
+          <div className="space-y-8 flex flex-col items-center">
+            <div className="w-12 h-[2px] bg-white mb-12" />
+            <h2 className="text-5xl md:text-8xl font-bold weight-plus-1 font-display leading-none text-white uppercase">
+              شروع یک <br /><span className="text-zinc-800">گفتگو.</span>
+            </h2>
           </div>
 
-          <div className="lg:col-span-7">
-            <Reveal>
-              <div className="bg-white p-10 md:p-14 rounded-[3rem] border border-zinc-100 shadow-2xl shadow-zinc-200/50">
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">نام و نام خانوادگی *</label>
-                    <input 
-                      type="text" name="name" value={formData.name} onChange={handleChange} required 
-                      className="w-full bg-zinc-50 border border-transparent p-5 rounded-2xl text-black focus:outline-none focus:bg-white focus:border-zinc-200 transition-all font-sans text-base" 
-                      placeholder="نام خود را وارد کنید..."
-                    />
-                  </div>
+          <form onSubmit={handleSubmit} className="relative max-w-4xl w-full">
+            <div className="text-xl md:text-3xl font-medium font-display leading-[2.5] md:leading-[2] text-white">
+              <span className="inline-block">سلام، من </span>
+              <input 
+                type="text" name="name" required 
+                placeholder="نام و نام خانوادگی"
+                className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-[90%] md:w-auto block md:inline-block text-center mx-auto md:mx-1 my-4 md:my-0"
+              />
+              <span className="inline-block"> هستم. می‌خواهم در مورد </span>
+              <input 
+                type="text" name="message" required 
+                placeholder="موضوع یا شرح پروژه"
+                className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-[90%] md:w-auto block md:inline-block text-center mx-auto md:mx-1 my-4 md:my-0"
+              />
+              <span className="inline-block"> با شما همکاری کنم. </span>
+              <br className="hidden md:block" />
+              <span className="inline-block">می‌توانید به من در </span>
+              <input 
+                type="text" name="phone" required 
+                placeholder="شماره تماس"
+                className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-[90%] md:w-auto block md:inline-block text-center mx-auto md:mx-1 my-4 md:my-0"
+                dir="ltr"
+              />
+              <span className="inline-block"> پیام دهید.</span>
+            </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">آدرس ایمیل</label>
-                      <input 
-                        type="email" name="email" value={formData.email} onChange={handleChange}
-                        className="w-full bg-zinc-50 border border-transparent p-5 rounded-2xl text-black focus:outline-none focus:bg-white focus:border-zinc-200 transition-all font-sans text-base" 
-                        placeholder="email@example.com"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">شماره تلفن</label>
-                      <input 
-                        type="tel" name="phone" value={formData.phone} onChange={handleChange}
-                        className="w-full bg-zinc-50 border border-transparent p-5 rounded-2xl text-black focus:outline-none focus:bg-white focus:border-zinc-200 transition-all font-sans text-base" 
-                        placeholder="۰۹..."
-                      />
-                    </div>
-                  </div>
+            <div className="mt-24 flex flex-col items-center gap-12">
+              <button 
+                type="submit" 
+                disabled={isPending}
+                className="group relative px-16 py-8 bg-white text-black rounded-full font-bold text-xl overflow-hidden active:scale-95 disabled:opacity-50 transition-transform"
+              >
+                <span className="relative z-10">{isPending ? 'در حال ارسال...' : 'ارسال بیانیه'}</span>
+                <div className="absolute inset-0 bg-zinc-200 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+              </button>
 
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">شرح درخواست یا پروژه</label>
-                    <textarea 
-                      name="message" value={formData.message} onChange={handleChange} rows={4}
-                      className="w-full bg-zinc-50 border border-transparent p-5 rounded-2xl text-black focus:outline-none focus:bg-white focus:border-zinc-200 transition-all font-sans text-base resize-none" 
-                      placeholder="جزئیات درخواست خود را بنویسید..."
-                    ></textarea>
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    disabled={status === 'sending'} 
-                    className="w-full py-6 bg-black text-white rounded-[1.5rem] font-black text-lg transition-all active:scale-[0.98] disabled:opacity-50 hover:bg-zinc-800 shadow-xl shadow-zinc-200"
-                  >
-                    {status === 'sending' ? 'در حال ارسال اطلاعات...' : 'ارسال درخواست مشاوره'}
-                  </button>
-
-                  {status === 'success' && <p className="text-xs font-bold text-green-600 text-center animate-pulse uppercase tracking-widest pt-2">درخواست شما با موفقیت ارسال شد.</p>}
-                  {status === 'error' && <p className="text-xs font-bold text-red-500 text-center pt-2">خطا در ارسال. لطفاً مجدداً تلاش کنید.</p>}
-                </form>
-              </div>
-            </Reveal>
-          </div>
-
+              {status === 'success' && (
+                <motion.p initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="text-green-600 font-bold uppercase tracking-widest text-sm">
+                  دریافت شد. به زودی تماس می‌گیریم.
+                </motion.p>
+              )}
+            </div>
+          </form>
         </div>
       </div>
     </section>

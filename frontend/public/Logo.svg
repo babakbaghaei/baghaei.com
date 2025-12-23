@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128px" height="128px" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Logo@1x</title>
+    <defs>
+        <path d="M0,0 L128,0 L128,128 L0,128 L0,0 Z" id="path-1"></path>
+        <path d="M64,0 C99.346224,0 128,28.653776 128,64 C128,99.346224 99.346224,128 64,128 C29.3231409,128 1.08765505,100.421203 0.0306786826,66.0007454 L62,66 C62.3365712,66 62.669906,65.9861437 62.9995331,65.9588877 C63.3294185,65.9861156 63.6630878,66 64,66 C70.627417,66 76,60.627417 76,54 L76,29 C76,22.372583 70.627417,17 64,17 C57.372583,17 52,22.372583 52,29 L52,42 L3.88163065,41.999768 C12.8529974,17.4913103 36.3838415,0 64,0 Z M25,73 C18.372583,73 13,78.372583 13,85 C13,91.627417 18.372583,97 25,97 C31.627417,97 37,91.627417 37,85 C37,78.372583 31.627417,73 25,73 Z" id="path-2"></path>
+    </defs>
+    <g id="Logo" stroke="none" fill="none" xlink:href="#path-1">
+        <mask id="mask-3" fill="white">
+            <use xlink:href="#path-2"></use>
+        </mask>
+        <use id="Combined-Shape" fill="#D8D8D8" fill-rule="evenodd" xlink:href="#path-2"></use>
+    </g>
+</svg>
