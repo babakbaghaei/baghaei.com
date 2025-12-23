@@ -62,7 +62,7 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
 
               <div className="lg:col-span-4 space-y-12 order-2 md:order-2 border-r border-zinc-900 pr-12 lg:pr-24 text-right">
                 <div className="space-y-4"><div className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em]">Category</div><div className="text-xl font-bold weight-plus-1 font-display text-white uppercase">{project.category}</div></div>
-                <div className="space-y-4"><div className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em]">Key Metrics</div><div className="grid grid-cols-1 gap-8">{project.metrics.map((metric: any, i: number) => (<div key={i} className="space-y-2"><div className="text-[9px] text-zinc-400 font-bold uppercase">{metric.label}</div><div className="text-3xl font-bold text-white font-en">{metric.value}</div></div>))}</div></div>
+                <div className="space-y-4"><div className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em]">Key Metrics</div><div className="grid grid-cols-1 gap-8">{project.metrics.map((metric: any, i: number) => (<div key={i} className="space-y-2"><div className="text-[9px] text-zinc-400 font-bold uppercase">{metric.label}</div><div className="text-3xl font-bold text-white font-display">{metric.value}</div></div>))}</div></div>
                 <div className="pt-12"><Logo className="w-16 h-16" /></div>
               </div>
             </div>

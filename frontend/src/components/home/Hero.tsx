@@ -73,7 +73,7 @@ export default function Hero() {
               { label: 'پشتیبانی فنی', value: '24/7' }
             ].map((stat, i) => (
               <div key={i} className="space-y-2">
-                <div className="text-3xl font-bold font-en">
+                <div className="text-3xl font-bold font-display">
                   <Counter value={stat.value} />
                 </div>
                 <div className="text-[10px] text-zinc-400 font-bold uppercase">{stat.label}</div>

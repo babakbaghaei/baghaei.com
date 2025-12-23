@@ -32,9 +32,9 @@ export default function Footer() {
             <div className="space-y-10 text-left flex flex-col items-end w-full">
               <h4 className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.4em] self-end text-right">Contact</h4>
               <div className="flex flex-col gap-6 text-xl font-display text-white w-full items-end">
-                <a href="tel:+989115790013" className="flex items-center justify-end gap-3 hover:text-zinc-400 transition-all font-en font-medium text-lg md:text-xl whitespace-nowrap" dir="ltr">
-                  <span>+۹۸ ۹۱۱ ۵۷۹ ۰۰۱۳</span>
+                <a href="tel:+989115790013" className="flex items-center justify-end gap-3 hover:text-zinc-400 transition-all font-display font-medium text-lg md:text-xl whitespace-nowrap" dir="ltr">
                   <Phone className="w-5 h-5 text-zinc-500" />
+                  <span>+۹۸ ۹۱۱ ۵۷۹ ۰۰۱۳</span>
                 </a>
                 
                 <div className="flex flex-wrap gap-4 pt-6 justify-end w-full">
