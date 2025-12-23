@@ -15,8 +15,8 @@ const config: Config = {
         accent: '#0066FF',
       },
       fontFamily: {
-        'sans': ['IRANSans', 'Yekan', 'sans-serif'],
-        'display': ['Yekan', 'IRANSans', 'sans-serif'],
+        'sans': ['IRANSans', 'sans-serif'],
+        'display': ['YekanBakh', 'IRANSans', 'sans-serif'],
         'english': ['Poppins', 'sans-serif'],
       },
       fontSize: {

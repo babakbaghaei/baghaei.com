@@ -3,24 +3,40 @@
 @theme {
   --color-primary: #000000;
   --color-secondary: #666666;
-  --color-accent: #0066FF;
+  --color-accent: #0071e3; /* Apple Blue */
+  --color-surface: #f5f5f7;
+  
+  --font-sans: var(--font-iransans), "Poppins", sans-serif;
+  --font-display: var(--font-yekanbakh), "Poppins", sans-serif;
+  --font-english: "Poppins", sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-white text-black font-sans antialiased transition-colors duration-300;
+    @apply bg-white text-black antialiased font-sans;
+    font-family: var(--font-iransans), "Poppins", sans-serif !important;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display {
+    @apply text-black;
+    font-family: var(--font-yekanbakh), "Poppins", sans-serif !important;
+    letter-spacing: -0.02em;
+  }
+
+  /* Force Poppins for English numbers and text if needed */
+  .font-en {
+    font-family: "Poppins", sans-serif !important;
   }
 }
 
-.scroll-smooth {
-  scroll-behavior: smooth;
+.minimal-card {
+  @apply bg-surface rounded-[2.5rem] p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-zinc-200/50 hover:scale-[1.01];
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+.btn-primary {
+  @apply bg-black text-white px-8 py-3 rounded-full font-bold transition-all hover:bg-zinc-800 active:scale-95;
 }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.btn-secondary {
+  @apply bg-transparent text-black border border-zinc-200 px-8 py-3 rounded-full font-bold transition-all hover:bg-zinc-50 active:scale-95;
 }

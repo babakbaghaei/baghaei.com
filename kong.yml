@@ -1,0 +1,26 @@
+# kong.yml - Kong declarative configuration
+_format_version: "3.0"
+
+services:
+  - name: backend-api
+    url: http://backend:3001
+    routes:
+      - name: backend-api-route
+        paths:
+          - /api
+    plugins:
+      - name: rate-limiting
+        config:
+          second: 10
+          hour: 10000
+      - name: key-auth
+        config:
+          key_names:
+            - apikey
+          hide_credentials: true
+  - name: keycloak-auth
+    url: http://keycloak:8080
+    routes:
+      - name: keycloak-route
+        paths:
+          - /auth/keycloak

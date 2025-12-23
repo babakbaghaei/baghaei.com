@@ -1,57 +1,59 @@
 "use client";
-import React, { useState } from 'react';
-import { Menu, X, Moon, Sun } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, X } from 'lucide-react';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-  };
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-300 transition-all shadow-sm" role="navigation">
-      <div className="max-w-7xl mx-auto px-6 lg:px-16 h-16 flex justify-between items-center">
-        <a href="#" className="logo-container flex items-center gap-4 group">
-          <div className="w-7 h-7 bg-black flex items-center justify-end pr-1">
-            <span className="text-white text-lg font-black font-display leading-none">B</span>
+    <nav 
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        scrolled ? 'bg-white/80 backdrop-blur-xl border-b border-zinc-100 py-3' : 'bg-transparent py-5'
+      }`} 
+      role="navigation"
+    >
+      <div className="max-w-7xl mx-auto px-6 lg:px-16 flex justify-between items-center">
+        <a href="#" className="flex items-center gap-4 group">
+          <div className="w-10 h-10 bg-black flex items-center justify-center text-white font-black text-xl font-display rounded-xl">
+            ب
           </div>
-          <span className="text-sm font-black text-black transition-opacity duration-200 opacity-100 hidden sm:inline">گروه فناوری بقایی</span>
-          <span className="text-sm font-black text-black transition-opacity duration-200 sm:hidden">بقایی</span>
+          <span className="text-sm font-black text-black tracking-tight hidden sm:inline font-display">گروه فناوری بقایی</span>
         </a>
 
-        <div className="hidden md:flex items-center gap-8 text-xs font-medium">
-          <a href="#projects" className="nav-link hover:text-black transition-all duration-300 relative py-2">پروژه‌ها</a>
-          <div className="services-dropdown relative group">
-            <a href="#services" className="nav-link hover:text-black transition-all duration-300 relative py-2">خدمات</a>
-            {/* Dropdown implementation skipped for brevity, can be added if needed */}
-          </div>
-          <a href="#testimonials" className="nav-link hover:text-black transition-all duration-300 relative py-2">نظرات مشتریان</a>
-          <a href="#about" className="nav-link hover:text-black transition-all duration-300 relative py-2">درباره ما</a>
+        <div className="hidden md:flex items-center gap-10 text-[11px] font-bold uppercase tracking-tight">
+          <a href="#projects" className="text-zinc-400 hover:text-black transition-colors">پروژه‌ها</a>
+          <a href="#services" className="text-zinc-400 hover:text-black transition-colors">خدمات</a>
+          <a href="#contact" className="text-zinc-400 hover:text-black transition-colors">تماس با ما</a>
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
-          <button onClick={toggleTheme} className="p-2 hover:opacity-60 transition-all" aria-label="تغییر تم">
-            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        <div className="hidden md:flex items-center gap-6">
+          <button className="text-[11px] font-bold text-zinc-300 hover:text-black transition-all font-en uppercase tracking-widest">
+            English
           </button>
-          <button className="px-3 py-1.5 text-xs font-black border-2 border-gray-200 hover:border-black transition-all">En</button>
+          <a href="#contact" className="px-6 py-2 bg-black text-white text-[11px] font-bold rounded-full hover:bg-zinc-800 transition-all">
+            مشاوره رایگان
+          </a>
         </div>
 
-        <button onClick={toggleMobileMenu} className="md:hidden p-3 hover:opacity-60 transition-all" aria-label="منو">
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden p-2 text-black" aria-label="منو">
           {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-xl border-t-2 border-gray-200">
-          <div className="px-6 py-6 space-y-5">
-            <a href="#projects" onClick={toggleMobileMenu} className="block text-sm font-medium hover:text-black transition-all py-2">پروژه‌ها</a>
-            <a href="#services" onClick={toggleMobileMenu} className="block text-sm font-medium hover:text-black transition-all py-2">خدمات</a>
-            <a href="#about" onClick={toggleMobileMenu} className="block text-sm font-medium hover:text-black transition-all py-2">درباره ما</a>
+        <div className="md:hidden bg-white h-screen p-8 space-y-8">
+          <div className="flex flex-col gap-8 text-2xl font-black font-display">
+            <a href="#projects" onClick={() => setIsMobileMenuOpen(false)} className="text-black">پروژه‌ها</a>
+            <a href="#services" onClick={() => setIsMobileMenuOpen(false)} className="text-black">خدمات</a>
+            <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="text-black">تماس با ما</a>
           </div>
         </div>
       )}

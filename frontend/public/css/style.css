@@ -63,26 +63,26 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 900;
     letter-spacing: -0.04em;
     line-height: 1.1;
-    font-family: 'Yekan', 'IRANSans', sans-serif;
+    font-family: 'YekanBakh', 'IRANSans', sans-serif;
 }
 
 p, span, div, a, button, input, textarea, label, li {
-    font-family: 'IRANSans', 'Yekan', sans-serif;
+    font-family: 'IRANSans', 'YekanBakh', sans-serif;
 }
 
 /* Font Family Setup */
 body {
-    font-family: 'IRANSans', 'Yekan', sans-serif;
+    font-family: 'IRANSans', 'YekanBakh', sans-serif;
 }
 
 .font-display {
-    font-family: 'Yekan', 'IRANSans', sans-serif;
+    font-family: 'YekanBakh', 'IRANSans', sans-serif;
     letter-spacing: -0.04em;
     font-weight: 900;
 }
 
 .font-sans {
-    font-family: 'IRANSans', 'Yekan', sans-serif;
+    font-family: 'IRANSans', 'YekanBakh', sans-serif;
 }
 
 .font-english {

@@ -9,6 +9,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ContactModule } from './contact/contact.module';
 import { AuthModule } from './auth/auth.module';
+import { OpenTelemetryModule } from './observability/opentelemetry.module';
+import { SecurityModule } from './security/security.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { AuthModule } from './auth/auth.module';
     ProjectsModule,
     ContactModule,
     AuthModule,
+    OpenTelemetryModule,
+    SecurityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

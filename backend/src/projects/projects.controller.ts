@@ -23,7 +23,7 @@ export class ProjectsController {
   }
 
   @Get(':id')
-  async getProjectById(@Param('id') id: string): Promise<ProjectModel> {
+  async getProjectById(@Param('id') id: string): Promise<ProjectModel | null> {
     return this.projectsService.project({ id: Number(id) });
   }
 
