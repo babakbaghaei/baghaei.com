@@ -18,7 +18,11 @@
 }
 
 /* Global Reset */
-html, body {
+html {
+  direction: ltr; /* Force scrollbar to right */
+}
+
+body {
   background-color: var(--bg) !important;
   color: var(--fg) !important;
   margin: 0;
@@ -33,7 +37,32 @@ html, body {
     font-family: var(--font-iransans), sans-serif !important;
     position: relative;
     overflow-x: hidden;
+    direction: rtl; /* Restore RTL for content */
   }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #09090b; 
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #ffffff; 
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a1a1aa; 
+  }
+
+  ::selection {
+    background: #ffffff;
+    color: #000000;
+  }
+
 
   /* Permanent Grid Background */
   body::after {

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { User, ArrowLeft, MessageSquare } from 'lucide-react';
+import { User, ArrowLeft, MessageSquare, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const testimonials = [
@@ -14,8 +14,8 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
-  // Multiply items for infinite loop
-  const list = [...testimonials, ...testimonials, ...testimonials];
+  // Quadruple items for absolutely seamless infinite loop on large screens
+  const list = [...testimonials, ...testimonials, ...testimonials, ...testimonials];
 
   return (
     <section id="testimonials" className="py-32 md:py-60 overflow-hidden relative border-t border-zinc-900">
@@ -32,19 +32,25 @@ export default function Testimonials() {
       </div>
 
       <div className="relative flex overflow-hidden group/marquee">
-        <div className="flex whitespace-nowrap gap-6 animate-scroll group-hover/marquee:[animation-play-state:paused] py-10 px-6">
+        <div className="flex whitespace-nowrap gap-6 animate-scroll-infinite group-hover/marquee:[animation-play-state:paused] py-10 px-6 w-fit">
           {list.map((t, i) => (
             <div 
               key={`${t.id}-${i}`}
               className="testimonial-card shrink-0 w-[300px] md:w-[350px] flex flex-col p-8 rounded-[2rem] border border-zinc-800 shadow-sm transition-all duration-500 hover:border-zinc-600 hover:bg-zinc-900/50"
               style={{ backgroundColor: 'var(--card)', whiteSpace: 'normal' }}
             >
-              <p className="text-sm md:text-base font-medium font-sans leading-relaxed mb-8 text-zinc-300 text-right line-clamp-4">
+              <p className="text-sm md:text-base font-medium font-sans leading-relaxed mb-6 text-zinc-300 text-right line-clamp-4">
                 {t.content}
               </p>
 
-              <div className="mt-auto pt-6 border-t border-zinc-800/50 flex items-center justify-start gap-3 flex-row-reverse">
-                <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500">
+              <div className="flex gap-1 mb-8 justify-end">
+                {[...Array(5)].map((_, si) => (
+                  <Star key={si} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                ))}
+              </div>
+
+              <div className="mt-auto pt-6 border-t border-zinc-800/50 flex items-center justify-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 shrink-0">
                   <User className="w-5 h-5" />
                 </div>
                 <div className="text-right">
@@ -58,12 +64,12 @@ export default function Testimonials() {
       </div>
 
       <style jsx global>{`
-        @keyframes scroll {
+        @keyframes scroll-infinite {
           0% { transform: translateX(0); }
-          100% { transform: translateX(calc(-33.33% - 1rem)); }
+          100% { transform: translateX(-25%); } /* Move only 1/4th since we have 4 sets */
         }
-        .animate-scroll {
-          animation: scroll 40s linear infinite;
+        .animate-scroll-infinite {
+          animation: scroll-infinite 40s linear infinite;
         }
       `}</style>
     </section>

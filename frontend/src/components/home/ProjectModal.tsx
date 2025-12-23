@@ -19,16 +19,19 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
       {isOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 md:p-12 lg:p-24">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/95 backdrop-blur-3xl cursor-pointer" />
-          <motion.div initial={{ opacity: 0, y: 100, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 100, scale: 0.95 }} transition={{ type: 'spring', stiffness: 300, damping: 35 }} className="bg-zinc-950 w-full max-w-6xl h-full max-h-[90vh] rounded-[4rem] border-2 shadow-2xl relative overflow-hidden overflow-y-auto" style={{ borderColor: project.borderColor }}>
+          <motion.div initial={{ opacity: 0, y: 100, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 100, scale: 0.95 }} transition={{ type: 'spring', stiffness: 300, damping: 35 }} className="bg-zinc-950 w-full max-w-6xl h-[85vh] rounded-[3rem] border-2 shadow-2xl relative overflow-hidden flex flex-col" style={{ borderColor: project.borderColor }}>
             <div className="absolute top-0 right-0 w-[600px] h-[600px] opacity-20 blur-[120px] pointer-events-none" style={{ background: project.color }} />
-            <div className="sticky top-0 p-8 flex justify-start z-50 bg-transparent">
-              <button onClick={onClose} className="flex items-center gap-4 py-3 px-8 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all" style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', backdropFilter: 'blur(10px)' }}>
-                <ArrowLeft className="w-4 h-4 text-white rotate-180" />
-                <span className="font-display text-white">بازگشت به پروژه‌ها</span>
-              </button>
-            </div>
+            
+            {/* Scrollable Content Container */}
+            <div className="overflow-y-auto h-full p-8 md:p-12 lg:p-20 pt-10 custom-scrollbar">
+              <div className="flex justify-start mb-12 sticky top-0 z-50">
+                <button onClick={onClose} className="flex items-center gap-4 py-3 px-8 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all" style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', backdropFilter: 'blur(10px)' }}>
+                  <ArrowLeft className="w-4 h-4 text-white rotate-180" />
+                  <span className="font-display text-white">بازگشت به پروژه‌ها</span>
+                </button>
+              </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 p-12 md:p-20 pt-10 h-full relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 relative z-10 pb-20">
               <div className="lg:col-span-8 space-y-16 order-1 md:order-1 text-right">
                 <div className="space-y-8">
                   <h2 className="text-6xl md:text-8xl font-bold weight-plus-1 font-display text-white leading-none tracking-tighter">{project.title}</h2>
@@ -61,6 +64,7 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                 <div className="space-y-4"><div className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em]">Key Metrics</div><div className="grid grid-cols-1 gap-8">{project.metrics.map((metric: any, i: number) => (<div key={i} className="space-y-2"><div className="text-[9px] text-zinc-400 font-bold uppercase">{metric.label}</div><div className="text-3xl font-bold text-white font-en">{metric.value}</div></div>))}</div></div>
                 <div className="pt-12"><Logo className="w-16 h-16" /></div>
               </div>
+            </div>
             </div>
           </motion.div>
         </div>

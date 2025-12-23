@@ -68,7 +68,7 @@ export default function Philosophy() {
       onMouseUp={() => setIsSelecting(false)}
       onMouseLeave={() => { setIsInside(false); setIsSelecting(false); }}
       id="philosophy" 
-      className="py-60 overflow-hidden relative border-y border-zinc-900 bg-black font-mono cursor-crosshair select-none"
+      className="relative w-full aspect-[1.618] min-h-[80vh] flex items-center justify-center overflow-hidden border-y border-zinc-900 bg-black font-mono cursor-crosshair select-none"
     >
       {/* Background Icon */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0">

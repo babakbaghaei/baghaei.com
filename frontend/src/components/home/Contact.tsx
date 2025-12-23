@@ -73,7 +73,7 @@ export default function Contact() {
                 disabled={isPending}
                 className="group relative px-16 py-8 bg-white text-black rounded-full font-bold text-xl overflow-hidden active:scale-95 disabled:opacity-50 transition-transform"
               >
-                <span className="relative z-10">{isPending ? 'در حال ارسال...' : 'ارسال بیانیه'}</span>
+                <span className="relative z-10">{isPending ? 'در حال ارسال...' : 'ارسال'}</span>
                 <div className="absolute inset-0 bg-zinc-200 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               </button>
 

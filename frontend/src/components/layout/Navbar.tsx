@@ -57,7 +57,7 @@ export default function Navbar() {
       style={{ backgroundColor: scrolled ? 'rgba(0,0,0,0.8)' : 'transparent' }}
       role="navigation"
     >
-      <motion.div className="absolute top-0 left-0 right-0 h-[2px] bg-white origin-right" style={{ scaleX }} />
+      <motion.div className="absolute top-0 left-0 right-0 h-[2px] bg-white origin-center" style={{ scaleX }} />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center relative">
         <a href="#" onClick={(e) => { e.preventDefault(); scrollTo('hero'); }} className="flex items-center gap-4 group cursor-pointer">

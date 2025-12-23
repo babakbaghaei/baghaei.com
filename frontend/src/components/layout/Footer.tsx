@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, Instagram, Send, Linkedin } from 'lucide-react';
+import { Mail, Phone, Instagram, Send, Linkedin, Github } from 'lucide-react';
 import Logo from './Logo';
 
 export default function Footer() {
@@ -33,8 +33,8 @@ export default function Footer() {
               <h4 className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.4em] self-end text-right">Contact</h4>
               <div className="flex flex-col gap-6 text-xl font-display text-white w-full items-end">
                 <a href="tel:+989115790013" className="flex items-center justify-end gap-3 hover:text-zinc-400 transition-all font-en font-medium text-lg md:text-xl whitespace-nowrap" dir="ltr">
+                  <span>+۹۸ ۹۱۱ ۵۷۹ ۰۰۱۳</span>
                   <Phone className="w-5 h-5 text-zinc-500" />
-                  <span>+98 911 579 0013</span>
                 </a>
                 
                 <div className="flex flex-wrap gap-4 pt-6 justify-end w-full">
@@ -43,6 +43,9 @@ export default function Footer() {
                   </a>
                   <a href="https://linkedin.com/in/babakbaghaei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
                     <Linkedin className="w-5 h-5" />
+                  </a>
+                  <a href="https://github.com/babakbaghaei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                    <Github className="w-5 h-5" />
                   </a>
                   <a href="https://t.me/babak_bagha_ei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
                     <Send className="w-5 h-5" />

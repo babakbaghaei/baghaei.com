@@ -23,12 +23,13 @@ export function Counter({ value }: CounterProps) {
         duration: 2,
         ease: [0.16, 1, 0.3, 1],
         onUpdate: (latest) => {
-          // If it's a percentage or has decimals, handle accordingly
+          let formatted;
           if (value.includes('%')) {
-            setDisplayValue(latest.toFixed(1));
+            formatted = latest.toFixed(1);
           } else {
-            setDisplayValue(Math.floor(latest).toString());
+            formatted = Math.floor(latest).toString();
           }
+          setDisplayValue(formatted.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]));
         },
       });
       return () => controls.stop();
@@ -36,8 +37,8 @@ export function Counter({ value }: CounterProps) {
   }, [isInView, numericPart, value]);
 
   return (
-    <span ref={ref} className="font-en">
-      {displayValue}{suffix}
+    <span ref={ref} className="font-display">
+      {displayValue}{suffix.replace(/\+/g, '+').replace(/%/g, '٪')}
     </span>
   );
 }
