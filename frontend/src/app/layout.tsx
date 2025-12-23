@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
+import Script from "next/script";
 import CustomCursor from "@/components/effects/CustomCursor";
 import Preloader from "@/components/effects/Preloader";
 import SmoothScroll from "@/components/effects/SmoothScroll";
@@ -87,6 +88,21 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" className={`dark ${iransans.variable} ${yekanbakh.variable}`}>
       <body className="antialiased">
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-YSHJT31R0K"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-YSHJT31R0K');
+          `}
+        </Script>
+        
         <div className="noise-bg" />
         <Preloader />
         <SmoothScroll>
