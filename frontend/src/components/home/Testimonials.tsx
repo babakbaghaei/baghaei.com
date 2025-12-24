@@ -36,13 +36,12 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
-            className="flex flex-col items-start"
+            className="flex flex-col h-full"
           >
-            {/* Message Bubble - Unified Right-to-Left Style */}
+            {/* Message Bubble - Standardized */}
             <div 
-              className="relative w-full p-8 rounded-[2.5rem] rounded-br-lg bg-zinc-900/50 border border-white/5 shadow-2xl transition-all duration-500 hover:bg-zinc-900 hover:scale-[1.02] group"
+              className="relative flex-1 p-8 rounded-[2.5rem] rounded-br-lg bg-zinc-900/50 border border-white/5 shadow-2xl transition-all duration-500 hover:bg-zinc-900 group"
             >
-              {/* Subtle background quote for texture */}
               <Quote className="absolute top-4 right-4 w-12 h-12 text-white opacity-[0.02] pointer-events-none" />
               
               <p className="text-sm md:text-base font-medium font-sans leading-relaxed text-zinc-300 text-right relative z-10">
@@ -50,19 +49,19 @@ export default function Testimonials() {
               </p>
             </div>
 
-            {/* Sender Info - Unified Alignment */}
-            <div className="mt-6 flex items-center gap-4 px-4 w-full justify-start flex-row-reverse">
-              <div 
-                className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white shrink-0 shadow-lg"
-                style={{ backgroundColor: t.color }}
-              >
-                <User className="w-5 h-5" />
-              </div>
+            {/* Sender Info - Avatar to the right of info */}
+            <div className="mt-6 flex items-center justify-end gap-4 px-4 w-full">
               <div className="text-right">
                 <div className="font-bold font-display text-sm text-white">{t.author}</div>
                 <div className="text-[10px] font-bold uppercase text-zinc-500 mt-1 font-display tracking-wider">
                   {t.company}
                 </div>
+              </div>
+              <div 
+                className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white shrink-0 shadow-lg"
+                style={{ backgroundColor: t.color }}
+              >
+                <User className="w-5 h-5" />
               </div>
             </div>
           </motion.div>
