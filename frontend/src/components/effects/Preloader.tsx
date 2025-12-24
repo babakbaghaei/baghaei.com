@@ -32,7 +32,7 @@ export default function Preloader() {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center text-black p-6"
             >
-              <Logo className="w-full h-full" />
+              <Logo className="w-full h-full text-black" />
             </motion.div>
             
             <div className="overflow-hidden h-4 w-48 bg-zinc-900 rounded-full">

@@ -17,21 +17,21 @@ export default function CookieConsent() {
   useEffect(() => {
     // Robust client-side check
     if (typeof window !== 'undefined') {
-      const consent = localStorage.getItem('cookie-consent');
+      const consent = localStorage.getItem('cookie-consent-v10');
       if (!consent) {
-        const timer = setTimeout(() => setIsVisible(true), 3000); // 3 second delay
+        const timer = setTimeout(() => setIsVisible(true), 1000); // 1 second delay
         return () => clearTimeout(timer);
       }
     }
   }, []);
 
   const handleAcceptAll = () => {
-    localStorage.setItem('cookie-consent', JSON.stringify({ all: true, ...preferences }));
+    localStorage.setItem('cookie-consent-v10', JSON.stringify({ all: true, ...preferences }));
     setIsVisible(false);
   };
 
   const handleSavePreferences = () => {
-    localStorage.setItem('cookie-consent', JSON.stringify(preferences));
+    localStorage.setItem('cookie-consent-v10', JSON.stringify(preferences));
     setIsVisible(false);
   };
 
