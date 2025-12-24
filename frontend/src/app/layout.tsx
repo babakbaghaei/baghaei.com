@@ -105,7 +105,6 @@ export default function RootLayout({
         </Script>
         
         <div className="noise-bg" />
-        <Preloader />
         <SmoothScroll>
           {children}
           <CookieConsent />

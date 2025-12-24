@@ -83,33 +83,27 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
         }}
         className={`project-card group relative flex flex-col h-[550px] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-[background-color] duration-500 overflow-visible z-10 ${project.isLocked ? 'cursor-default' : 'cursor-pointer'}`}
       >
-        {/* Base Border Layer */}
-        <div className="absolute inset-0 border border-white/10 rounded-[3rem] pointer-events-none z-20" />
-
-        {/* Glow Effect */}
-        <div className="absolute inset-0 z-0 overflow-hidden rounded-[3rem] pointer-events-none">
+        {/* Borders Layer - Perfectly Aligned */}
+        <div className="absolute inset-0 pointer-events-none z-30 rounded-[3rem]">
+          {/* Base Static Border */}
+          <div className="absolute inset-0 border border-white/10 rounded-[3rem]" />
+          
+          {/* Reactive Hover Border */}
           <motion.div 
-            animate={{ opacity: isHovered ? 0.6 : 0 }}
+            className="absolute inset-0 rounded-[3rem] p-[1px]"
+            animate={{ opacity: isNear ? (isHovered ? 1 : 0.4) : 0 }}
             style={{
-              left: mouseXPos,
-              top: mouseYPos,
-              background: `radial-gradient(circle at center, ${project.color} 0%, transparent 80%)`,
-              filter: project.isLocked ? 'grayscale(1) brightness(1.5)' : 'none'
+              background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(250px circle at ${cx}px ${cy}px, ${project.isLocked ? 'rgba(255,255,255,0.6)' : project.borderColor}, transparent 80%)`),
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', 
+              WebkitMaskComposite: 'xor', 
+              maskComposite: 'exclude',
+              filter: project.isLocked ? 'grayscale(1)' : 'none'
             }}
-            className="absolute w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 blur-[60px]" 
           />
         </div>
 
-        {/* Reactive Border */}
-        <motion.div 
-          className="absolute inset-0 z-30 pointer-events-none rounded-[3rem] p-[2px]"
-          animate={{ opacity: isNear ? (isHovered ? 1 : 0.4) : 0 }}
-          style={{
-            background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(250px circle at ${cx}px ${cy}px, ${project.isLocked ? 'rgba(255,255,255,0.6)' : project.borderColor}, transparent 80%)`),
-            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude',
-            filter: project.isLocked ? 'grayscale(1)' : 'none'
-          }}
-        />
+        {/* Glow Effect */}
+        <div className="absolute inset-0 z-0 overflow-hidden rounded-[3rem] pointer-events-none">
 
         {/* Locked Overlay */}
         {project.isLocked && (

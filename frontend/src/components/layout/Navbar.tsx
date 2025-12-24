@@ -66,9 +66,9 @@ export default function Navbar() {
 
       <div className="max-w-7xl mx-auto px-6 lg:px-16 flex justify-between items-center relative">
         <Link 
-          href="/" 
+          href="https://baghaei.com" 
           onClick={(e) => {
-            if (pathname === '/') {
+            if (pathname === '/' && typeof window !== 'undefined' && window.location.hostname === 'baghaei.com') {
               e.preventDefault();
               window.scrollTo({
                 top: 0,
