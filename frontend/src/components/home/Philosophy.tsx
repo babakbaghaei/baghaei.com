@@ -105,9 +105,9 @@ export default function Philosophy() {
             <p className="text-xl md:text-3xl font-sans text-zinc-400 leading-relaxed max-w-2xl">
               ما معتقدیم نرم‌افزار ابزار نیست؛ زیرساخت آینده است. هر خط کد، یک تصمیم راهبردی برای پایداری برند شماست.
             </p>
-            <div className="grid grid-cols-2 gap-8 pt-8 border-t border-zinc-900">
-              <div className="space-y-1"><div className="text-lg font-bold text-white uppercase">Accuracy</div><p className="text-[10px] text-zinc-500 text-right">محاسبات دقیق.</p></div>
-              <div className="space-y-1 text-left"><div className="text-lg font-bold text-white uppercase text-right">Stability</div><p className="text-[10px] text-zinc-500 text-right">پایداری تضمین شده.</p></div>
+            <div className="grid grid-cols-2 gap-8 pt-8">
+              <div className="space-y-1"><div className="text-lg font-bold text-white uppercase font-display">دقت مهندسی</div><p className="text-[10px] text-zinc-500 text-right">محاسبات بی نقص.</p></div>
+              <div className="space-y-1 text-left"><div className="text-lg font-bold text-white uppercase text-right font-display">پایداری سیستم</div><p className="text-[10px] text-zinc-500 text-right">تداوم عملیاتی.</p></div>
             </div>
           </div>
 
