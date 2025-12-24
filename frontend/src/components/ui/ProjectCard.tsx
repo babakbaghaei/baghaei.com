@@ -26,14 +26,16 @@ export interface Project {
 interface ProjectCardProps {
   project: Project;
   onClick: () => void;
+  globalMouseX?: any;
+  globalMouseY?: any;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, globalMouseX, globalMouseY }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const mouseXPos = useMotionValue(0);
-  const mouseYPos = useMotionValue(0);
+  const localMouseX = useMotionValue(0);
+  const localMouseY = useMotionValue(0);
   
   const [isNear, setIsNear] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -42,26 +44,49 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
   const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-12, 12]), { stiffness: 150, damping: 25 });
   const scale = useSpring(isHovered ? 1.02 : 1, { stiffness: 150, damping: 25 });
 
-  const handleGlobalMouseMove = (e: React.MouseEvent) => {
+  // Sync global mouse to local coordinates for each card
+  React.useEffect(() => {
+    if (!globalMouseX || !globalMouseY || !containerRef.current) return;
+    
+    return globalMouseX.on("change", (latestX: number) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const parentRect = containerRef.current.parentElement?.getBoundingClientRect();
+      if (!parentRect) return;
+      
+      const xInCard = latestX - (rect.left - parentRect.left);
+      localMouseX.set(xInCard);
+    });
+  }, [globalMouseX, containerRef]);
+
+  React.useEffect(() => {
+    if (!globalMouseX || !globalMouseY || !containerRef.current) return;
+    
+    return globalMouseY.on("change", (latestY: number) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const parentRect = containerRef.current.parentElement?.getBoundingClientRect();
+      if (!parentRect) return;
+
+      const yInCard = latestY - (rect.top - parentRect.top);
+      localMouseY.set(yInCard);
+    });
+  }, [globalMouseY, containerRef]);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const cardX = e.clientX - rect.left;
-    const cardY = e.clientY - rect.top;
-    
-    mouseXPos.set(cardX);
-    mouseYPos.set(cardY);
-
     if (isHovered) {
-      x.set(cardX / rect.width - 0.5);
-      y.set(cardY / rect.height - 0.5);
+      x.set((e.clientX - rect.left) / rect.width - 0.5);
+      y.set((e.clientY - rect.top) / rect.height - 0.5);
     }
   };
 
   return (
     <div 
       ref={containerRef}
-      onMouseMove={handleGlobalMouseMove}
-      onMouseEnter={() => setIsNear(true)}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => { setIsNear(true); setIsHovered(true); }}
       onMouseLeave={() => {
         setIsNear(false);
         setIsHovered(false);
@@ -73,8 +98,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
     >
       <motion.div
         onClick={project.isLocked ? undefined : onClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         style={{ 
           rotateX, 
           rotateY, 
@@ -88,12 +111,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
           {/* 1. Base Static Border (Inner border) */}
           <div className="absolute inset-0 border border-white/10 rounded-[3rem]" />
           
-          {/* 2. Reactive Glow Border (Perfectly Overlapping) */}
+          {/* 2. Reactive Glow Border (Global Sync) */}
           <motion.div 
             className="absolute inset-0 rounded-[3rem] p-[1px]"
-            animate={{ opacity: isNear ? (isHovered ? 1 : 0.4) : 0 }}
+            animate={{ opacity: isNear ? 1 : 0.4 }}
             style={{
-              background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(250px circle at ${cx}px ${cy}px, ${project.isLocked ? 'rgba(255,255,255,0.6)' : project.borderColor}, transparent 80%)`),
+              background: useTransform([localMouseX, localMouseY], ([cx, cy]: any) => `radial-gradient(250px circle at ${cx}px ${cy}px, ${project.isLocked ? 'rgba(255,255,255,0.6)' : project.borderColor}, transparent 80%)`),
               WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', 
               WebkitMaskComposite: 'xor', 
               maskComposite: 'exclude',
@@ -102,13 +125,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
           />
         </div>
 
-        {/* Glow Effect */}
+        {/* Glow Effect (Local) */}
         <div className="absolute inset-0 z-0 overflow-hidden rounded-[3rem] pointer-events-none">
           <motion.div 
             animate={{ opacity: isHovered ? 0.6 : 0 }}
             style={{
-              left: mouseXPos,
-              top: mouseYPos,
+              left: useTransform(localMouseX, (val) => val),
+              top: useTransform(localMouseY, (val) => val),
               background: `radial-gradient(circle at center, ${project.color} 0%, transparent 80%)`,
               filter: project.isLocked ? 'grayscale(1) brightness(1.5)' : 'none'
             }}

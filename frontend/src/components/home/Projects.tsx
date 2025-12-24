@@ -15,6 +15,17 @@ export default function Projects() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(true);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  
+  // Global Mouse Tracking for Cross-Card Lighting
+  const mouseX = useMotionValue(-1000);
+  const mouseY = useMotionValue(-1000);
+
+  const handleGlobalMouseMove = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return;
+    const rect = scrollContainerRef.current.getBoundingClientRect();
+    mouseX.set(e.clientX - rect.left);
+    mouseY.set(e.clientY - rect.top);
+  };
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -47,29 +58,21 @@ export default function Projects() {
 
       <Heading subtitle="منتخب">پروژه‌های</Heading>
 
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden" onMouseMove={handleGlobalMouseMove}>
         <div 
           ref={scrollContainerRef}
           onScroll={handleScroll}
           className="flex overflow-x-auto pb-20 pl-8 md:pl-48 no-scrollbar relative z-10"
         >
           {PROJECTS_DATA.map((p) => (
-            <ProjectCard key={p.id} project={p} onClick={() => setSelectedProject(p)} />
+            <ProjectCard 
+              key={p.id} 
+              project={p} 
+              onClick={() => setSelectedProject(p)}
+              globalMouseX={mouseX}
+              globalMouseY={mouseY}
+            />
           ))}
-
-          {/* See All Card */}
-          <div className="shrink-0 w-[300px] md:w-[400px] p-6 relative">
-            <Link 
-              href="/projects"
-              className="project-card flex flex-col items-center justify-center h-[550px] p-12 border border-dashed border-white/20 rounded-[3rem] hover:border-white transition-all group"
-            >
-              <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                <ExternalLink className="w-8 h-8 text-white" />
-              </div>
-              <span className="text-2xl font-bold font-display text-white text-center">مشاهده همه پروژه‌ها</span>
-              <p className="text-zinc-500 text-sm mt-4 text-center">آرشیو کامل فعالیت‌های گروه فناوری بقایی</p>
-            </Link>
-          </div>
         </div>
         
         {/* Left Scroll Button */}
