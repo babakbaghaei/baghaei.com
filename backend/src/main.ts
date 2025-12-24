@@ -1,45 +1,28 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as dotenv from 'dotenv';
-import helmet from 'helmet';
-import * as compression from 'compression';
-import { OpenTelemetryService } from './observability/opentelemetry.service';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { AppModule } from './app.module';
 import { SecurityService } from './security/security.service';
-
-// Load environment variables
-dotenv.config();
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
+  // Use pino-logger
+  app.useLogger(app.get(Logger));
 
-  // Initialize OpenTelemetry
-  const openTelemetryService = app.get(OpenTelemetryService);
-  await openTelemetryService.onModuleInit();
+  // Global validation pipe
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+    forbidNonWhitelisted: true,
+  }));
 
   // Apply security middleware
   const securityService = app.get(SecurityService);
   securityService.applySecurityMiddleware(app);
 
-  app.useGlobalPipes(new ValidationPipe());
-  app.use(compression());
-
-  const port = process.env.PORT || 3001;
-  await app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
-
-  // Graceful shutdown
-  process.on('SIGTERM', async () => {
-    console.log('Shutting down gracefully...');
-    await openTelemetryService.onModuleDestroy();
-    await app.close();
-  });
-
-  process.on('SIGINT', async () => {
-    console.log('Shutting down gracefully...');
-    await openTelemetryService.onModuleDestroy();
-    await app.close();
-  });
-}
-bootstrap();
+  const port = process.env.PORT || 8000;
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
+}ootstrap();

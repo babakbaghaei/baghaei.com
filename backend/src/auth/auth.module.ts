@@ -4,7 +4,6 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { KeycloakService } from './keycloak.service';
 
 @Module({
   imports: [
@@ -12,7 +11,7 @@ import { KeycloakService } from './keycloak.service';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: configService.get<string>('JWT_SECRET', 'secret'),
         signOptions: { expiresIn: '60m' },
       }),
       inject: [ConfigService],
@@ -20,7 +19,7 @@ import { KeycloakService } from './keycloak.service';
     ConfigModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, KeycloakService],
-  exports: [AuthService, KeycloakService],
+  providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}

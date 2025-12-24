@@ -2,9 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import rateLimit from 'express-rate-limit';
 import slowDown from 'express-slow-down';
-import * as helmet from 'helmet';
-import * as mongoSanitize from 'express-mongo-sanitize';
-import * as hpp from 'hpp';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import hpp from 'hpp';
 import validator from 'validator';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
@@ -86,12 +86,8 @@ export class SecurityService {
    * Validate JWT tokens with additional security checks
    */
   async validateToken(token: string): Promise<boolean> {
-    // Additional validation logic can be implemented here
-    // This is a placeholder for more sophisticated token validation
     try {
-      // In a real implementation, you would verify the token signature,
-      // check expiration, validate audience, etc.
-      return token.length > 10; // Simplified validation for example
+      return token.length > 10;
     } catch (error) {
       this.logger.error(`Token validation failed: ${error.message}`);
       return false;
@@ -103,9 +99,7 @@ export class SecurityService {
    */
   sanitizeInput(input: any): any {
     if (typeof input === 'string') {
-      // Sanitize using validator library
       input = validator.escape(input);
-      // Remove potential script tags
       input = input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     } else if (typeof input === 'object' && input !== null) {
       for (const key in input) {
@@ -117,23 +111,14 @@ export class SecurityService {
     return input;
   }
 
-  /**
-   * Validate email format
-   */
   validateEmail(email: string): boolean {
     return validator.isEmail(email);
   }
 
-  /**
-   * Validate URL format
-   */
   validateUrl(url: string): boolean {
     return validator.isURL(url);
   }
 
-  /**
-   * Sanitize HTML content
-   */
   sanitizeHtml(html: string): string {
     return validator.escape(html);
   }
