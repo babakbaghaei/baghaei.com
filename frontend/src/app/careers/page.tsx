@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer';
 import { Section, Heading } from '@/components/ui/Layout';
 import { JobCard } from '@/components/ui/JobCard';
 import { CareerModal } from '@/components/ui/CareerModal';
+import { motion } from 'framer-motion';
 
 const detailedJobs = [
   { 
@@ -55,25 +56,52 @@ export default function CareersPage() {
     <main className="min-h-screen bg-black">
       <Navbar />
       
-      <Section className="pt-48 pb-20">
-        <Heading subtitle="رشد">فرصت‌های</Heading>
-        
-        <p className="text-zinc-400 max-w-2xl font-sans text-lg md:text-xl leading-relaxed mb-24 text-right ml-auto">
-          در گروه فناوری بقایی، ما به دنبال بهترین‌ها هستیم تا با هم آینده‌ای هوشمندتر بسازیم. محیط ما بر پایه تخصص، خلاقیت و رشد مستمر بنا شده است.
-        </p>
+      <Section className="pt-48 pb-40">
+        <div className="max-w-4xl">
+          <Heading subtitle="رشد">فرصت‌های</Heading>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-zinc-400 max-w-2xl font-sans text-xl md:text-2xl leading-relaxed mb-24 text-right"
+          >
+            ما به دنبال مهندسانی هستیم که کدنویسی را فراتر از یک ابزار، و آن را به عنوان یک هنر و دانش معماری می‌بینند. در گروه بقایی، چالش‌های بزرگ منتظر راه‌حل‌های هوشمندانه شماست.
+          </motion.p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {detailedJobs.map((job) => (
-            <JobCard 
-              key={job.id} 
-              job={job} 
-              onClick={() => setSelectedJob(job)} 
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+          {detailedJobs.map((job, index) => (
+            <motion.div
+              key={job.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + (index * 0.1) }}
+            >
+              <JobCard 
+                job={job} 
+                onClick={() => setSelectedJob(job)} 
+              />
+            </motion.div>
           ))}
         </div>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-32 p-12 rounded-[3rem] border border-white/5 bg-white/[0.02] text-center"
+        >
+          <h3 className="text-2xl font-bold text-white mb-4 font-display">موقعیتی که دنبالش هستید را نمی‌بینید؟</h3>
+          <p className="text-zinc-500 max-w-xl mx-auto mb-8 font-sans">
+            اگر فکر می‌کنید تخصص شما می‌تواند به گروه ما کمک کند، رزومه خود را برای ما بفرستید. ما همیشه برای استعدادهای واقعی جا داریم.
+          </p>
+          <a href="mailto:hr@baghaei.com" className="text-white border-b border-white/20 pb-1 hover:border-white transition-colors font-display">
+            hr@baghaei.com
+          </a>
+        </motion.div>
       </Section>
 
-      {/* Reusing CareerModal but could be enhanced for requirements/benefits */}
       <CareerModal 
         job={selectedJob} 
         onClose={() => setSelectedJob(null)} 

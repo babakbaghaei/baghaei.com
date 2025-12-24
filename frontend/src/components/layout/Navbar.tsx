@@ -6,6 +6,8 @@ import Logo from './Logo';
 import { useScroll, useSpring as useFramerSpring } from 'framer-motion';
 import { NavItem } from '../ui/NavItem';
 import { MobileMenu } from '../ui/MobileMenu';
+import { useSound } from '@/lib/utils/sounds';
+import Magnetic from '../effects/Magnetic';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -15,6 +17,7 @@ const navLinks = [
   { id: 'philosophy', label: 'فلسفه ما' },
   { id: 'projects', label: 'پروژه‌ها' },
   { id: 'services', label: 'خدمات' },
+  { id: 'testimonials', label: 'اعتماد مشتریان' },
   { id: 'contact', label: 'ارتباط' },
 ];
 
@@ -22,6 +25,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
+  const { play } = useSound();
   const pathname = usePathname();
   const router = useRouter();
   const { scrollYProgress } = useScroll();
@@ -95,9 +99,15 @@ export default function Navbar() {
           </div>
           
           <div className="h-6 w-px bg-zinc-800" />
-          <button onClick={() => scrollTo('contact')} className="px-8 py-2.5 bg-white !text-black text-[10px] !font-black font-display uppercase rounded-full hover:scale-105 active:scale-95 transition-all">
-            شروع همکاری
-          </button>
+          <Magnetic intensity={0.2}>
+            <button 
+              onClick={() => { play('pop'); scrollTo('contact'); }} 
+              onMouseEnter={() => play('hover')}
+              className="px-8 py-2.5 bg-white !text-black text-[10px] !font-black font-display uppercase rounded-full hover:scale-105 active:scale-95 transition-all"
+            >
+              شروع همکاری
+            </button>
+          </Magnetic>
         </div>
 
         <div className="md:hidden flex items-center gap-4">
