@@ -41,22 +41,22 @@ export default function Services() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ delay: index * 0.05 }}
-              className="relative overflow-hidden p-12 border border-zinc-50 dark:border-zinc-900 rounded-[3rem] bg-zinc-50/30 dark:bg-zinc-900/20 hover:bg-zinc-900 transition-all duration-500 group"
+              className="relative overflow-hidden p-12 border border-zinc-800/50 rounded-[3rem] bg-zinc-900/10 hover:bg-zinc-900/40 transition-all duration-500 group"
             >
               {/* Card Background Icon */}
-              <div className="absolute -bottom-10 -left-10 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500 transform rotate-12 pointer-events-none">
-                <step.Icon className="w-56 h-56 text-black dark:text-white" strokeWidth={1} />
+              <div className="absolute -bottom-10 -left-10 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-500 transform rotate-12 pointer-events-none">
+                <step.Icon className="w-56 h-56 text-white" strokeWidth={1} />
               </div>
 
               <div className="relative z-10">
-                <div className="text-sm font-bold font-en text-zinc-300 dark:text-zinc-700 mb-8 group-hover:text-black dark:group-hover:text-white transition-colors">
+                <div className="text-sm font-bold font-en text-zinc-700 mb-8 group-hover:text-zinc-400 transition-colors">
                   {step.id}
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-2xl font-bold font-display text-black dark:text-white">
+                  <h3 className="text-2xl font-bold font-display text-white">
                     {step.title}
                   </h3>
-                  <p className="text-zinc-400 text-base leading-relaxed">
+                  <p className="text-zinc-500 text-base leading-relaxed group-hover:text-zinc-400 transition-colors">
                     {step.desc}
                   </p>
                 </div>
