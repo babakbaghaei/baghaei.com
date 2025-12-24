@@ -151,13 +151,32 @@ function ProjectCard({ project, onClick }: { project: any, onClick: () => void }
 }
 
 export default function Projects() {
-  const [selectedProject, setSelectedProject] = useState<any | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+  const [canScrollLeft, setCanScrollLeft] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
-      setShowScrollIndicator(Math.abs(scrollContainerRef.current.scrollLeft) < 50);
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      const absScroll = Math.abs(scrollLeft);
+      const maxScroll = scrollWidth - clientWidth;
+      
+      setCanScrollLeft(absScroll < maxScroll - 10);
+      setCanScrollRight(absScroll > 10);
+    }
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 400;
+      // In RTL, moving 'left' means decreasing scrollLeft (more negative)
+      // Moving 'right' means increasing scrollLeft (towards 0)
+      const multiplier = direction === 'left' ? -1 : 1;
+      scrollContainerRef.current.scrollBy({
+        left: multiplier * scrollAmount,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -186,18 +205,38 @@ export default function Projects() {
           ))}
         </div>
         
-        {/* Scroll Indicator */}
+        {/* Left Scroll Button (Forward in RTL) */}
         <div 
-          className={`absolute left-0 top-0 bottom-20 w-32 md:w-64 bg-gradient-to-r from-black via-black/60 to-transparent z-20 pointer-events-none flex items-center justify-start pl-6 transition-opacity duration-700 ${showScrollIndicator ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute left-0 top-0 bottom-20 w-32 md:w-64 bg-gradient-to-r from-black via-black/60 to-transparent z-20 pointer-events-none flex items-center justify-start pl-6 transition-opacity duration-700 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`}
         >
-          <motion.div 
-            animate={{ x: [0, -10, 0], opacity: [0.5, 1, 0.5] }}
+          <motion.button 
+            onClick={() => scroll('left')}
+            className="pointer-events-auto"
+            animate={{ x: [0, -10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md bg-white/5">
+            <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md bg-white/5 hover:bg-white/10 transition-colors">
               <ArrowLeft className="w-5 h-5 text-white" />
             </div>
-          </motion.div>
+          </motion.button>
+        </div>
+
+        {/* Right Scroll Button (Backward in RTL) */}
+        <div 
+          className={`absolute right-0 top-0 bottom-20 w-32 md:w-64 bg-gradient-to-l from-black via-black/60 to-transparent z-20 pointer-events-none flex items-center justify-end pr-6 transition-opacity duration-700 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`}
+        >
+          <motion.button 
+            onClick={() => scroll('right')}
+            className="pointer-events-auto"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md bg-white/5 hover:bg-white/10 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-white rotate-180" />
+            </div>
+          </motion.button>
         </div>
       </div>
 
