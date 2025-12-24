@@ -83,12 +83,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
         }}
         className={`project-card group relative flex flex-col h-[550px] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-[background-color] duration-500 overflow-visible z-10 ${project.isLocked ? 'cursor-default' : 'cursor-pointer'}`}
       >
-        {/* Borders Layer - Perfectly Aligned */}
-        <div className="absolute inset-0 pointer-events-none z-30">
-          {/* Base Static Border */}
+        {/* Borders Layer - Unified Stacking */}
+        <div className="absolute inset-0 pointer-events-none z-30 rounded-[3rem] overflow-hidden">
+          {/* 1. Base Static Border (Inner border) */}
           <div className="absolute inset-0 border border-white/10 rounded-[3rem]" />
           
-          {/* Reactive Hover Border */}
+          {/* 2. Reactive Glow Border (Perfectly Overlapping) */}
           <motion.div 
             className="absolute inset-0 rounded-[3rem] p-[1px]"
             animate={{ opacity: isNear ? (isHovered ? 1 : 0.4) : 0 }}

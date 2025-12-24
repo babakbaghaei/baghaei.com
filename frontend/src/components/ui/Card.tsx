@@ -19,7 +19,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <motion.div
       whileHover={isHoverable ? { y: -5 } : {}}
-      className={`project-card relative bg-zinc-950/50 backdrop-blur-sm border border-white/10 rounded-[3rem] p-10 transition-all duration-500 hover:border-white/20 ${className}`}
+      className={`relative bg-zinc-950/50 backdrop-blur-sm border border-white/10 rounded-[3rem] p-10 transition-all duration-500 hover:border-white/20 ${className}`}
     >
       {/* Background Glow Effect */}
       <div className="absolute inset-0 z-0 overflow-hidden rounded-[3rem] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700">
