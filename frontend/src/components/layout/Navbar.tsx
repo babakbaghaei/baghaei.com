@@ -74,13 +74,16 @@ export default function Navbar() {
           onClick={(e) => {
             if (pathname === '/') {
               e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+              });
             }
           }}
-          className="flex items-center gap-4 group cursor-pointer"
+          className="flex items-center gap-4 group cursor-pointer relative z-[110]"
         >
           <Logo className="w-8 h-8 text-white" />
-          <span className="text-base md:text-lg font-bold text-white uppercase hidden sm:inline font-display">گروه فناوری بقایی</span>
+          <span className="text-base md:text-lg font-bold text-white uppercase hidden sm:inline-block font-display">گروه فناوری بقایی</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
