@@ -88,7 +88,7 @@ export default function Navbar() {
         </div>
 
         <div className="md:hidden flex items-center gap-4">
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-3 bg-white text-black rounded-full">
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-3 bg-white !text-black rounded-full">
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>

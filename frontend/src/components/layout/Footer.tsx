@@ -38,19 +38,19 @@ export default function Footer() {
                 </a>
                 
                 <div className="flex flex-wrap gap-4 pt-6 justify-end w-full">
-                  <a href="mailto:baabakbaghaaei@gmail.com" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                  <a href="mailto:baabakbaghaaei@gmail.com" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:!text-black transition-all">
                     <Mail className="w-5 h-5" />
                   </a>
-                  <a href="https://linkedin.com/in/babakbaghaei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                  <a href="https://linkedin.com/in/babakbaghaei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:!text-black transition-all">
                     <Linkedin className="w-5 h-5" />
                   </a>
-                  <a href="https://github.com/babakbaghaei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                  <a href="https://github.com/babakbaghaei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:!text-black transition-all">
                     <Github className="w-5 h-5" />
                   </a>
-                  <a href="https://t.me/babak_bagha_ei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                  <a href="https://t.me/babak_bagha_ei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:!text-black transition-all">
                     <Send className="w-5 h-5" />
                   </a>
-                  <a href="https://instagram.com/babak__baghaei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+                  <a href="https://instagram.com/babak__baghaei" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-white hover:bg-white hover:!text-black transition-all">
                     <Instagram className="w-5 h-5" />
                   </a>
                 </div>
