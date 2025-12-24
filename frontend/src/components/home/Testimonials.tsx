@@ -28,44 +28,41 @@ export default function Testimonials() {
 
       <Heading subtitle="برترین‌ها">اعتماد</Heading>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-6xl mx-auto px-6 lg:px-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-6 lg:px-16">
         {testimonials.map((t, index) => (
           <motion.div
             key={t.id}
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.1, duration: 0.5 }}
-            className={`flex flex-col ${index % 2 === 0 ? 'items-start' : 'items-end'}`}
+            transition={{ delay: index * 0.1 }}
+            className="flex flex-col items-start"
           >
-            {/* Message Bubble */}
+            {/* Message Bubble - Unified Right-to-Left Style */}
             <div 
-              className={`relative max-w-[90%] p-6 md:p-8 rounded-[2.5rem] shadow-2xl transition-all duration-500 hover:scale-[1.02] ${
-                index % 2 === 0 
-                ? 'bg-zinc-900 border-br-none rounded-br-lg text-right' 
-                : 'bg-zinc-800 border-bl-none rounded-bl-lg text-right self-end'
-              }`}
-              style={{ border: '1px solid rgba(255,255,255,0.05)' }}
+              className="relative w-full p-8 rounded-[2.5rem] rounded-br-lg bg-zinc-900/50 border border-white/5 shadow-2xl transition-all duration-500 hover:bg-zinc-900 hover:scale-[1.02] group"
             >
-              <p className="text-sm md:text-base font-medium font-sans leading-relaxed text-zinc-200">
-                {t.content}
-              </p>
+              {/* Subtle background quote for texture */}
+              <Quote className="absolute top-4 right-4 w-12 h-12 text-white opacity-[0.02] pointer-events-none" />
               
-              {/* Subtle bubble tail effect can be added with CSS before/after if needed, 
-                  but rounded-br-lg/rounded-bl-lg already creates the iMessage feel */}
+              <p className="text-sm md:text-base font-medium font-sans leading-relaxed text-zinc-300 text-right relative z-10">
+                «{t.content}»
+              </p>
             </div>
 
-            {/* Sender Info (Under Bubble) */}
-            <div className={`mt-4 flex items-center gap-3 px-4 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
+            {/* Sender Info - Unified Alignment */}
+            <div className="mt-6 flex items-center gap-4 px-4 w-full justify-start flex-row-reverse">
               <div 
-                className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white shrink-0 shadow-lg"
+                className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white shrink-0 shadow-lg"
                 style={{ backgroundColor: t.color }}
               >
-                <User className="w-4 h-4" />
+                <User className="w-5 h-5" />
               </div>
-              <div className={index % 2 === 0 ? 'text-right' : 'text-left'}>
-                <div className="font-bold font-display text-xs text-zinc-400">{t.author}</div>
-                <div className="text-[8px] font-black uppercase text-zinc-600 font-display">{t.company}</div>
+              <div className="text-right">
+                <div className="font-bold font-display text-sm text-white">{t.author}</div>
+                <div className="text-[10px] font-bold uppercase text-zinc-500 mt-1 font-display tracking-wider">
+                  {t.company}
+                </div>
               </div>
             </div>
           </motion.div>
