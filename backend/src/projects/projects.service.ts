@@ -7,7 +7,6 @@ export class ProjectsService {
 
   async findAll() {
     return this.prisma.project.findMany({
-      where: { published: true },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -20,5 +19,24 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
     return project;
+  }
+
+  async create(data: any) {
+    return this.prisma.project.create({
+      data,
+    });
+  }
+
+  async update(id: number, data: any) {
+    return this.prisma.project.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async remove(id: number) {
+    return this.prisma.project.delete({
+      where: { id },
+    });
   }
 }

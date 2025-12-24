@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
+import { useSound } from '@/lib/utils/sounds';
 
 interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   children?: React.ReactNode;
@@ -21,6 +22,7 @@ export const Button: React.FC<ButtonProps> = ({
   className = "",
   ...props
 }) => {
+  const { play } = useSound();
   const baseStyles = "relative flex items-center justify-center gap-3 px-8 py-3 rounded-full font-black font-display text-sm transition-all duration-300 active:scale-95 disabled:opacity-70 overflow-hidden group";
   
   const variants = {
@@ -34,6 +36,11 @@ export const Button: React.FC<ButtonProps> = ({
     <motion.button
       whileHover={{ y: -2 }}
       whileTap={{ y: 0 }}
+      onHoverStart={() => play('hover')}
+      onClick={(e) => {
+        play('click');
+        if (props.onClick) props.onClick(e as any);
+      }}
       className={`${baseStyles} ${variants[variant]} ${className}`}
       disabled={isLoading || props.disabled}
       {...(props as any)}

@@ -5,6 +5,7 @@ import { User, MessageSquare, Quote } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Section, Heading } from '../ui/Layout';
 import { Card } from '../ui/Card';
+import { useSound } from '@/lib/utils/sounds';
 
 const testimonials = [
   { id: 1, content: "طراحی سیستم یکپارچه نمایش اطلاعات پرواز فرودگاه کیش، با دقت مهندسی فوق‌العاده و پایداری کامل در شرایط عملیاتی سخت.", author: "سیستم FIDS", company: "Airport Infrastructure", color: 'rgba(30, 64, 175, 0.4)' },
@@ -16,6 +17,8 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
+  const { play } = useSound();
+
   return (
     <Section id="testimonials" className="border-t border-zinc-900">
       {/* Background Icon */}
@@ -26,32 +29,42 @@ export default function Testimonials() {
       <Heading subtitle="برترین‌ها">اعتماد</Heading>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {testimonials.map((t) => (
-          <Card 
+        {testimonials.map((t, index) => (
+          <motion.div
             key={t.id}
-            glowColor={t.color}
-            className="flex flex-col relative overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
+            onMouseEnter={() => play('hover')}
           >
-            {/* Background Quote Icon */}
-            <Quote className="absolute -top-4 -left-4 w-24 h-24 text-white opacity-[0.03] -rotate-12 pointer-events-none" />
+            <Card 
+              glowColor={t.color}
+              className="flex flex-col h-full relative overflow-hidden"
+            >
+              {/* Background Quote Icon */}
+              <Quote className="absolute -top-4 -left-4 w-24 h-24 text-white opacity-[0.03] -rotate-12 pointer-events-none" />
 
-            <p className="text-sm md:text-base font-medium font-sans leading-relaxed mb-8 text-zinc-300 text-right line-clamp-4 relative z-10">
-              {t.content}
-            </p>
+              <p className="text-sm md:text-base font-medium font-sans leading-relaxed mb-8 text-zinc-300 text-right line-clamp-4 relative z-10">
+                «{t.content}»
+              </p>
 
-            <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-start gap-3 relative z-10">
-              <div 
-                className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center text-white shrink-0"
-                style={{ backgroundColor: t.color }}
-              >
-                <User className="w-5 h-5" />
+              <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-start gap-3 relative z-10">
+                <div 
+                  className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center text-white shrink-0 shadow-lg"
+                  style={{ backgroundColor: t.color }}
+                >
+                  <User className="w-5 h-5" />
+                </div>
+                <div className="text-right">
+                  <div className="font-bold font-display text-sm text-white">{t.author}</div>
+                  <div className="text-[10px] font-bold uppercase text-zinc-500 mt-1 font-display tracking-wider">
+                    {t.company}
+                  </div>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="font-bold font-display text-sm text-white">{t.author}</div>
-                <div className="text-[10px] font-bold uppercase text-zinc-500 mt-1 font-display">{t.company}</div>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </motion.div>
         ))}
       </div>
     </Section>

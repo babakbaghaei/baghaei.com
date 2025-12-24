@@ -1,6 +1,10 @@
-import { Controller, Get, Post, Body, Param, UseInterceptors, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '@prisma/client';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('projects')
 @UseInterceptors(TransformInterceptor)
@@ -17,5 +21,24 @@ export class ProjectsController {
     return this.projectsService.findOne(+id);
   }
 
-  // Admin routes can be added here with Guards
+  @Post()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  create(@Body() data: any) {
+    return this.projectsService.create(data);
+  }
+
+  @Put(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  update(@Param('id') id: string, @Body() data: any) {
+    return this.projectsService.update(+id, data);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  remove(@Param('id') id: string) {
+    return this.projectsService.remove(+id);
+  }
 }

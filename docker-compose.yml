@@ -1,180 +1,48 @@
 version: '3.8'
 
 services:
-  # Kong Database
-  kong-database:
+  db:
     image: postgres:15-alpine
-    container_name: baghaei_kong_db
+    container_name: baghaei-db
+    restart: always
     environment:
-      POSTGRES_USER: kong
-      POSTGRES_PASSWORD: kong
-      POSTGRES_DB: kong
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "kong"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
-    volumes:
-      - kong_data:/var/lib/postgresql/data
-    networks:
-      - baghaei_net
-
-  # Kong Migrations
-  kong-migrations:
-    image: kong:3.4
-    container_name: baghaei_kong_migrations
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
-    command: kong migrations bootstrap
-    depends_on:
-      kong-database:
-        condition: service_healthy
-    networks:
-      - baghaei_net
-
-  # Kong Gateway
-  kong:
-    image: kong:3.4
-    container_name: baghaei_kong
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
-    depends_on:
-      - kong-migrations
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://kong:8001"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-    ports:
-      - "8000:8000" # Proxy
-      - "8001:8001" # Admin API
-      - "8443:8443" # Proxy HTTPS
-      - "8444:8444" # Admin HTTPS
-    networks:
-      - baghaei_net
-
-  # Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: baghaei_postgres
-    environment:
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      POSTGRES_DB: ${DB_NAME:-baghaei_db}
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-password}
+      POSTGRES_DB: ${DATABASE_NAME:-baghaei_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - baghaei_net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Cache
-  redis:
-    image: redis:alpine
-    container_name: baghaei_redis
     ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - baghaei_net
+      - "5432:5432"
 
-  # Messaging
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: baghaei_rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-user}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-password}
-    ports:
-      - "5672:5672"   # AMQP
-      - "15672:15672" # Management UI
-    networks:
-      - baghaei_net
-
-  # Monitoring - Prometheus
-  prometheus:
-    image: prom/prometheus
-    container_name: baghaei_prometheus
-    volumes:
-      - ./infra/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - baghaei_net
-
-  # Monitoring - Grafana
-  grafana:
-    image: grafana/grafana
-    container_name: baghaei_grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
-    ports:
-      - "3001:3000" # Mapped to 3001 to avoid conflict if frontend runs on 3000
-    networks:
-      - baghaei_net
-    depends_on:
-      - prometheus
-
-  # Backend
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: baghaei_backend
-    ports:
-      - "3001:3001"
+    container_name: baghaei-backend
+    restart: always
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-baghaei_db}?schema=public
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      RABBITMQ_URL: amqp://${RABBITMQ_USER:-user}:${RABBITMQ_PASS:-password}@rabbitmq:5672
+      DATABASE_URL: postgresql://${DATABASE_USER:-postgres}:${DATABASE_PASSWORD:-password}@db:5432/${DATABASE_NAME:-baghaei_db}?schema=public
+      PORT: 8000
+      JWT_SECRET: ${JWT_SECRET:-secret}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-    networks:
-      - baghaei_net
+      - db
+    ports:
+      - "8000:8000"
 
-  # Frontend
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: baghaei_frontend
-    ports:
-      - "3000:3000"
+    container_name: baghaei-frontend
+    restart: always
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000 # Changed to go through Kong
+      NEXT_PUBLIC_API_URL: http://backend:8000
     depends_on:
       - backend
-    networks:
-      - baghaei_net
-
-networks:
-  baghaei_net:
-    driver: bridge
+    ports:
+      - "3000:3000"
 
 volumes:
-  kong_data:
   postgres_data:
-  redis_data:

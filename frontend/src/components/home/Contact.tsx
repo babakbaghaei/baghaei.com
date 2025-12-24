@@ -6,10 +6,12 @@ import { submitContactForm } from '@/app/actions';
 import { Mail, Send, Check, Loader2 } from 'lucide-react';
 import { Section, Heading } from '../ui/Layout';
 import { Button } from '../ui/Button';
+import { useSound } from '@/lib/utils/sounds';
 
 export default function Contact() {
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const { play } = useSound();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,6 +21,7 @@ export default function Contact() {
       const result = await submitContactForm(formData);
       if (result.success) {
         setStatus('success');
+        play('pop');
         setTimeout(() => setStatus('idle'), 5000);
         (e.target as HTMLFormElement).reset();
       } else {
@@ -28,7 +31,7 @@ export default function Contact() {
   };
 
   return (
-    <Section id="contact">
+    <Section id="contact" className="border-t border-zinc-900">
       {/* Background Icon */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0">
         <Mail className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
@@ -43,20 +46,20 @@ export default function Contact() {
             <input 
               type="text" name="name" required 
               placeholder="نام و نام خانوادگی"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1"
+              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display"
             />
             <span className="inline"> هستم. می‌خواهم در مورد </span>
             <input 
               type="text" name="message" required 
               placeholder="موضوع یا شرح پروژه"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1"
+              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display"
             />
             <span className="inline"> با شما همکاری کنم. </span>
             <span className="inline">می‌توانید به من در </span>
             <input 
               type="text" name="phone" required 
               placeholder="شماره تماس"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1"
+              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display"
               dir="ltr"
             />
             <span className="inline"> پیام دهید.</span>
