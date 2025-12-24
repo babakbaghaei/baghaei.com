@@ -93,7 +93,8 @@ function ProjectCard({ project, onClick }: { project: any, onClick: () => void }
             style={{ 
               left: mouseXPos, 
               top: mouseYPos, 
-              background: `radial-gradient(circle at center, ${project.color} 0%, transparent 80%)`
+              background: `radial-gradient(circle at center, ${project.color} 0%, transparent 80%)`,
+              filter: project.isLocked ? 'grayscale(1) brightness(1.5)' : 'none'
             }} 
             className="absolute w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 blur-[60px]" 
           />
@@ -103,8 +104,9 @@ function ProjectCard({ project, onClick }: { project: any, onClick: () => void }
           className="absolute inset-0 z-30 pointer-events-none rounded-[3rem] p-[2px]"
           animate={{ opacity: isNear ? (isHovered ? 1 : 0.4) : 0 }}
           style={{
-            background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(250px circle at ${cx}px ${cy}px, ${project.borderColor}, transparent 80%)`),
+            background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(250px circle at ${cx}px ${cy}px, ${project.isLocked ? 'rgba(255,255,255,0.6)' : project.borderColor}, transparent 80%)`),
             WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude',
+            filter: project.isLocked ? 'grayscale(1)' : 'none'
           }}
         />
 
@@ -112,7 +114,7 @@ function ProjectCard({ project, onClick }: { project: any, onClick: () => void }
           <div className="absolute inset-0 z-40 bg-black/60 flex items-center justify-center flex-col gap-4 rounded-[3rem] overflow-hidden text-center p-6">
             <motion.div 
               style={{
-                background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(100px circle at ${cx}px ${cy}px, rgba(255,255,255,0.2), transparent 100%)`),
+                background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(150px circle at ${cx}px ${cy}px, rgba(255,255,255,0.15), transparent 100%)`),
               }}
               className="absolute inset-0 pointer-events-none"
             />
