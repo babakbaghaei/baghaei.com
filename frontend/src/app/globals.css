@@ -101,13 +101,13 @@ section, main {
 .btn-primary {
   background-color: #ffffff !important;
   color: #000000 !important;
-  @apply px-10 py-4 rounded-full font-bold font-display transition-all duration-300 hover:scale-105 active:scale-95;
+  @apply px-10 py-4 rounded-full font-black font-display transition-all duration-300 hover:scale-105 active:scale-95;
 }
 
 .btn-secondary {
   border: 1px solid var(--border) !important;
   color: #ffffff !important;
-  @apply px-10 py-4 rounded-full font-bold font-display transition-all duration-300 hover:bg-zinc-900 active:scale-95;
+  @apply px-10 py-4 rounded-full font-black font-display transition-all duration-300 hover:bg-zinc-900 active:scale-95;
 }
 
 .glass {
