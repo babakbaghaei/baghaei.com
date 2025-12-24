@@ -5,6 +5,7 @@ import Script from "next/script";
 import CustomCursor from "@/components/effects/CustomCursor";
 import Preloader from "@/components/effects/Preloader";
 import SmoothScroll from "@/components/effects/SmoothScroll";
+import CookieConsent from "@/components/layout/CookieConsent";
 
 const iransans = localFont({
   src: [
@@ -107,6 +108,7 @@ export default function RootLayout({
         <Preloader />
         <SmoothScroll>
           {children}
+          <CookieConsent />
         </SmoothScroll>
       </body>
     </html>
