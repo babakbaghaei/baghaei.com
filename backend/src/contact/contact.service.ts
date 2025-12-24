@@ -20,7 +20,7 @@ export class ContactService {
           email: createContactDto.email || undefined,
           phone: createContactDto.phone,
           message: createContactDto.message,
-        },
+        } as any,
       });
       
       this.logger.log(`New contact message received from ${createContactDto.name}`);
