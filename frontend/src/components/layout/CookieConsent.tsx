@@ -15,10 +15,13 @@ export default function CookieConsent() {
   });
 
   useEffect(() => {
-    const consent = localStorage.getItem('cookie-consent');
-    if (!consent) {
-      const timer = setTimeout(() => setIsVisible(true), 5000); // 5 second delay
-      return () => clearTimeout(timer);
+    // Robust client-side check
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem('cookie-consent');
+      if (!consent) {
+        const timer = setTimeout(() => setIsVisible(true), 3000); // 3 second delay
+        return () => clearTimeout(timer);
+      }
     }
   }, []);
 
@@ -40,7 +43,7 @@ export default function CookieConsent() {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -100, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed bottom-6 left-6 right-6 md:right-auto md:left-12 md:max-w-md z-[150]"
+          className="fixed bottom-6 left-6 right-6 md:right-auto md:left-12 md:max-w-md z-[9999]"
         >
           <div className="bg-zinc-950/90 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
             <div className="relative z-10 space-y-6">
