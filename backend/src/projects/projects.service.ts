@@ -1,56 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Project, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProjectsService {
   constructor(private prisma: PrismaService) {}
 
-  async project(
-    projectWhereUniqueInput: Prisma.ProjectWhereUniqueInput,
-  ): Promise<Project | null> {
-    return this.prisma.project.findUnique({
-      where: projectWhereUniqueInput,
-    });
-  }
-
-  async projects(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.ProjectWhereUniqueInput;
-    where?: Prisma.ProjectWhereInput;
-    orderBy?: Prisma.ProjectOrderByWithRelationInput;
-  }): Promise<Project[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+  async findAll() {
     return this.prisma.project.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
+      where: { published: true },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
-  async createProject(data: Prisma.ProjectCreateInput): Promise<Project> {
-    return this.prisma.project.create({
-      data,
+  async findOne(id: number) {
+    const project = await this.prisma.project.findUnique({
+      where: { id },
     });
-  }
-
-  async updateProject(params: {
-    where: Prisma.ProjectWhereUniqueInput;
-    data: Prisma.ProjectUpdateInput;
-  }): Promise<Project> {
-    const { where, data } = params;
-    return this.prisma.project.update({
-      data,
-      where,
-    });
-  }
-
-  async deleteProject(where: Prisma.ProjectWhereUniqueInput): Promise<Project> {
-    return this.prisma.project.delete({
-      where,
-    });
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+    return project;
   }
 }
