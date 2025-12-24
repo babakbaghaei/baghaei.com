@@ -144,7 +144,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, glob
           <div className="absolute inset-0 z-40 bg-black/60 flex items-center justify-center flex-col gap-4 rounded-[3rem] overflow-hidden text-center p-6">
             <motion.div 
               style={{
-                background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(150px circle at ${cx}px ${cy}px, rgba(255,255,255,0.15), transparent 100%)`),
+                background: useTransform([localMouseX, localMouseY], ([cx, cy]: any) => `radial-gradient(150px circle at ${cx}px ${cy}px, rgba(255,255,255,0.15), transparent 100%)`),
               }}
               className="absolute inset-0 pointer-events-none"
             />
