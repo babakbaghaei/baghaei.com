@@ -10,13 +10,16 @@ export class ContactService {
 
   async create(createContactDto: CreateContactDto) {
     try {
+      // Forcing any to bypass Prisma Client type lag
+      const data: any = {
+        name: createContactDto.name,
+        email: createContactDto.email || undefined,
+        phone: createContactDto.phone,
+        message: createContactDto.message,
+      };
+
       const message = await this.prisma.contactMessage.create({
-        data: {
-          name: createContactDto.name,
-          email: createContactDto.email || undefined,
-          phone: createContactDto.phone,
-          message: createContactDto.message,
-        },
+        data,
       });
       
       this.logger.log(`New contact message received from ${createContactDto.name}`);
