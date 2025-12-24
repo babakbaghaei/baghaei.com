@@ -72,7 +72,13 @@ export class SecurityService {
 
     // Enable CORS with specific origin in production
     const corsOptions = {
-      origin: this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000'),
+      origin: [
+        'https://baghaei.com',
+        'https://admin.baghaei.com',
+        'https://blog.baghaei.com',
+        'https://projects.baghaei.com',
+        'http://localhost:3000'
+      ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
       credentials: true,
