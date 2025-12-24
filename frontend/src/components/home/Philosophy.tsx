@@ -113,12 +113,12 @@ export default function Philosophy() {
 
           <div className="lg:w-[38.2%] flex flex-col items-center justify-center relative py-20 min-h-[400px]">
             <div className="relative w-80 h-80 flex items-center justify-center">
-              <motion.div style={{ x: xOuter, y: yOuter, transformStyle: "preserve-3d" }} className="absolute inset-0 border-2 border-dashed border-white/20 rounded-full flex items-center justify-center">
+              <motion.div style={{ x: xOuter, y: yOuter, transformStyle: "preserve-3d" }} className="absolute inset-0 border border-white/10 rounded-full flex items-center justify-center">
                 <motion.div animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} className="w-full h-full relative">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-[0_0_15px_white]" />
                 </motion.div>
               </motion.div>
-              <motion.div style={{ x: xInner, y: yInner }} className="absolute w-60 h-60 border border-white/10 rounded-full flex items-center justify-center pointer-events-none" />
+              <motion.div style={{ x: xInner, y: yInner }} className="absolute w-60 h-60 border-2 border-dashed border-white/20 rounded-full flex items-center justify-center pointer-events-none" />
               <motion.div style={{ x: xText, y: yText }} className="text-center space-y-2">
                 <div className="text-6xl md:text-7xl font-black font-en text-white tracking-tighter drop-shadow-2xl">10Y+</div>
                 <div className="text-[8px] font-bold uppercase text-zinc-500">Experience</div>

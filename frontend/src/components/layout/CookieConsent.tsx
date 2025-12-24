@@ -19,7 +19,7 @@ export default function CookieConsent() {
     if (typeof window !== 'undefined') {
       const consent = localStorage.getItem('cookie-consent-v10');
       if (!consent) {
-        const timer = setTimeout(() => setIsVisible(true), 1000); // 1 second delay
+        const timer = setTimeout(() => setIsVisible(true), 5000); // 5 second delay
         return () => clearTimeout(timer);
       }
     }
