@@ -72,7 +72,7 @@ export default function Contact() {
               <button 
                 type="submit" 
                 disabled={isPending || status === 'success'}
-                className="group relative px-16 py-8 bg-white !text-black rounded-full font-black font-display text-xl overflow-hidden active:scale-95 disabled:opacity-80 transition-all flex items-center gap-4"
+                className="group relative px-16 py-8 bg-white !text-black rounded-full !font-black font-display text-xl overflow-hidden active:scale-95 disabled:opacity-80 transition-all flex items-center gap-4"
               >
                 <span className="relative z-10 !text-black">
                   {isPending ? 'در حال ارسال...' : status === 'success' ? 'ارسال شد' : 'ارسال'}
