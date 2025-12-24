@@ -14,11 +14,8 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
-  // Quadruple items for absolutely seamless infinite loop on large screens
-  const list = [...testimonials, ...testimonials, ...testimonials, ...testimonials];
-
   return (
-    <section id="testimonials" className="py-32 md:py-60 overflow-hidden relative border-t border-zinc-900">
+    <section id="testimonials" className="py-32 md:py-60 relative border-t border-zinc-900">
       {/* Background Icon */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0">
         <MessageSquare className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
@@ -31,13 +28,13 @@ export default function Testimonials() {
         </h2>
       </div>
 
-      <div className="relative flex overflow-hidden group/marquee">
-        <div className="flex whitespace-nowrap animate-scroll-infinite group-hover/marquee:[animation-play-state:paused] py-10 px-6 w-fit">
-          {list.map((t, i) => (
+      <div className="max-w-7xl mx-auto px-6 lg:px-16 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {testimonials.map((t) => (
             <div 
-              key={`${t.id}-${i}`}
-              className="testimonial-card shrink-0 w-[300px] md:w-[350px] ml-6 flex flex-col p-8 rounded-[2rem] border border-zinc-800 shadow-sm transition-all duration-500 hover:border-zinc-600 hover:bg-zinc-900/50"
-              style={{ backgroundColor: 'var(--card)', whiteSpace: 'normal' }}
+              key={t.id}
+              className="testimonial-card flex flex-col p-8 rounded-[2rem] border border-zinc-800 shadow-sm transition-all duration-500 hover:border-zinc-600 hover:bg-zinc-900/50"
+              style={{ backgroundColor: 'var(--card)' }}
             >
               <p className="text-sm md:text-base font-medium font-sans leading-relaxed mb-6 text-zinc-300 text-right line-clamp-4">
                 {t.content}
@@ -62,16 +59,6 @@ export default function Testimonials() {
           ))}
         </div>
       </div>
-
-      <style jsx global>{`
-        @keyframes scroll-infinite {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-25%); } /* Move only 1/4th since we have 4 sets */
-        }
-        .animate-scroll-infinite {
-          animation: scroll-infinite 40s linear infinite;
-        }
-      `}</style>
     </section>
   );
 }
