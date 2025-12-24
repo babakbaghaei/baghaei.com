@@ -34,36 +34,35 @@ export default function Contact() {
         <Mail className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
       </div>
 
-      <div className="flex flex-col items-center gap-20">
-        <Heading align="center" subtitle="گفتگو">شروع یک</Heading>
+      <div className="flex flex-col items-start gap-12">
+        <Heading align="right" subtitle="گفتگو">شروع یک</Heading>
 
-        <form onSubmit={handleSubmit} className="relative max-w-4xl w-full">
-          <div className="text-xl md:text-3xl font-medium font-display leading-[2.5] md:leading-[2] text-white text-center">
+        <form onSubmit={handleSubmit} className="relative max-w-6xl w-full">
+          <div className="text-xl md:text-4xl font-medium font-display leading-[2] md:leading-[1.8] text-white text-right">
             <span className="inline-block">سلام، من </span>
             <input 
               type="text" name="name" required 
               placeholder="نام و نام خانوادگی"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-[90%] md:w-auto block md:inline-block text-center mx-auto md:mx-1 my-4 md:my-0"
+              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto block md:inline-block text-right md:mx-2 my-2 md:my-0"
             />
             <span className="inline-block"> هستم. می‌خواهم در مورد </span>
             <input 
               type="text" name="message" required 
               placeholder="موضوع یا شرح پروژه"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-[90%] md:w-auto block md:inline-block text-center mx-auto md:mx-1 my-4 md:my-0"
+              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto block md:inline-block text-right md:mx-2 my-2 md:my-0"
             />
             <span className="inline-block"> با شما همکاری کنم. </span>
-            <br className="hidden md:block" />
             <span className="inline-block">می‌توانید به من در </span>
             <input 
               type="text" name="phone" required 
               placeholder="شماره تماس"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-[90%] md:w-auto block md:inline-block text-center mx-auto md:mx-1 my-4 md:my-0"
+              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto block md:inline-block text-right md:mx-2 my-2 md:my-0"
               dir="ltr"
             />
             <span className="inline-block"> پیام دهید.</span>
           </div>
 
-          <div className="mt-24 flex flex-col items-center gap-12">
+          <div className="mt-16 flex flex-col items-start gap-12">
             <Button
               type="submit"
               isLoading={isPending}
