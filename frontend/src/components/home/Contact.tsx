@@ -78,7 +78,7 @@ export default function Contact() {
                   {isPending ? 'در حال ارسال...' : status === 'success' ? 'ارسال شد' : 'ارسال'}
                 </span>
                 
-                <div className="relative w-6 h-6 z-10">
+                <div className="relative w-6 h-6 z-10 text-black">
                   <AnimatePresence mode="wait">
                     {isPending ? (
                       <motion.div key="loading" initial={{ opacity: 0, rotate: 0 }} animate={{ opacity: 1, rotate: 360 }} exit={{ opacity: 0 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
@@ -86,7 +86,7 @@ export default function Contact() {
                       </motion.div>
                     ) : status === 'success' ? (
                       <motion.div key="success" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}>
-                        <Check className="w-6 h-6 text-green-600" strokeWidth={3} />
+                        <Check className="w-6 h-6 text-green-800" strokeWidth={3} />
                       </motion.div>
                     ) : (
                       <motion.div 
