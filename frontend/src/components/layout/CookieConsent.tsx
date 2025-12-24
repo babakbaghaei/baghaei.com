@@ -89,7 +89,7 @@ export default function CookieConsent() {
               <div className="flex flex-col gap-3 pt-2">
                 <button
                   onClick={isExpanded ? handleSavePreferences : handleAcceptAll}
-                  className="w-full bg-white text-black py-3.5 rounded-full font-black font-display text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                  className="w-full bg-white !text-black py-3.5 rounded-full !font-black font-display text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                 >
                   {isExpanded ? 'ذخیره تنظیمات' : 'تایید و قبول همه'}
                 </button>
