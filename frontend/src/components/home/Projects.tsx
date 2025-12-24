@@ -45,11 +45,11 @@ export default function Projects() {
 
       <Heading subtitle="منتخب">پروژه‌های</Heading>
 
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <div 
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className="flex overflow-x-auto -mr-6 pb-20 pl-8 md:pl-48 no-scrollbar relative z-10"
+          className="flex overflow-x-auto pb-20 pl-8 md:pl-48 no-scrollbar relative z-10"
         >
           {PROJECTS_DATA.map((p) => (
             <ProjectCard key={p.id} project={p} onClick={() => setSelectedProject(p)} />

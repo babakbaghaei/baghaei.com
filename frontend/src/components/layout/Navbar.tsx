@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react';
 import Logo from './Logo';
 import { useScroll, useSpring as useFramerSpring } from 'framer-motion';
 import { NavItem } from '../ui/NavItem';
+import { MobileMenu } from '../ui/MobileMenu';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -17,11 +18,6 @@ const navLinks = [
   { id: 'careers', label: 'استخدام' },
   { id: 'contact', label: 'ارتباط' },
 ];
-
-const menuVariants = {
-  closed: { opacity: 0, y: "-100%", transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as any } },
-  open: { opacity: 1, y: "0%", transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as any } }
-};
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -112,21 +108,12 @@ export default function Navbar() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div variants={menuVariants} initial="closed" animate="open" exit="closed" className="fixed inset-0 bg-black z-[90] flex flex-col justify-center px-12">
-            <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-8 left-6 flex items-center gap-2 text-zinc-500">
-              <span className="text-sm font-bold uppercase">بازگشت</span>
-              <X className="w-6 h-6" />
-            </button>
-            <div className="space-y-8">
-              {navLinks.map((link) => (
-                <button key={link.id} onClick={() => scrollTo(link.id)} className="text-5xl font-black font-display text-white text-right block w-full">{link.label}</button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MobileMenu 
+        isOpen={isMobileMenuOpen} 
+        links={navLinks} 
+        onClose={() => setIsMobileMenuOpen(false)} 
+        onLinkClick={scrollTo} 
+      />
     </nav>
   );
 }
