@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'ferset-motion';
+import { motion } from 'framer-motion';
 import { Section, Heading } from '../ui/Layout';
 import { Card } from '../ui/Card';
 import { 
