@@ -30,7 +30,7 @@ export async function submitContactForm(formData: FormData) {
 
     refresh();
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Form submission error:', error);
     return { success: false, error: error.message || 'Failed to send message' };
   }
