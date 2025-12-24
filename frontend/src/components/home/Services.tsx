@@ -34,23 +34,30 @@ export default function Services() {
 
       <Heading subtitle="خدمات">تخصص و</Heading>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {servicesData.map((service, index) => (
-          <motion.div
-            key={service.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <Card 
-              className="group h-full" 
-              glowColor="rgba(255,255,255,0.05)"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {servicesData.map((service, index) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ 
+                duration: 0.8,
+                delay: index * 0.1,
+                ease: [0.215, 0.61, 0.355, 1]
+              }}
             >
-              {/* Individual Service Background Icon */}
-              <div className="absolute -bottom-10 -left-10 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-500 transform rotate-12 pointer-events-none">
-                <service.Icon className="w-56 h-56 text-white" strokeWidth={1} />
-              </div>
+              <Card 
+                className="group h-full" 
+                glowColor="rgba(255,255,255,0.05)"
+              >
+                {/* Individual Service Background Icon */}
+                <motion.div 
+                  whileHover={{ scale: 1.2, rotate: -15 }}
+                  className="absolute -bottom-10 -left-10 opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-500 transform rotate-12 pointer-events-none"
+                >
+                  <service.Icon className="w-56 h-56 text-white" strokeWidth={1} />
+                </motion.div>
 
               <div className="text-sm font-bold font-en text-zinc-700 mb-8 group-hover:text-zinc-400 transition-colors">
                 {toPersianDigits(service.id)}

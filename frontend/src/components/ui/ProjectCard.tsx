@@ -133,7 +133,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
 
         <div className="flex-1 flex flex-col h-full relative z-10 pointer-events-none text-right" style={{ transformStyle: "preserve-3d" }}>
           <div style={{ transform: "translateZ(80px)", transformStyle: "preserve-3d" }} className="space-y-4">
-            <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] font-display">{project.category}</div>
+            <div className={`text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] font-display ${project.isLocked ? 'blur-sm' : ''}`}>{project.category}</div>
             <h3 className="text-3xl md:text-4xl font-bold weight-plus-1 font-display text-white leading-tight">
               {project.isLocked ? (
                 <TextDecrypt text={project.title} trigger={isHovered} className="font-display" />
@@ -141,7 +141,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
                 project.title
               )}
             </h3>
-            <div className="mt-4 inline-flex items-center gap-2 text-zinc-500 text-[10px] font-bold font-display">
+            <div className={`mt-4 inline-flex items-center gap-2 text-zinc-500 text-[10px] font-bold font-display ${project.isLocked ? 'blur-sm' : ''}`}>
               <div className="w-1 h-1 bg-zinc-500 rounded-full" />
               <span>مسئولیت: {project.role}</span>
             </div>
@@ -153,11 +153,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
             filter: project.isLocked ? 'blur(4px)' : 'none' 
           }}>
             <p className="text-zinc-500 font-sans leading-relaxed text-base mt-8 line-clamp-3">
-              {project.isLocked ? (
-                <TextDecrypt text={project.desc} trigger={isHovered} speed={20} className="font-sans" />
-              ) : (
-                project.desc
-              )}
+              {project.desc}
             </p>
           </div>
           

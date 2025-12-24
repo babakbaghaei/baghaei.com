@@ -27,7 +27,7 @@ export default function Hero() {
 
   const stats = [
     { label: 'سال تجربه', value: '10+' },
-    { label: 'شرکت بزرگ', value: '14+' },
+    { label: 'شرکت بزرگ', value: '+5' },
     { label: 'پایداری سیستم', value: '99.9%' },
     { label: 'پشتیبانی فنی', value: '24/7' }
   ];
