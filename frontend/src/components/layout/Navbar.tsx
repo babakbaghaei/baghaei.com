@@ -71,7 +71,7 @@ export default function Navbar() {
               <button 
                 key={link.id} 
                 onClick={() => scrollTo(link.id)}
-                className={`relative py-2 hover:text-white transition-colors ${activeSection === link.id ? 'text-white' : ''}`}
+                className={`relative py-2 hover:text-white transition-colors font-display ${activeSection === link.id ? 'text-white' : ''}`}
               >
                 {link.label}
                 {activeSection === link.id && (

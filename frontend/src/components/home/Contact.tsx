@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useTransition } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { submitContactForm } from '@/app/actions';
 import Magnetic from '@/components/effects/Magnetic';
-import { Mail } from 'lucide-react';
+import { Mail, Send, Check, Loader2 } from 'lucide-react';
 
 export default function Contact() {
   const [isPending, startTransition] = useTransition();
@@ -17,6 +17,7 @@ export default function Contact() {
       const result = await submitContactForm(formData);
       if (result.success) {
         setStatus('success');
+        setTimeout(() => setStatus('idle'), 5000);
         (e.target as HTMLFormElement).reset();
       } else {
         setStatus('error');
@@ -70,16 +71,43 @@ export default function Contact() {
             <div className="mt-24 flex flex-col items-center gap-12">
               <button 
                 type="submit" 
-                disabled={isPending}
-                className="group relative px-16 py-8 bg-white text-black rounded-full font-bold text-xl overflow-hidden active:scale-95 disabled:opacity-50 transition-transform"
+                disabled={isPending || status === 'success'}
+                className="group relative px-16 py-8 bg-white text-black rounded-full font-black font-display text-xl overflow-hidden active:scale-95 disabled:opacity-80 transition-all flex items-center gap-4"
               >
-                <span className="relative z-10">{isPending ? 'در حال ارسال...' : 'ارسال'}</span>
+                <span className="relative z-10">
+                  {isPending ? 'در حال ارسال...' : status === 'success' ? 'ارسال شد' : 'ارسال'}
+                </span>
+                
+                <div className="relative w-6 h-6 z-10">
+                  <AnimatePresence mode="wait">
+                    {isPending ? (
+                      <motion.div key="loading" initial={{ opacity: 0, rotate: 0 }} animate={{ opacity: 1, rotate: 360 }} exit={{ opacity: 0 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+                        <Loader2 className="w-6 h-6" />
+                      </motion.div>
+                    ) : status === 'success' ? (
+                      <motion.div key="success" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}>
+                        <Check className="w-6 h-6 text-green-600" strokeWidth={3} />
+                      </motion.div>
+                    ) : (
+                      <motion.div 
+                        key="idle" 
+                        initial={{ x: -20, opacity: 0 }} 
+                        whileHover={{ x: 0, opacity: 1 }}
+                        animate={{ x: -10, opacity: 0.5 }}
+                        className="group-hover:opacity-100"
+                      >
+                        <Send className="w-6 h-6" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
                 <div className="absolute inset-0 bg-zinc-200 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               </button>
 
-              {status === 'success' && (
-                <motion.p initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="text-green-600 font-bold uppercase tracking-widest text-sm">
-                  دریافت شد. به زودی تماس می‌گیریم.
+              {status === 'error' && (
+                <motion.p initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="text-red-600 font-bold uppercase tracking-widest text-sm font-display">
+                  خطا در ارسال. مجدداً تلاش کنید.
                 </motion.p>
               )}
             </div>
