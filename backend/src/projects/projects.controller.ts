@@ -1,52 +1,21 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Post,
-  Body,
-  Put,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseInterceptors, Put, Delete } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { Project as ProjectModel } from '@prisma/client';
+import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
 
 @Controller('projects')
+@UseInterceptors(TransformInterceptor)
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
-  async getAllProjects(): Promise<ProjectModel[]> {
-    return this.projectsService.projects({
-      where: { published: true },
-      orderBy: { createdAt: 'desc' },
-    });
+  findAll() {
+    return this.projectsService.findAll();
   }
 
   @Get(':id')
-  async getProjectById(@Param('id') id: string): Promise<ProjectModel | null> {
-    return this.projectsService.project({ id: Number(id) });
+  findOne(@Param('id') id: string) {
+    return this.projectsService.findOne(+id);
   }
 
-  @Post()
-  async createProject(
-    @Body() projectData: { title: string; slug: string; description: string; content?: string; tags?: string[] },
-  ): Promise<ProjectModel> {
-    return this.projectsService.createProject(projectData);
-  }
-
-  @Put(':id')
-  async updateProject(
-    @Param('id') id: string,
-    @Body() projectData: { title?: string; description?: string; published?: boolean },
-  ): Promise<ProjectModel> {
-    return this.projectsService.updateProject({
-      where: { id: Number(id) },
-      data: projectData,
-    });
-  }
-
-  @Delete(':id')
-  async deleteProject(@Param('id') id: string): Promise<ProjectModel> {
-    return this.projectsService.deleteProject({ id: Number(id) });
-  }
+  // Admin routes can be added here with Guards
 }

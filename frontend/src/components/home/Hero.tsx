@@ -3,9 +3,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Counter } from '@/components/effects/Counter';
-import Magnetic from '@/components/effects/Magnetic';
 import MaskText from '@/components/effects/MaskText';
-import { Compass } from 'lucide-react';
+import { Compass, ArrowDown } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { toPersianDigits } from '@/lib/utils/format';
 
 export default function Hero() {
   const containerVariants = {
@@ -24,8 +25,15 @@ export default function Hero() {
     }
   };
 
+  const stats = [
+    { label: 'سال تجربه', value: '10+' },
+    { label: 'شرکت بزرگ', value: '14+' },
+    { label: 'پایداری سیستم', value: '99.9%' },
+    { label: 'پشتیبانی فنی', value: '24/7' }
+  ];
+
   return (
-    <section id="hero" className="relative min-h-[90vh] flex items-center justify-center pt-32 overflow-hidden">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center pt-32 overflow-hidden">
       {/* Background Icon */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0">
         <Compass className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
@@ -37,21 +45,22 @@ export default function Hero() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="space-y-10"
+          className="space-y-12"
         >
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-3 px-4 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-full">
+          {/* Badge */}
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-3 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
-            <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">
+            <span className="text-zinc-500 text-[10px] font-black uppercase tracking-wider font-display">
               پیشرو در معماری سیستم‌های سازمانی
             </span>
           </motion.div>
           
           <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl lg:text-9xl font-bold weight-plus-2 leading-[1.1] font-display">
             <MaskText>خلق سیستم‌های</MaskText> <br />
-            <span className="text-zinc-200 dark:text-zinc-800">
+            <span className="text-zinc-800">
               <MaskText>ماندگار و هوشمند.</MaskText>
             </span>
           </motion.h1>
@@ -60,28 +69,43 @@ export default function Hero() {
             گروه فناوری بقایی؛ طراحی و توسعه نرم‌افزارهای مقیاس‌پذیر و زیرساخت‌های مهندسی شده برای کسب‌وکارهای مدرن.
           </motion.p>
 
+          {/* Atomic Buttons */}
           <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-6 pt-4">
-            <a href="#contact" className="btn-primary">شروع همکاری</a>
-            <a href="#projects" className="btn-secondary">مشاهده پروژه‌ها</a>
+            <Button 
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              شروع همکاری
+            </Button>
+            <Button 
+              variant="secondary"
+              onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              مشاهده پروژه‌ها
+            </Button>
           </motion.div>
 
-          <motion.div variants={itemVariants} className="pt-24 pb-20 md:pb-32 grid grid-cols-2 md:grid-cols-4 gap-12 max-w-4xl mx-auto">
-            {[
-              { label: 'سال تجربه', value: '10+' },
-              { label: 'شرکت بزرگ', value: '14+' },
-              { label: 'پایداری سیستم', value: '99.9%' },
-              { label: 'پشتیبانی فنی', value: '24/7' }
-            ].map((stat, i) => (
+          {/* Stats Grid */}
+          <motion.div variants={itemVariants} className="pt-24 pb-20 md:pb-32 grid grid-cols-2 md:grid-cols-4 gap-12 max-w-4xl mx-auto border-t border-white/5">
+            {stats.map((stat, i) => (
               <div key={i} className="space-y-2">
-                <div className="text-3xl font-bold font-display">
+                <div className="text-3xl font-bold font-display text-white">
                   <Counter value={stat.value} />
                 </div>
-                <div className="text-[10px] text-zinc-400 font-bold uppercase">{stat.label}</div>
+                <div className="text-[10px] text-zinc-500 font-black uppercase font-display">{stat.label}</div>
               </div>
             ))}
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Scroll Down Indicator */}
+      <motion.div 
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 2, repeat: Infinity }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-zinc-800 pointer-events-none"
+      >
+        <ArrowDown className="w-6 h-6" />
+      </motion.div>
     </section>
   );
 }
