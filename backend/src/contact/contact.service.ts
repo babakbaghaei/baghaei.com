@@ -13,7 +13,7 @@ export class ContactService {
       const message = await this.prisma.contactMessage.create({
         data: {
           name: createContactDto.name,
-          email: createContactDto.email || null,
+          email: createContactDto.email || undefined,
           phone: createContactDto.phone,
           message: createContactDto.message,
         },
