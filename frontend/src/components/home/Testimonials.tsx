@@ -36,7 +36,7 @@ export default function Testimonials() {
               {t.content}
             </p>
 
-            <div className="flex gap-1 mb-8 justify-end">
+            <div className="flex gap-1 mb-8 justify-start">
               {[...Array(5)].map((_, si) => (
                 <Star key={si} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
               ))}

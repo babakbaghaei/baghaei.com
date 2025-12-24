@@ -135,11 +135,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
           <div style={{ transform: "translateZ(80px)", transformStyle: "preserve-3d" }} className="space-y-4">
             <div className={`text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] font-display ${project.isLocked ? 'blur-sm' : ''}`}>{project.category}</div>
             <h3 className="text-3xl md:text-4xl font-bold weight-plus-1 font-display text-white leading-tight">
-              {project.isLocked ? (
-                <TextDecrypt text={project.title} trigger={isHovered} className="font-display" />
-              ) : (
-                project.title
-              )}
+              {project.title}
             </h3>
             <div className={`mt-4 inline-flex items-center gap-2 text-zinc-500 text-[10px] font-bold font-display ${project.isLocked ? 'blur-sm' : ''}`}>
               <div className="w-1 h-1 bg-zinc-500 rounded-full" />
