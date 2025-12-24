@@ -7,11 +7,12 @@ interface TextDecryptProps {
   speed?: number;
   delay?: number;
   trigger?: boolean;
+  className?: string;
 }
 
 const chars = '-/_*+!<>@#$%&?0123456789';
 
-export default function TextDecrypt({ text, speed = 40, delay = 0, trigger = false }: TextDecryptProps) {
+export default function TextDecrypt({ text, speed = 40, delay = 0, trigger = false, className = "" }: TextDecryptProps) {
   const [displayText, setDisplayText] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -56,7 +57,7 @@ export default function TextDecrypt({ text, speed = 40, delay = 0, trigger = fal
   }, [trigger, text, delay, decrypt]);
 
   return (
-    <span className="font-mono">
+    <span className={className}>
       {displayText}
     </span>
   );

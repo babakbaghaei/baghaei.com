@@ -138,7 +138,7 @@ function ProjectCard({ project, onClick }: { project: any, onClick: () => void }
             <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em]">{project.category}</div>
             <h3 className="text-3xl md:text-4xl font-bold weight-plus-1 font-display text-white leading-tight">
               {project.isLocked ? (
-                <TextDecrypt text={project.title} trigger={isHovered} />
+                <TextDecrypt text={project.title} trigger={isHovered} className="font-display" />
               ) : (
                 project.title
               )}
@@ -156,7 +156,7 @@ function ProjectCard({ project, onClick }: { project: any, onClick: () => void }
           }}>
             <p className="text-zinc-500 font-sans leading-relaxed text-base mt-8 line-clamp-3">
               {project.isLocked ? (
-                <TextDecrypt text={project.desc} trigger={isHovered} speed={20} />
+                <TextDecrypt text={project.desc} trigger={isHovered} speed={20} className="font-sans" />
               ) : (
                 project.desc
               )}
