@@ -28,42 +28,46 @@ export default function Testimonials() {
 
       <Heading subtitle="برترین‌ها">اعتماد</Heading>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-6xl mx-auto px-6 lg:px-16">
         {testimonials.map((t, index) => (
           <motion.div
             key={t.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.1 }}
-            onMouseEnter={() => play('hover')}
+            transition={{ delay: index * 0.1, duration: 0.5 }}
+            className={`flex flex-col ${index % 2 === 0 ? 'items-start' : 'items-end'}`}
           >
-            <Card 
-              glowColor={t.color}
-              className="flex flex-col h-full relative overflow-hidden"
+            {/* Message Bubble */}
+            <div 
+              className={`relative max-w-[90%] p-6 md:p-8 rounded-[2.5rem] shadow-2xl transition-all duration-500 hover:scale-[1.02] ${
+                index % 2 === 0 
+                ? 'bg-zinc-900 border-br-none rounded-br-lg text-right' 
+                : 'bg-zinc-800 border-bl-none rounded-bl-lg text-right self-end'
+              }`}
+              style={{ border: '1px solid rgba(255,255,255,0.05)' }}
             >
-              {/* Background Quote Icon */}
-              <Quote className="absolute -top-4 -left-4 w-24 h-24 text-white opacity-[0.03] -rotate-12 pointer-events-none" />
-
-              <p className="text-sm md:text-base font-medium font-sans leading-relaxed mb-8 text-zinc-300 text-right line-clamp-4 relative z-10">
-                «{t.content}»
+              <p className="text-sm md:text-base font-medium font-sans leading-relaxed text-zinc-200">
+                {t.content}
               </p>
+              
+              {/* Subtle bubble tail effect can be added with CSS before/after if needed, 
+                  but rounded-br-lg/rounded-bl-lg already creates the iMessage feel */}
+            </div>
 
-              <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-start gap-3 relative z-10">
-                <div 
-                  className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center text-white shrink-0 shadow-lg"
-                  style={{ backgroundColor: t.color }}
-                >
-                  <User className="w-5 h-5" />
-                </div>
-                <div className="text-right">
-                  <div className="font-bold font-display text-sm text-white">{t.author}</div>
-                  <div className="text-[10px] font-bold uppercase text-zinc-500 mt-1 font-display tracking-wider">
-                    {t.company}
-                  </div>
-                </div>
+            {/* Sender Info (Under Bubble) */}
+            <div className={`mt-4 flex items-center gap-3 px-4 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
+              <div 
+                className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white shrink-0 shadow-lg"
+                style={{ backgroundColor: t.color }}
+              >
+                <User className="w-4 h-4" />
               </div>
-            </Card>
+              <div className={index % 2 === 0 ? 'text-right' : 'text-left'}>
+                <div className="font-bold font-display text-xs text-zinc-400">{t.author}</div>
+                <div className="text-[8px] font-black uppercase text-zinc-600 font-display">{t.company}</div>
+              </div>
+            </div>
           </motion.div>
         ))}
       </div>
