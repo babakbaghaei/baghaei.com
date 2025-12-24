@@ -5,6 +5,9 @@ import { Menu, X } from 'lucide-react';
 import Logo from './Logo';
 import { useScroll, useSpring as useFramerSpring } from 'framer-motion';
 
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+
 const navLinks = [
   { id: 'hero', label: 'خانه' },
   { id: 'philosophy', label: 'فلسفه ما' },
@@ -23,10 +26,13 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
+  const pathname = usePathname();
+  const router = useRouter();
   const { scrollYProgress } = useScroll();
   const scaleX = useFramerSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
   useEffect(() => {
+    if (pathname !== '/') return;
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
       const sections = navLinks.map(link => document.getElementById(link.id));
@@ -39,9 +45,13 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [pathname]);
 
   const scrollTo = (id: string) => {
+    if (pathname !== '/') {
+      router.push(`/#${id}`);
+      return;
+    }
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -52,18 +62,17 @@ export default function Navbar() {
   return (
     <nav 
       className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
-        scrolled ? 'py-4 backdrop-blur-xl border-b border-zinc-900' : 'py-8 bg-transparent'
+        scrolled || pathname !== '/' ? 'py-4 backdrop-blur-xl border-b border-zinc-900 bg-black/80' : 'py-8 bg-transparent'
       }`} 
-      style={{ backgroundColor: scrolled ? 'rgba(0,0,0,0.8)' : 'transparent' }}
       role="navigation"
     >
       <motion.div className="absolute top-0 left-0 right-0 h-[2px] bg-white origin-center" style={{ scaleX }} />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-16 flex justify-between items-center relative">
-        <a href="#" onClick={(e) => { e.preventDefault(); scrollTo('hero'); }} className="flex items-center gap-4 group cursor-pointer">
+        <Link href="/" className="flex items-center gap-4 group cursor-pointer">
           <Logo className="w-8 h-8 text-white" />
           <span className="text-base md:text-lg font-bold text-white uppercase hidden sm:inline font-display">گروه فناوری بقایی</span>
-        </a>
+        </Link>
 
         <div className="hidden md:flex items-center gap-10">
           <div className="flex gap-8 text-[13px] font-bold uppercase text-zinc-400">
