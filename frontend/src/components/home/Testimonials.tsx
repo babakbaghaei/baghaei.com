@@ -50,18 +50,18 @@ export default function Testimonials() {
             </div>
 
             {/* Sender Info - Avatar to the right of info */}
-            <div className="mt-6 flex items-center justify-end gap-4 px-4 w-full">
-              <div className="text-right">
-                <div className="font-bold font-display text-sm text-white">{t.author}</div>
-                <div className="text-[10px] font-bold uppercase text-zinc-500 mt-1 font-display tracking-wider">
-                  {t.company}
-                </div>
-              </div>
+            <div className="mt-6 flex items-center justify-start gap-4 px-4 w-full">
               <div 
                 className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white shrink-0 shadow-lg"
                 style={{ backgroundColor: t.color }}
               >
                 <User className="w-5 h-5" />
+              </div>
+              <div className="text-right">
+                <div className="font-bold font-display text-sm text-white leading-tight">{t.author}</div>
+                <div className="text-[10px] font-bold uppercase text-zinc-500 mt-1 font-display tracking-wider">
+                  {t.company}
+                </div>
               </div>
             </div>
           </motion.div>
