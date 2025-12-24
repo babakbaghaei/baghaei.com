@@ -12,6 +12,9 @@ export async function submitContactForm(formData: FormData) {
   await new Promise(resolve => setTimeout(resolve, 1000))
 
   try {
+    // Mock success for now since backend is not ready
+    // TODO: Integrate with Resend or Nodemailer directly in Next.js
+    /* 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/contact`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -21,6 +24,10 @@ export async function submitContactForm(formData: FormData) {
     if (!response.ok) {
       throw new Error('Failed to submit form')
     }
+    */
+    
+    // Log for debug
+    console.log('Form Submitted:', { name, email, phone, message })
 
     // Refresh the current route to update any server-side data if needed
     refresh()
