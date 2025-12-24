@@ -81,8 +81,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
           scale, 
           transformStyle: "preserve-3d" 
         }}
-        className={`project-card group relative flex flex-col h-[550px] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-[background-color,border-color] duration-500 overflow-visible z-10 ${project.isLocked ? 'cursor-default' : 'cursor-pointer'}`}
+        className={`project-card group relative flex flex-col h-[550px] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-[background-color] duration-500 overflow-visible z-10 ${project.isLocked ? 'cursor-default' : 'cursor-pointer'}`}
       >
+        {/* Base Border Layer */}
+        <div className="absolute inset-0 border border-white/10 rounded-[3rem] pointer-events-none z-20" />
+
         {/* Glow Effect */}
         <div className="absolute inset-0 z-0 overflow-hidden rounded-[3rem] pointer-events-none">
           <motion.div 
