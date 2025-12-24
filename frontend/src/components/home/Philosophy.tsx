@@ -54,7 +54,7 @@ export default function Philosophy() {
   return (
     <Section 
       id="philosophy" 
-      className="!py-0 aspect-[1.618] min-h-[80vh] flex items-center justify-center border-y border-zinc-900 bg-black font-mono cursor-crosshair select-none"
+      className="!py-0 min-h-screen flex items-center justify-center border-y border-zinc-900 bg-black font-mono cursor-crosshair select-none"
       containerClassName="h-full flex items-center"
     >
       <div 
@@ -78,9 +78,9 @@ export default function Philosophy() {
         <Lightbulb className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
       </div>
 
-      {/* Fibonacci SVG */}
+      {/* Fibonacci SVG - Full Page */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center opacity-10">
-        <svg viewBox="0 0 1000 618" className="w-[110%] h-[110%] text-zinc-100 fill-none stroke-current stroke-[1]">
+        <svg viewBox="0 0 1000 618" className="w-full h-full text-zinc-100 fill-none stroke-current stroke-[1] object-cover">
           <rect x="0" y="0" width="618" height="618" /><rect x="618" y="0" width="382" height="382" /><rect x="618" y="382" width="236" height="236" />
           <path d="M 618,618 A 618,618 0 0 1 0,0 M 618,618 A 382,382 0 0 0 1000,236" />
         </svg>
