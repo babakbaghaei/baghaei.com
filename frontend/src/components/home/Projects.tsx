@@ -55,7 +55,7 @@ function ProjectCard({ project, onClick }: { project: any, onClick: () => void }
     mouseXPos.set(cardX);
     mouseYPos.set(cardY);
 
-    if (isHovered && !project.isLocked) {
+    if (isHovered) {
       x.set(cardX / rect.width - 0.5);
       y.set(cardY / rect.height - 0.5);
     }
@@ -85,25 +85,49 @@ function ProjectCard({ project, onClick }: { project: any, onClick: () => void }
           scale, 
           transformStyle: "preserve-3d" 
         }}
-        className={`project-card group relative flex flex-col h-[550px] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-[background-color,border-color] duration-500 overflow-visible z-10 ${project.isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+        className={`project-card group relative flex flex-col h-[550px] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-[background-color,border-color] duration-500 overflow-visible z-10 ${project.isLocked ? 'cursor-default' : 'cursor-pointer'}`}
       >
         <div className="absolute inset-0 z-0 overflow-hidden rounded-[3rem] pointer-events-none">
-          <motion.div animate={{ opacity: isHovered && !project.isLocked ? 0.6 : 0 }} style={{ left: mouseXPos, top: mouseYPos, background: `radial-gradient(circle at center, ${project.color} 0%, transparent 80%)` }} className="absolute w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 blur-[60px]" />
+          <motion.div 
+            animate={{ opacity: isHovered ? (project.isLocked ? 0.3 : 0.6) : 0 }} 
+            style={{ 
+              left: mouseXPos, 
+              top: mouseYPos, 
+              background: `radial-gradient(circle at center, ${project.color} 0%, transparent 80%)`,
+              filter: project.isLocked ? 'grayscale(1) brightness(0.5)' : 'none'
+            }} 
+            className="absolute w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 blur-[60px]" 
+          />
         </div>
 
         <motion.div 
           className="absolute inset-0 z-30 pointer-events-none rounded-[3rem] p-[2px]"
-          animate={{ opacity: isNear && !project.isLocked ? (isHovered ? 1 : 0.4) : 0 }}
+          animate={{ opacity: isNear ? (isHovered ? 1 : 0.4) : 0 }}
           style={{
-            background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(250px circle at ${cx}px ${cy}px, ${project.borderColor}, transparent 80%)`),
+            background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(250px circle at ${cx}px ${cy}px, ${project.isLocked ? 'rgba(255,255,255,0.4)' : project.borderColor}, transparent 80%)`),
             WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude',
           }}
         />
 
         {project.isLocked && (
           <div className="absolute inset-0 z-40 bg-black/60 flex items-center justify-center flex-col gap-4 rounded-[3rem] overflow-hidden text-center p-6">
-            <div className="w-16 h-16 bg-white/10 border border-white/20 rounded-full flex items-center justify-center relative z-10"><Hammer className="w-6 h-6 text-white" /></div>
-            <span className="text-[10px] font-black text-white uppercase relative z-10">در حال توسعه</span>
+            <motion.div 
+              style={{
+                background: useTransform([mouseXPos, mouseYPos], ([cx, cy]: any) => `radial-gradient(100px circle at ${cx}px ${cy}px, rgba(255,255,255,0.2), transparent 100%)`),
+              }}
+              className="absolute inset-0 pointer-events-none"
+            />
+            <motion.div 
+              style={{ transform: "translateZ(50px)" }}
+              animate={{ 
+                scale: isHovered ? 1.1 : 1,
+                rotate: isHovered ? [0, -10, 10, 0] : 0
+              }}
+              className="w-16 h-16 bg-white/10 border border-white/20 rounded-full flex items-center justify-center relative z-10"
+            >
+              <Hammer className="w-6 h-6 text-white" />
+            </motion.div>
+            <span className="text-[10px] font-black text-white uppercase relative z-10 font-display">در حال توسعه</span>
           </div>
         )}
 
