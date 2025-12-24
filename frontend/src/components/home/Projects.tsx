@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 import { ArrowLeft, Box } from 'lucide-react';
 import ProjectModal from './ProjectModal';
 import { Project, ProjectCard } from '../ui/ProjectCard';
