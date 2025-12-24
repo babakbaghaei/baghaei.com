@@ -9,7 +9,7 @@ export async function submitContactForm(formData: FormData) {
   const message = formData.get('message')
 
   // Use the internal server URL for backend communication
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
   try {
     const response = await fetch(`${backendUrl}/contact`, {

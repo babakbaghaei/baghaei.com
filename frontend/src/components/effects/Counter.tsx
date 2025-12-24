@@ -37,9 +37,8 @@ export function Counter({ value }: CounterProps) {
   }, [isInView, numericPart, value]);
 
   return (
-    <span ref={ref} className="font-display inline-flex flex-row-reverse items-center justify-end" dir="ltr">
-      <span>{suffix.replace(/\+/g, '+').replace(/%/g, '٪')}</span>
-      <span>{displayValue}</span>
+    <span ref={ref} className="font-display" dir="ltr">
+      {displayValue}{suffix.replace(/\+/g, '+').replace(/%/g, '٪').replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)])}
     </span>
   );
 }

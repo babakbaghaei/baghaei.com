@@ -18,7 +18,7 @@ export const PROJECTS_DATA: Project[] = [
     category: 'سرگرمی و بازی', 
     role: 'طراح بازی و صداساز', 
     desc: 'طراحی و توسعه بازی موبایل پیکسلی با تمرکز بر تجربه کاربری رقابتی و صداسازی منحصر به فرد.', 
-    metrics: [{ label: 'دانلود فعال', value: '۱۰۰K+' }, { label: 'امتیاز کاربر', value: '۴.۸/۵' }], 
+    metrics: [{ label: 'نصب فعال', value: '۱۰۰۰' }, { label: 'امتیاز کاربر', value: '۴.۷' }], 
     color: 'rgba(34, 197, 94, 0.3)', 
     borderColor: 'rgba(34, 197, 94, 0.8)', 
     isLocked: false 
@@ -40,14 +40,14 @@ export const PROJECTS_DATA: Project[] = [
     category: 'هوش مصنوعی / Social', 
     role: 'بنیان‌گذار و توسعه‌دهنده', 
     desc: 'پلتفرم هوشمند گفتگو و همدلی ناشناس با محوریت هوش مصنوعی برای ایجاد ارتباطات انسانی عمیق‌تر.', 
-    metrics: [{ label: 'کاربر فعال', value: '۲M+' }, { label: 'پیام روزانه', value: '۵M+' }], 
+    metrics: [{ label: 'کاربر فعال', value: '۱۰۰۰' }, { label: 'پیام روزانه', value: '۱۰۰' }], 
     color: 'rgba(168, 85, 247, 0.4)', 
     borderColor: 'rgba(168, 85, 247, 0.8)', 
     isLocked: false 
   },
   { 
     id: 1, 
-    title: 'FIDS و کانتر فرودگاه', 
+    title: 'FIDS و Counter فرودگاه کیش', 
     category: 'زیرساخت فرودگاهی', 
     role: 'طراح ارشد رابط کاربری', 
     desc: 'طراحی سیستم‌های FIDS و رابط کاربری کانترهای فرودگاه بین‌المللی کیش با استانداردهای نوین بصری.', 
