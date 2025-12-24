@@ -69,7 +69,16 @@ export default function Navbar() {
       <motion.div className="absolute top-0 left-0 right-0 h-[2px] bg-white origin-center" style={{ scaleX }} />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-16 flex justify-between items-center relative">
-        <Link href="/" className="flex items-center gap-4 group cursor-pointer">
+        <Link 
+          href="/" 
+          onClick={(e) => {
+            if (pathname === '/') {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+          className="flex items-center gap-4 group cursor-pointer"
+        >
           <Logo className="w-8 h-8 text-white" />
           <span className="text-base md:text-lg font-bold text-white uppercase hidden sm:inline font-display">گروه فناوری بقایی</span>
         </Link>
