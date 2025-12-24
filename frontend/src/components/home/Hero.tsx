@@ -6,7 +6,7 @@ import { Counter } from '@/components/effects/Counter';
 import MaskText from '@/components/effects/MaskText';
 import { Compass, ArrowDown } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { toPersianDigits } from '@/lib/utils/format';
+import { StatItem } from '../ui/StatItem';
 
 export default function Hero() {
   const containerVariants = {
@@ -87,12 +87,7 @@ export default function Hero() {
           {/* Stats Grid */}
           <motion.div variants={itemVariants} className="pt-24 pb-20 md:pb-32 grid grid-cols-2 md:grid-cols-4 gap-12 max-w-4xl mx-auto border-t border-white/5">
             {stats.map((stat, i) => (
-              <div key={i} className="space-y-2">
-                <div className="text-3xl font-bold font-display text-white">
-                  <Counter value={stat.value} />
-                </div>
-                <div className="text-[10px] text-zinc-500 font-black uppercase font-display">{stat.label}</div>
-              </div>
+              <StatItem key={i} label={stat.label} value={stat.value} />
             ))}
           </motion.div>
         </motion.div>

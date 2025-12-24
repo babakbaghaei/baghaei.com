@@ -17,8 +17,8 @@ export const Heading: React.FC<HeadingProps> = ({
   align = 'right' 
 }) => {
   const alignmentClasses = {
-    right: "text-right items-end",
-    left: "text-left items-start",
+    right: "text-right items-start",
+    left: "text-left items-end",
     center: "text-center items-center"
   };
 

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Logo from './Logo';
 import { useScroll, useSpring as useFramerSpring } from 'framer-motion';
+import { NavItem } from '../ui/NavItem';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -89,16 +90,12 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-10">
           <div className="flex gap-8 text-[13px] font-bold uppercase text-zinc-400">
             {navLinks.map((link) => (
-              <button 
+              <NavItem 
                 key={link.id} 
+                label={link.label}
+                isActive={activeSection === link.id}
                 onClick={() => scrollTo(link.id)}
-                className={`relative py-2 hover:text-white transition-colors font-display ${activeSection === link.id ? 'text-white' : ''}`}
-              >
-                {link.label}
-                {activeSection === link.id && (
-                  <motion.div layoutId="nav-dot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />
-                )}
-              </button>
+              />
             ))}
           </div>
           
