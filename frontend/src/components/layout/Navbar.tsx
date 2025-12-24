@@ -59,7 +59,7 @@ export default function Navbar() {
     >
       <motion.div className="absolute top-0 left-0 right-0 h-[2px] bg-white origin-center" style={{ scaleX }} />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center relative">
+      <div className="max-w-7xl mx-auto px-6 lg:px-16 flex justify-between items-center relative">
         <a href="#" onClick={(e) => { e.preventDefault(); scrollTo('hero'); }} className="flex items-center gap-4 group cursor-pointer">
           <Logo className="w-8 h-8 text-white" />
           <span className="text-base md:text-lg font-bold text-white uppercase hidden sm:inline font-display">گروه فناوری بقایی</span>

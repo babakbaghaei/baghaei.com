@@ -25,7 +25,7 @@ export default function Logo({ className = "w-10 h-10" }: { className?: string }
           10% { clip-path: inset(80% 0 5% 0); transform: translate(-8px, 8px); }
           20% { clip-path: inset(30% 0 20% 0); transform: translate(8px, 4px); }
           30% { clip-path: inset(10% 0 80% 0); transform: translate(-4px, -8px); }
-          40% { clip-path: inset(50% 0 30% 0); transform: translate(4px, 8px); }
+          40% { clip-path: inset(50% 0 30% 0); transform: translate(2px, 4px); }
           50% { clip-path: inset(70% 0 10% 0); transform: translate(-8px, 4px); }
           60% { clip-path: inset(20% 0 60% 0); transform: translate(8px, -4px); }
           70% { clip-path: inset(60% 0 20% 0); transform: translate(-8px, 4px); }
@@ -43,49 +43,25 @@ export default function Logo({ className = "w-10 h-10" }: { className?: string }
         }
       `}</style>
 
-      {/* Glitch Layer 1 (Red/Cyan) */}
-      <div 
-        className="glitch-layer-1 absolute inset-0 w-full h-full bg-[#ff00ff] opacity-0 mix-blend-screen pointer-events-none transition-opacity duration-100"
-        style={{
-          maskImage: 'url("/logo.svg")',
-          maskSize: 'contain',
-          maskRepeat: 'no-repeat',
-          maskPosition: 'center',
-          WebkitMaskImage: 'url("/logo.svg")',
-          WebkitMaskSize: 'contain',
-          WebkitMaskRepeat: 'no-repeat',
-          WebkitMaskPosition: 'center'
-        }}
+      {/* Glitch Layer 1 */}
+      <img 
+        src="/logo.svg" 
+        alt=""
+        className="glitch-layer-1 absolute inset-0 w-full h-full opacity-0 mix-blend-screen pointer-events-none transition-opacity duration-100 invert sepia(100%) saturate(500%) hue-rotate(280deg)"
       />
 
-      {/* Glitch Layer 2 (Blue/Green) */}
-      <div 
-        className="glitch-layer-2 absolute inset-0 w-full h-full bg-[#00ffff] opacity-0 mix-blend-screen pointer-events-none transition-opacity duration-100"
-        style={{
-          maskImage: 'url("/logo.svg")',
-          maskSize: 'contain',
-          maskRepeat: 'no-repeat',
-          maskPosition: 'center',
-          WebkitMaskImage: 'url("/logo.svg")',
-          WebkitMaskSize: 'contain',
-          WebkitMaskRepeat: 'no-repeat',
-          WebkitMaskPosition: 'center'
-        }}
+      {/* Glitch Layer 2 */}
+      <img 
+        src="/logo.svg" 
+        alt=""
+        className="glitch-layer-2 absolute inset-0 w-full h-full opacity-0 mix-blend-screen pointer-events-none transition-opacity duration-100 invert sepia(100%) saturate(500%) hue-rotate(150deg)"
       />
 
       {/* Main Logo */}
-      <div 
-        className="w-full h-full bg-current relative z-10"
-        style={{
-          maskImage: 'url("/logo.svg")',
-          maskSize: 'contain',
-          maskRepeat: 'no-repeat',
-          maskPosition: 'center',
-          WebkitMaskImage: 'url("/logo.svg")',
-          WebkitMaskSize: 'contain',
-          WebkitMaskRepeat: 'no-repeat',
-          WebkitMaskPosition: 'center'
-        }}
+      <img 
+        src="/logo.svg" 
+        alt="Logo" 
+        className={`w-full h-full object-contain relative z-10 ${className.includes('text-black') ? 'brightness-0' : 'brightness-0 invert'}`}
       />
     </div>
   );

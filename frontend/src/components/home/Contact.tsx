@@ -31,7 +31,7 @@ export default function Contact() {
         <Mail className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-16 relative z-10 text-center">
+      <div className="max-w-7xl mx-auto px-6 lg:px-16 relative z-10 text-center">
         <div className="flex flex-col items-center gap-20">
           
           <div className="space-y-8 flex flex-col items-center">

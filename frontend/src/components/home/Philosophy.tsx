@@ -95,7 +95,7 @@ export default function Philosophy() {
         />
       )}
 
-      <div className="max-w-7xl mx-auto px-16 relative z-20 pointer-events-none">
+      <div className="max-w-7xl mx-auto px-6 lg:px-16 relative z-20 pointer-events-none">
         <div className="flex flex-col lg:flex-row items-center gap-0">
           
           <div className="lg:w-[61.8%] space-y-12 pr-12 text-right py-20">
