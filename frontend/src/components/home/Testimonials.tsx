@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { User, MessageSquare, Star } from 'lucide-react';
+import { User, MessageSquare, Quote } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Section, Heading } from '../ui/Layout';
 import { Card } from '../ui/Card';
@@ -30,19 +30,16 @@ export default function Testimonials() {
           <Card 
             key={t.id}
             glowColor="rgba(255,255,255,0.03)"
-            className="flex flex-col"
+            className="flex flex-col relative overflow-hidden"
           >
-            <p className="text-sm md:text-base font-medium font-sans leading-relaxed mb-6 text-zinc-300 text-right line-clamp-4">
+            {/* Background Quote Icon */}
+            <Quote className="absolute -top-4 -left-4 w-24 h-24 text-white opacity-[0.03] -rotate-12 pointer-events-none" />
+
+            <p className="text-sm md:text-base font-medium font-sans leading-relaxed mb-8 text-zinc-300 text-right line-clamp-4 relative z-10">
               {t.content}
             </p>
 
-            <div className="flex gap-1 mb-8 justify-start">
-              {[...Array(5)].map((_, si) => (
-                <Star key={si} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              ))}
-            </div>
-
-            <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-start gap-3">
+            <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-start gap-3 relative z-10">
               <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-500 shrink-0">
                 <User className="w-5 h-5" />
               </div>

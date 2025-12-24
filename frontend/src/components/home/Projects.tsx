@@ -7,6 +7,8 @@ import ProjectModal from './ProjectModal';
 import { Project, ProjectCard } from '../ui/ProjectCard';
 import { Section, Heading } from '../ui/Layout';
 import { PROJECTS_DATA } from '@/lib/data/projects';
+import Link from 'next/link';
+import { ExternalLink } from 'lucide-react';
 
 export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -54,6 +56,20 @@ export default function Projects() {
           {PROJECTS_DATA.map((p) => (
             <ProjectCard key={p.id} project={p} onClick={() => setSelectedProject(p)} />
           ))}
+
+          {/* See All Card */}
+          <div className="shrink-0 w-[300px] md:w-[400px] p-6 relative">
+            <Link 
+              href="/projects"
+              className="project-card flex flex-col items-center justify-center h-[550px] p-12 border border-dashed border-white/20 rounded-[3rem] hover:border-white transition-all group"
+            >
+              <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                <ExternalLink className="w-8 h-8 text-white" />
+              </div>
+              <span className="text-2xl font-bold font-display text-white text-center">مشاهده همه پروژه‌ها</span>
+              <p className="text-zinc-500 text-sm mt-4 text-center">آرشیو کامل فعالیت‌های گروه فناوری بقایی</p>
+            </Link>
+          </div>
         </div>
         
         {/* Left Scroll Button */}

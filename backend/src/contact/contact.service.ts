@@ -13,8 +13,9 @@ export class ContactService {
       const message = await this.prisma.contactMessage.create({
         data: {
           name: createContactDto.name,
-          email: createContactDto.email || 'N/A', // Handling optional email
-          message: `Phone: ${createContactDto.phone} | Message: ${createContactDto.message}`,
+          email: createContactDto.email || null,
+          phone: createContactDto.phone,
+          message: createContactDto.message,
         },
       });
       

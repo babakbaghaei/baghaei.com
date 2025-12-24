@@ -59,7 +59,7 @@ export default function Services() {
                   <service.Icon className="w-56 h-56 text-white" strokeWidth={1} />
                 </motion.div>
 
-              <div className="text-sm font-bold font-en text-zinc-700 mb-8 group-hover:text-zinc-400 transition-colors">
+              <div className="text-sm font-bold font-display text-zinc-700 mb-8 group-hover:text-zinc-400 transition-colors">
                 {toPersianDigits(service.id)}
               </div>
               <div className="space-y-4">

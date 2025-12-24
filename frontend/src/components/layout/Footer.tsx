@@ -13,6 +13,7 @@ const navLinks = [
   { label: 'پروژه‌های منتخب', href: '#projects' },
   { label: 'فلسفه و رویکرد', href: '#philosophy' },
   { label: 'نظرات مشتریان', href: '#testimonials' },
+  { label: 'فرصت‌های رشد', href: '/careers' },
   { label: 'شروع همکاری', href: '#contact' },
 ];
 
