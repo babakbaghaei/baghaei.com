@@ -104,6 +104,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
 
         {/* Glow Effect */}
         <div className="absolute inset-0 z-0 overflow-hidden rounded-[3rem] pointer-events-none">
+          <motion.div 
+            animate={{ opacity: isHovered ? 0.6 : 0 }}
+            style={{
+              left: mouseXPos,
+              top: mouseYPos,
+              background: `radial-gradient(circle at center, ${project.color} 0%, transparent 80%)`,
+              filter: project.isLocked ? 'grayscale(1) brightness(1.5)' : 'none'
+            }}
+            className="absolute w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 blur-[60px]" 
+          />
+        </div>
 
         {/* Locked Overlay */}
         {project.isLocked && (
