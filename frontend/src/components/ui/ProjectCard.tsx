@@ -133,7 +133,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
 
         <div className="flex-1 flex flex-col h-full relative z-10 pointer-events-none text-right" style={{ transformStyle: "preserve-3d" }}>
           <div style={{ transform: "translateZ(80px)", transformStyle: "preserve-3d" }} className="space-y-4">
-            <div className={`text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] font-display ${project.isLocked ? 'blur-sm' : ''}`}>{project.category}</div>
+            <div className={`text-[10px] font-bold text-zinc-400 uppercase font-display ${project.isLocked ? 'blur-sm' : ''}`}>{project.category}</div>
             <h3 className="text-3xl md:text-4xl font-bold weight-plus-1 font-display text-white leading-tight">
               {project.title}
             </h3>
