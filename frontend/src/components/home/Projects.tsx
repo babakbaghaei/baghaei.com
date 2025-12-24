@@ -179,7 +179,7 @@ export default function Projects() {
         <div 
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className="flex overflow-x-auto -mr-6 pb-20 pl-8 md:pl-48 no-scrollbar relative z-10 touch-pan-x"
+          className="flex overflow-x-auto -mr-6 pb-20 pl-8 md:pl-48 no-scrollbar relative z-10"
         >
           {staticProjects.map((p) => (
             <ProjectCard key={p.id} project={p} onClick={() => setSelectedProject(p)} />

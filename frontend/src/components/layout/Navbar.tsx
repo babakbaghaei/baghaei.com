@@ -97,6 +97,10 @@ export default function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div variants={menuVariants} initial="closed" animate="open" exit="closed" className="fixed inset-0 bg-black z-[90] flex flex-col justify-center px-12">
+            <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-8 left-6 flex items-center gap-2 text-zinc-500">
+              <span className="text-sm font-bold uppercase">بازگشت</span>
+              <X className="w-6 h-6" />
+            </button>
             <div className="space-y-8">
               {navLinks.map((link) => (
                 <button key={link.id} onClick={() => scrollTo(link.id)} className="text-5xl font-black font-display text-white text-right block w-full">{link.label}</button>

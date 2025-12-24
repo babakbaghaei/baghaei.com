@@ -41,7 +41,7 @@ export default function Services() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ delay: index * 0.05 }}
-              className="relative overflow-hidden p-12 border border-zinc-50 dark:border-zinc-900 rounded-[3rem] bg-zinc-50/30 dark:bg-zinc-900/20 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-500 group"
+              className="relative overflow-hidden p-12 border border-zinc-50 dark:border-zinc-900 rounded-[3rem] bg-zinc-50/30 dark:bg-zinc-900/20 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-500 group"
             >
               {/* Card Background Icon */}
               <div className="absolute -bottom-10 -left-10 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500 transform rotate-12 pointer-events-none">
