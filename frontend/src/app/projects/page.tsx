@@ -19,7 +19,7 @@ export default function AllProjectsPage() {
       <Section className="pt-48 pb-20">
         <Heading subtitle="تمام آثار">پروژه‌های</Heading>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mt-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 mt-20">
           {PROJECTS_DATA.map((project) => (
             <ProjectCard 
               key={project.id} 

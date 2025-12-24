@@ -15,7 +15,6 @@ const navLinks = [
   { id: 'philosophy', label: 'فلسفه ما' },
   { id: 'projects', label: 'پروژه‌ها' },
   { id: 'services', label: 'خدمات' },
-  { id: 'careers', label: 'استخدام' },
   { id: 'contact', label: 'ارتباط' },
 ];
 
