@@ -61,7 +61,7 @@ export default function Navbar() {
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center relative">
         <a href="#" onClick={(e) => { e.preventDefault(); scrollTo('hero'); }} className="flex items-center gap-4 group cursor-pointer">
-          <Logo className="w-8 h-8" />
+          <Logo className="w-8 h-8 text-white" />
           <span className="text-base md:text-lg font-bold text-white uppercase hidden sm:inline font-display">گروه فناوری بقایی</span>
         </a>
 

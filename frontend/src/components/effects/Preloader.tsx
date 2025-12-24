@@ -30,7 +30,7 @@ export default function Preloader() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="w-24 h-24 text-white"
+              className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center text-black p-6"
             >
               <Logo className="w-full h-full" />
             </motion.div>
