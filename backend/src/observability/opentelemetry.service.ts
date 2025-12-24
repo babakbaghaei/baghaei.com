@@ -1,15 +1,14 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 
 @Injectable()
-export class OpenTelemetryService implements OnModuleInit {
+export class OpenTelemetryService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(OpenTelemetryService.name);
   private sdk: NodeSDK;
 
@@ -17,20 +16,18 @@ export class OpenTelemetryService implements OnModuleInit {
     // Configure OpenTelemetry SDK
     this.sdk = new NodeSDK({
       resource: new Resource({
-        [SemanticResourceAttributes.SERVICE_NAME]: process.env.SERVICE_NAME || 'baghaei-backend',
-        [SemanticResourceAttributes.SERVICE_VERSION]: process.env.SERVICE_VERSION || '1.0.0',
+        [ATTR_SERVICE_NAME]: process.env.SERVICE_NAME || 'baghaei-backend',
+        [ATTR_SERVICE_VERSION]: process.env.SERVICE_VERSION || '1.0.0',
       }),
       metricReader: new PeriodicExportingMetricReader({
         exporter: new PrometheusExporter({
           port: 9464, // Default Prometheus metrics port
-        }),
+        }) as any,
       }),
-      // For development, we'll also export to Jaeger for tracing
-      // In production, you might want to use OTLP exporters
       traceExporter: new JaegerExporter({
         host: process.env.JAEGER_HOST || 'localhost',
-        port: parseInt(process.env.JAEGER_PORT || '6832'),
-      }),
+        port: 6832,
+      }) as any,
       instrumentations: [getNodeAutoInstrumentations()],
     });
 
@@ -44,8 +41,10 @@ export class OpenTelemetryService implements OnModuleInit {
 
   async onModuleDestroy() {
     try {
-      await this.sdk?.shutdown();
-      this.logger.log('OpenTelemetry SDK shut down successfully');
+      if (this.sdk) {
+        await this.sdk.shutdown();
+        this.logger.log('OpenTelemetry SDK shut down successfully');
+      }
     } catch (error) {
       this.logger.error(`Error shutting down OpenTelemetry SDK: ${error.message}`);
     }
