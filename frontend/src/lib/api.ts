@@ -8,14 +8,14 @@ const getAuthHeader = (): Record<string, string> => {
 
 export const api = {
   async get(endpoint: string) {
-    const res = await fetch(`https://api.baghaei.com${endpoint}`, {
+    const res = await fetch(`http://127.0.0.1:8000${endpoint}`, {
       headers: { ...getAuthHeader() },
     });
     return res.json();
   },
 
   async post(endpoint: string, data: any) {
-    const res = await fetch(`https://api.baghaei.com${endpoint}`, {
+    const res = await fetch(`http://127.0.0.1:8000${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ export const api = {
   },
 
   async put(endpoint: string, data: any) {
-    const res = await fetch(`https://api.baghaei.com${endpoint}`, {
+    const res = await fetch(`http://127.0.0.1:8000${endpoint}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const api = {
   },
 
   async delete(endpoint: string) {
-    const res = await fetch(`https://api.baghaei.com${endpoint}`, {
+    const res = await fetch(`http://127.0.0.1:8000${endpoint}`, {
       method: 'DELETE',
       headers: { ...getAuthHeader() },
     });
