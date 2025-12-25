@@ -17,17 +17,17 @@ export const StatItem: React.FC<StatItemProps> = ({ label, value, className = ""
   // Create a transform that checks for the "10+" milestone
   const isTenPlus = useTransform(
     isMotionValue ? (value as MotionValue<string>) : fallbackValue, 
-    (v) => v === '10+' || v === '۱۰+'
+    (v) => (v === '10+' || v === '۱۰+') ? 1 : 0
   );
   
   // Static check for initial render or non-motion values
   const initialIsTenPlus = !isMotionValue && (value === '10+' || value === '۱۰+');
 
   // Animated properties
-  const targetScale = useTransform(isTenPlus, [false, true], [1, 1.15]);
+  const targetScale = useTransform(isTenPlus, [0, 1], [1, 1.15]);
   const scale = useSpring(initialIsTenPlus ? 1.15 : targetScale, { stiffness: 300, damping: 15 });
   
-  const targetWeight = useTransform(isTenPlus, [false, true], [700, 900]);
+  const targetWeight = useTransform(isTenPlus, [0, 1], [700, 900]);
   const fontWeight = targetWeight;
 
   return (
