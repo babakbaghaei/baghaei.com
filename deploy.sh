@@ -35,6 +35,11 @@ sshpass -p "$SERVER_PASS" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_I
 
     # Backend Build
     install_deps "backend"
+    echo "🗄️ Running Prisma Generate & Migrate..."
+    cd $PROJECT_PATH/backend
+    npx prisma generate || { echo "❌ Prisma generate failed"; exit 1; }
+    npx prisma migrate deploy || { echo "❌ Prisma migrate failed"; exit 1; }
+    
     echo "🏗️ Building Backend..."
     npm run build || { echo "❌ Backend build failed"; exit 1; }
 
