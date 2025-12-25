@@ -40,12 +40,12 @@ export const Card: React.FC<CardProps> = ({
   const mouseX = useMotionValue(-1000);
   const mouseY = useMotionValue(-1000);
 
-  const springConfig = { stiffness: 400, damping: 30, restDelta: 0.001 };
+  const springConfig = { stiffness: 300, damping: 40, restDelta: 0.001 };
   const tiltX = useSpring(0, springConfig);
   const tiltY = useSpring(0, springConfig);
   const scale = useSpring(1, springConfig);
-  const innerGlowOpacity = useSpring(0, springConfig);
-  const borderOpacity = useSpring(0.2, springConfig);
+  const innerGlowOpacity = useSpring(0, { stiffness: 200, damping: 35 });
+  const borderOpacity = useSpring(0.2, { stiffness: 200, damping: 35 });
 
   const rotateX = useTransform(tiltY, [-0.5, 0.5], [15, -15]);
   const rotateY = useTransform(tiltX, [-0.5, 0.5], [-15, 15]);
@@ -115,7 +115,6 @@ export const Card: React.FC<CardProps> = ({
     <CardContext.Provider value={{ tiltX, tiltY }}>
       <div 
         ref={containerRef}
-        data-cursor="card"
         className={`relative group ${className} ${roundedClass} select-none`}
         style={{ perspective: "2000px" }}
       >

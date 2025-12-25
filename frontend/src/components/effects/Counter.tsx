@@ -9,36 +9,33 @@ interface CounterProps {
 }
 
 export function Counter({ value }: CounterProps) {
-  const [displayValue, setDisplayValue] = useState('0');
+  const [displayValue, setDisplayValue] = useState('۰');
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   
-  // Extract number and suffix (e.g., "10+" -> number: 10, suffix: "+")
-  const numericPart = parseFloat(value.replace(/[^0-9.]/g, ''));
-  const suffix = value.replace(/[0-9.]/g, '');
+  // Normalize value: convert Persian digits to English for calculation
+  const strValue = value ? value.toString() : '0';
+  const normalized = strValue.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString());
+  const numericPart = parseFloat(normalized.replace(/[^0-9.]/g, '')) || 0;
+  const suffix = strValue.replace(/[0-9.۰-۹]/g, '');
 
   useEffect(() => {
-    if (isInView) {
+    if (isInView && !isNaN(numericPart)) {
       const controls = animate(0, numericPart, {
         duration: 2,
         ease: [0.16, 1, 0.3, 1],
         onUpdate: (latest) => {
-          let formatted;
-          if (value.includes('%')) {
-            formatted = latest.toFixed(1);
-          } else {
-            formatted = Math.floor(latest).toString();
-          }
-          setDisplayValue(formatted.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]));
+          const val = Math.floor(latest);
+          setDisplayValue(val.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]));
         },
       });
       return () => controls.stop();
     }
-  }, [isInView, numericPart, value]);
+  }, [isInView, numericPart]);
 
   return (
-    <span ref={ref} className="font-display" dir="ltr">
-      {displayValue}{suffix.replace(/\+/g, '+').replace(/%/g, '٪').replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)])}
+    <span ref={ref} className="font-display">
+      {displayValue}{suffix}
     </span>
   );
 }

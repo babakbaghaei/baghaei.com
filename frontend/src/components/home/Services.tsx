@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useMotionTemplate } from 'framer-motion';
 import { Section, Heading } from '../ui/Layout';
 import { Card, useCardTilt } from '../ui/Card';
@@ -18,30 +18,27 @@ import { toPersianDigits } from '@/lib/utils/format';
 const ServiceIcon = ({ Icon }: { Icon: any }) => {
   const { tiltX, tiltY } = useCardTilt();
   
-  // Inverting light physics for accurate reflection:
-  // Highlights move towards the light source (mouse)
+  // High-fidelity light reaction: shadows move away from the light source
   const hX = useTransform(tiltX, [-0.5, 0.5], [10, -10]);
   const hY = useTransform(tiltY, [-0.5, 0.5], [10, -10]);
-  
-  // Shadows move away from the light source
   const sX = useTransform(tiltX, [-0.5, 0.5], [-15, 15]);
   const sY = useTransform(tiltY, [-0.5, 0.5], [-15, 15]);
   
   const hOpacity = useTransform(tiltX, [-0.5, 0, 0.5], [0.6, 0.1, 0.6]);
-  const iconScale = useTransform(tiltX, [-0.5, 0.5], [1.05, 0.95]);
+  const iconScale = useTransform(tiltX, [-0.5, 0.5], [0.9, 0.8]);
 
-  const filter = useMotionTemplate`drop-shadow(${hX}px ${hY}px 10px rgba(255,255,255,${hOpacity})) drop-shadow(${sX}px ${sY}px 40px rgba(0,0,0,0.95))`;
+  const filter = useMotionTemplate`drop-shadow(${hX}px ${hY}px 4px rgba(255,255,255,${hOpacity})) drop-shadow(${sX}px ${sY}px 20px rgba(0,0,0,0.95))`;
 
   return (
     <motion.div 
-      className="absolute -bottom-16 -left-16 opacity-[0.25] pointer-events-none"
+      className="absolute -bottom-8 -left-8 opacity-[0.12] pointer-events-none"
       style={{ 
-        transform: "translateZ(30px) rotate(12deg)",
+        transform: "translateZ(20px) rotate(12deg)",
         scale: iconScale,
         filter
       }}
     >
-      <Icon className="w-72 h-72 text-white" strokeWidth={0.5} />
+      <Icon className="w-64 h-64 text-white" strokeWidth={2} />
     </motion.div>
   );
 };
@@ -57,11 +54,15 @@ const servicesData = [
 
 export default function Services() {
   const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+
+  const { scrollYProgress } = useScroll({ 
+    target: sectionRef, 
+    offset: ["start end", "end start"] 
+  });
   const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
   return (
-    <Section sectionRef={sectionRef} id="services">
+    <Section sectionRef={sectionRef} id="services" className="border-t border-zinc-900">
       {/* Section Background Icon */}
       <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
         <Layers className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
@@ -87,21 +88,30 @@ export default function Services() {
                 glowColor="rgba(255,255,255,0.05)"
                 maskedContent={<ServiceIcon Icon={service.Icon} />}
               >
-                <div style={{ transform: "translateZ(10px)" }} className="text-sm font-bold font-display text-zinc-700 mb-8 group-hover:text-zinc-400 transition-colors">
+                <div 
+                  style={{ transform: "translateZ(40px)" }} 
+                  className="text-sm font-bold font-display text-zinc-700 mb-8 group-hover:text-zinc-400 transition-colors"
+                >
                   {toPersianDigits(service.id)}
                 </div>
                 <div style={{ transformStyle: "preserve-3d" }} className="space-y-4">
-                  <h3 style={{ transform: "translateZ(30px)" }} className="text-2xl font-bold font-display text-white">
+                  <h3 
+                    style={{ transform: "translateZ(30px)" }} 
+                    className="text-2xl font-bold font-display text-white"
+                  >
                     {service.title}
                   </h3>
-                  <p style={{ transform: "translateZ(15px)" }} className="text-zinc-500 text-base leading-relaxed group-hover:text-zinc-400 transition-colors">
+                  <p 
+                    style={{ transform: "translateZ(15px)" }} 
+                    className="text-zinc-500 text-base leading-relaxed group-hover:text-zinc-400 transition-colors"
+                  >
                     {service.desc}
                   </p>
                 </div>
               </Card>
             </motion.div>
-        ))}
-      </div>
+          ))}
+        </div>
     </Section>
   );
 }

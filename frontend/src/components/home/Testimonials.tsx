@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { User, MessageSquare, Quote } from 'lucide-react';
 import { motion, useScroll, useTransform, useMotionTemplate } from 'framer-motion';
 import { Section, Heading } from '../ui/Layout';
@@ -38,9 +38,12 @@ const testimonials = [
 
 export default function Testimonials() {
   const { play } = useSound();
-
   const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+
+  const { scrollYProgress } = useScroll({ 
+    target: sectionRef, 
+    offset: ["start end", "end start"] 
+  });
   const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
   return (
@@ -52,7 +55,7 @@ export default function Testimonials() {
 
       <Heading subtitle="برترین‌ها">اعتماد</Heading>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-6 lg:px-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
         {testimonials.map((t, index) => (
           <motion.div
             key={t.id}
@@ -69,7 +72,10 @@ export default function Testimonials() {
               className="flex-1"
               maskedContent={<ReactiveQuote />}
             >
-              <p style={{ transform: "translateZ(20px)" }} className="text-sm md:text-base font-medium font-sans leading-relaxed text-zinc-300 text-right relative z-10">
+              <p 
+                style={{ transform: "translateZ(30px)" }} 
+                className="text-sm md:text-base font-medium font-sans leading-relaxed text-zinc-300 text-right relative z-10"
+              >
                 «{t.content}»
               </p>
             </Card>

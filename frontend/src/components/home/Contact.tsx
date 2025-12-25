@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useTransition, useRef } from 'react';
+import React, { useState, useTransition, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { submitContactForm } from '@/app/actions';
 import { Mail, Send, Check, Loader2 } from 'lucide-react';
 import { Section, Heading } from '../ui/Layout';
 import { Button } from '../ui/Button';
+import Magnetic from '@/components/effects/Magnetic';
 import { useSound } from '@/lib/utils/sounds';
 
 export default function Contact() {
@@ -13,8 +14,8 @@ export default function Contact() {
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const { play } = useSound();
 
-  const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  // Use GLOBAL scroll to avoid hydration issues with refs
+  const { scrollYProgress } = useScroll();
   const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,7 +36,7 @@ export default function Contact() {
   };
 
   return (
-    <Section sectionRef={sectionRef} id="contact" className="border-t border-zinc-900">
+    <Section id="contact" className="border-t border-zinc-900">
       {/* Background Icon */}
       <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
         <Mail className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
@@ -70,21 +71,23 @@ export default function Contact() {
           </div>
 
           <div className="mt-16 flex flex-col items-start gap-12">
-            <Button
-              type="submit"
-              isLoading={isPending}
-              disabled={status === 'success'}
-              className="px-16 py-8 text-xl"
-              rightIcon={
-                status === 'success' ? (
-                  <Check className="w-6 h-6 text-green-800" strokeWidth={3} />
-                ) : (
-                  <Send className="w-6 h-6" />
-                )
-              }
-            >
-              {status === 'success' ? 'ارسال شد' : 'ارسال'}
-            </Button>
+            <Magnetic>
+              <Button
+                type="submit"
+                isLoading={isPending}
+                disabled={status === 'success'}
+                className="px-16 py-8 text-xl"
+                rightIcon={
+                  status === 'success' ? (
+                    <Check className="w-6 h-6 text-green-800" strokeWidth={3} />
+                  ) : (
+                    <Send className="w-6 h-6" />
+                  )
+                }
+              >
+                {status === 'success' ? 'ارسال شد' : 'ارسال'}
+              </Button>
+            </Magnetic>
 
             {status === 'error' && (
               <motion.p initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="text-red-600 font-bold uppercase tracking-widest text-sm font-display">

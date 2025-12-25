@@ -59,14 +59,14 @@ export default function CustomCursor() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 bg-white mix-blend-difference rounded-full pointer-events-none z-[9999] hidden lg:flex items-center justify-center overflow-hidden will-change-[width,height,transform]"
+      className="fixed top-0 left-0 bg-white rounded-full pointer-events-none z-[9999] hidden lg:flex items-center justify-center overflow-hidden will-change-[width,height,transform]"
       style={{
         left: x,
         top: y,
         x: "-50%",
         y: "-50%",
-        width: isHovering ? (cursorText ? 100 : 60) : 12,
-        height: isHovering ? (cursorText ? 100 : 60) : 12,
+        width: isHovering ? (cursorText ? 100 : 40) : 6,
+        height: isHovering ? (cursorText ? 100 : 40) : 6,
       }}
     >
       {cursorText && (

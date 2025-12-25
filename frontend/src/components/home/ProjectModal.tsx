@@ -81,14 +81,16 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
           {/* Expanding Card */}
           <motion.div 
             layoutId={`project-${project.id}`}
-            className="bg-[#0a0a0a] w-full max-w-6xl h-full md:h-[80vh] md:rounded-[3rem] border-x border-white/10 md:border border-white/10 shadow-2xl relative flex flex-col z-10 overflow-hidden" 
+            className="w-full max-w-6xl h-full md:h-[80vh] md:rounded-[3rem] border-x border-white/10 md:border border-white/10 shadow-2xl relative flex flex-col z-10 overflow-hidden" 
+            style={{ 
+              backgroundColor: '#0a0a0a',
+              backgroundImage: `linear-gradient(to bottom, ${project.borderColor.replace('0.8', '0.1')}, #0a0a0a)`,
+              willChange: 'transform, opacity'
+            }}
             transition={{ type: 'spring', stiffness: 300, damping: 35 }}
           >
-            {/* Ambient Background Glow */}
-            <div 
-              className="absolute top-0 right-0 w-[600px] h-[600px] opacity-10 pointer-events-none z-0" 
-              style={{ background: project.color }} 
-            />
+            {/* Overlay to ensure readability and solid base */}
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-3xl pointer-events-none z-0" />
             
             {/* Content Container */}
             <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10" dir="ltr">

@@ -4,7 +4,6 @@ import Script from "next/script";
 import BackgroundGrid from "@/components/effects/BackgroundGrid";
 import CookieConsent from "@/components/layout/CookieConsent";
 import { RootMobileMenu } from "@/components/layout/RootMobileMenu";
-import { CustomCursor } from "@/components/ui/CustomCursor";
 
 export const metadata: Metadata = {
   title: {
@@ -76,8 +75,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl" className="dark">
-      <body className="antialiased bg-black selection:bg-white selection:text-black cursor-none">
-        <CustomCursor />
+      <body className="antialiased bg-black selection:bg-white selection:text-black">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-YSHJT31R0K"
           strategy="afterInteractive"

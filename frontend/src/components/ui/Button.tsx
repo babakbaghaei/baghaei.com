@@ -37,7 +37,6 @@ export const Button: React.FC<ButtonProps> = ({
       whileHover={{ y: -2 }}
       whileTap={{ y: 0 }}
       onHoverStart={() => play('hover')}
-      data-cursor={variant === 'primary' ? 'black' : 'link'}
       onClick={(e) => {
         play('click');
         if (props.onClick) props.onClick(e as any);

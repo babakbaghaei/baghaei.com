@@ -39,26 +39,6 @@ export default function BackgroundGrid() {
           backgroundSize: '40px 40px'
         }} 
       />
-
-      {/* Interactive Spotlight on Grid */}
-      <motion.div 
-        className="absolute inset-0 opacity-[0.15]"
-        style={{
-          background: spotlightBackground,
-          maskImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
-          maskSize: '40px 40px',
-          WebkitMaskImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
-          WebkitMaskSize: '40px 40px',
-        }}
-      />
-
-      {/* Subtle Ambient Light */}
-      <motion.div 
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          background: ambientBackground
-        }}
-      />
     </div>
   );
 }

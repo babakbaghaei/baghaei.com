@@ -24,15 +24,6 @@ const legalLinks = [
 ];
 
 export default function Footer() {
-  const textRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: textRef,
-    offset: ["start end", "end end"]
-  });
-
-  const clipPath = useTransform(scrollYProgress, [0, 1], ["inset(0 0 50% 0)", "inset(0 0 0% 0)"]);
-  const y = useTransform(scrollYProgress, [0, 1], [50, 0]);
-
   return (
     <footer className="bg-black pt-60 pb-20 relative overflow-hidden transition-colors duration-700">
       <div className="max-w-7xl mx-auto px-6 lg:px-16 relative z-10">
@@ -69,13 +60,14 @@ export default function Footer() {
         </div>
 
         {/* Massive Background Text */}
-        <motion.div 
-          ref={textRef}
-          style={{ clipPath, y }}
-          className="text-[15vw] font-black text-zinc-900/50 leading-none select-none pointer-events-none mb-12 tracking-tighter uppercase"
+        <div 
+          style={{ 
+            WebkitTextStroke: '1px rgba(255,255,255,0.3)'
+          }}
+          className="text-[12vw] md:text-[18vw] font-black text-transparent leading-none select-none pointer-events-none mb-12 tracking-tighter uppercase opacity-30 text-right w-full"
         >
-          Baghaei Tech
-        </motion.div>
+          BAGHAEI TECH
+        </div>
 
         {/* Bottom Bar */}
         <div className="pt-12 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-8">

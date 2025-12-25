@@ -15,7 +15,13 @@ import {
   Layout,
   Terminal,
   Box,
-  Braces
+  Braces,
+  Gamepad2,
+  Globe,
+  Palette,
+  Cloud,
+  Radio,
+  Workflow
 } from 'lucide-react';
 import { formatMetric } from '@/lib/utils/format';
 import { useSound } from '@/lib/utils/sounds';
@@ -42,24 +48,46 @@ export interface Project {
 interface ProjectCardProps {
   project: Project;
   onClick: () => void;
+  compact?: boolean;
 }
 
 const TechIcon = ({ name }: { name: string }) => {
   const n = name.toLowerCase();
-  if (n.includes('react') || n.includes('next')) return <Code2 className="w-3 h-3" />;
-  if (n.includes('node') || n.includes('go') || n.includes('python') || n.includes('fastapi')) return <Terminal className="w-3 h-3" />;
-  if (n.includes('postgresql') || n.includes('sql') || n.includes('mongo') || n.includes('redis')) return <Database className="w-3 h-3" />;
-  if (n.includes('docker') || n.includes('k8s') || n.includes('kubern')) return <Box className="w-3 h-3" />;
-  if (n.includes('ai') || n.includes('llm') || n.includes('torch')) return <Cpu className="w-3 h-3" />;
-  if (n.includes('aws') || n.includes('cloud')) return <Server className="w-3 h-3" />;
-  if (n.includes('security') || n.includes('امنیت')) return <Shield className="w-3 h-3" />;
-  if (n.includes('android') || n.includes('ios') || n.includes('mobile')) return <Smartphone className="w-3 h-3" />;
+  // Frontend / Web
+  if (n.includes('react') || n.includes('next') || n.includes('vue') || n.includes('html') || n.includes('css')) return <Globe className="w-3 h-3" />;
   if (n.includes('webgl') || n.includes('three')) return <Layers className="w-3 h-3" />;
-  if (n.includes('branding') || n.includes('ui')) return <Layout className="w-3 h-3" />;
+  
+  // Mobile
+  if (n.includes('android') || n.includes('ios') || n.includes('mobile') || n.includes('flutter')) return <Smartphone className="w-3 h-3" />;
+  
+  // Game
+  if (n.includes('unity') || n.includes('c#') || n.includes('game') || n.includes('fmod')) return <Gamepad2 className="w-3 h-3" />;
+  
+  // Backend / Langs
+  if (n.includes('node') || n.includes('go') || n.includes('python') || n.includes('fastapi') || n.includes('c++')) return <Terminal className="w-3 h-3" />;
+  if (n.includes('graphql') || n.includes('api') || n.includes('websockets')) return <Workflow className="w-3 h-3" />;
+  
+  // Data
+  if (n.includes('sql') || n.includes('mongo') || n.includes('redis') || n.includes('prisma') || n.includes('elastic')) return <Database className="w-3 h-3" />;
+  
+  // DevOps / Infra
+  if (n.includes('docker') || n.includes('k8s') || n.includes('kubern') || n.includes('linux')) return <Box className="w-3 h-3" />;
+  if (n.includes('aws') || n.includes('cloud')) return <Cloud className="w-3 h-3" />;
+  if (n.includes('kafka') || n.includes('message')) return <Radio className="w-3 h-3" />;
+  
+  // AI
+  if (n.includes('ai') || n.includes('llm') || n.includes('torch') || n.includes('gpt')) return <Cpu className="w-3 h-3" />;
+  
+  // Security
+  if (n.includes('security') || n.includes('امنیت')) return <Shield className="w-3 h-3" />;
+  
+  // Design
+  if (n.includes('branding') || n.includes('ui') || n.includes('design') || n.includes('figma')) return <Palette className="w-3 h-3" />;
+  
   return <Braces className="w-3 h-3" />;
 };
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, compact = false }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const { play } = useSound();
@@ -71,13 +99,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
   const mouseX = useMotionValue(-1000);
   const mouseY = useMotionValue(-1000);
 
-  const springConfig = { stiffness: 400, damping: 30 };
+  const springConfig = { stiffness: 300, damping: 40 };
   const tiltX = useSpring(0, springConfig);
   const tiltY = useSpring(0, springConfig);
   const scale = useSpring(1, springConfig);
   
-  const innerGlowOpacity = useSpring(0, { stiffness: 300, damping: 30 });
-  const borderOpacity = useSpring(0.4, { stiffness: 300, damping: 30 });
+  const innerGlowOpacity = useSpring(0, { stiffness: 200, damping: 35 });
+  const borderOpacity = useSpring(0.4, { stiffness: 200, damping: 35 });
 
   const rotateX = useTransform(tiltY, [-0.5, 0.5], [12, -12]);
   const rotateY = useTransform(tiltX, [-0.5, 0.5], [-12, 12]);
@@ -166,25 +194,22 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
     };
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
-    // Removed scroll listeners to improve performance
     
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
-      // Removed scroll listeners cleanup
     };
   }, [project.isLocked, isTouchDevice]);
 
   return (
     <div 
       ref={containerRef}
-      className="shrink-0 w-[85vw] md:w-[450px] relative p-2 md:p-8 select-none"
+      className={`shrink-0 w-full h-full relative select-none ${compact ? 'p-1 md:p-2' : 'p-2 md:p-4'}`}
       style={{ perspective: "2000px" }}
     >
       <motion.div
         ref={cardRef}
         layoutId={`project-${project.id}`}
         onClick={project.isLocked ? undefined : onClick}
-        data-cursor={project.isLocked ? undefined : "project"}
         style={{ 
           rotateX, 
           rotateY, 
@@ -192,13 +217,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
           transformStyle: "preserve-3d",
           willChange: isHovered ? "transform" : "auto"
         }}
-        className={`project-card group relative flex flex-col h-[550px] md:h-[600px] w-full z-10 bg-[#0a0a0a] rounded-[2.5rem] md:rounded-[3rem] ${project.isLocked ? 'cursor-default' : 'cursor-pointer'}`}
+        className={`project-card group relative flex flex-col h-full w-full z-10 bg-[#0a0a0a] rounded-[2rem] md:rounded-[2.5rem] ${project.isLocked ? 'cursor-default' : 'cursor-pointer'}`}
       >
         {/* 1. Clipping Background Layer */}
-        <div className="absolute inset-0 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl overflow-hidden z-0 bg-[#0a0a0a]">
+        <div className="absolute inset-0 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden z-0 bg-[#0a0a0a]">
           {/* Static Tint Layer */}
           <div 
-             className="absolute inset-0" 
+             className="absolute inset-0 w-full h-full" 
              style={{ backgroundColor: project.isLocked ? 'transparent' : project.color, opacity: 0.05 }}
           />
           
@@ -213,13 +238,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
             />
           )}
           
-          {/* Border Glow - Only visible when mouse is near */}
+          {/* Border Glow */}
           {!isTouchDevice && (
             <motion.div 
-              className="absolute inset-0 pointer-events-none rounded-[2.5rem] md:rounded-[3rem] z-20"
+              className="absolute inset-0 pointer-events-none rounded-[2rem] md:rounded-[2.5rem] z-20"
               style={{
                 opacity: borderOpacity,
-                padding: '2px',
+                padding: '1px',
                 background: borderBackground,
                 WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', 
                 WebkitMaskComposite: 'xor', 
@@ -229,51 +254,52 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
           )}
         </div>
 
-        {/* 2. Full Content Layer (Inside Card) */}
-        <div className="flex-1 flex flex-col h-full relative z-10 p-8 md:p-12 pointer-events-none text-right" style={{ 
-          transformStyle: "preserve-3d",
-          opacity: project.isLocked ? 0.4 : 1,
-          filter: project.isLocked ? 'blur(5px)' : 'none'
-        }}>
-          <div style={{ transform: isTouchDevice ? "none" : "translateZ(100px)" }} className="space-y-3 md:space-y-4">
-            <div className="text-[9px] md:text-[10px] font-bold text-white/40 uppercase font-display tracking-normal">{project.category}</div>
-            <h3 className="text-2xl md:text-4xl font-display text-white leading-tight font-black">
-              {project.title}
-            </h3>
-            <div className="mt-2 md:mt-4 inline-flex items-center gap-2 text-white/40 text-[9px] md:text-[10px] font-bold font-display tracking-normal">
-              <div className="w-1 h-1 bg-white/20 rounded-full" />
-              <span>{project.role}</span>
-            </div>
-          </div>
-
-          <div style={{ transform: isTouchDevice ? "none" : "translateZ(60px)" }} className="mt-6 md:mt-8">
-            <p className="text-white/50 font-sans leading-relaxed text-sm md:text-base line-clamp-3">{project.desc}</p>
-          </div>
-
-          {project.tech && (
-            <div style={{ transform: isTouchDevice ? "none" : "translateZ(50px)" }} className="flex flex-wrap gap-1.5 md:gap-2 mt-4 md:mt-6 justify-start">
-              {project.tech.map((t, i) => (
-                <span key={i} className="px-2.5 md:px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[7px] md:text-[8px] font-bold text-white/50 uppercase tracking-wider flex items-center gap-1.5">
-                  {t}
-                  <TechIcon name={t} />
-                </span>
-              ))}
-            </div>
-          )}
-          
-          <div style={{ transform: isTouchDevice ? "none" : "translateZ(40px)" }} className="grid grid-cols-2 gap-4 md:gap-8 pt-8 md:pt-10 border-t border-white/5 mt-auto">
-            {project.metrics.map((m, i) => (
-              <div key={i} style={{ transformStyle: "preserve-3d" }}>
-                <div className="text-[8px] md:text-[9px] text-white/30 uppercase font-bold font-display mb-1 tracking-wider">{m.label}</div>
-                <div className="text-xl md:text-2xl font-bold font-display text-white" style={{ transform: isTouchDevice ? "none" : "translateZ(20px)" }}>{formatMetric(m.value)}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
+        {/* 2. Full Content Layer */}
+                <div className={`flex-1 flex flex-col h-full relative z-10 pointer-events-none text-right ${compact ? 'p-5 md:p-6 justify-center' : 'p-6 md:p-8'}`} style={{
+                  transformStyle: "preserve-3d",
+                  opacity: project.isLocked ? 0.4 : 1,
+                  filter: project.isLocked ? 'blur(5px)' : 'none'
+                }}>
+                  <div style={{ transform: isTouchDevice ? "none" : "translateZ(100px)" }} className={`space-y-3 ${compact ? 'md:space-y-1' : 'md:space-y-4'}`}>
+                    <div className="flex items-center justify-start gap-2">
+                      <span className="text-[9px] md:text-[10px] font-bold text-white/60 uppercase font-display tracking-normal bg-white/5 px-2 py-1 rounded-full">{project.category}</span>
+                    </div>
+                    <h3 className={`font-display text-white leading-tight font-black ${compact ? 'text-lg md:text-xl' : 'text-2xl md:text-3xl'}`}>
+                      {project.title}
+                    </h3>
+                    {!compact && (
+                      <div className="mt-2 inline-flex items-center gap-2 text-white/50 text-[10px] md:text-xs font-bold font-display tracking-normal">
+                        <div className="w-1.5 h-1.5 bg-white/20 rounded-full" />
+                        <span>{project.role}</span>
+                      </div>
+                    )}
+                  </div>
+        
+                  {!compact && (
+                    <div style={{ transform: isTouchDevice ? "none" : "translateZ(60px)" }} className="mt-4">
+                      <p className="text-white/60 font-sans leading-relaxed text-sm line-clamp-4">{project.desc}</p>
+                    </div>
+                  )}
+        
+                  {project.tech && (
+                    <div style={{ transform: isTouchDevice ? "none" : "translateZ(50px)" }} className={`flex flex-wrap gap-1.5 md:gap-2 mt-auto justify-start`} dir="ltr">
+                      {project.tech.slice(0, compact ? 4 : 4).map((t, i) => (
+                        <span key={i} className={`rounded-full bg-white/5 border border-white/10 font-bold text-white/40 uppercase tracking-wider flex items-center gap-1.5 hover:bg-white/10 transition-colors ${compact ? 'p-1.5' : 'pl-1.5 pr-2.5 py-1 text-[9px]'}`}>
+                          <TechIcon name={t} />
+                          {!compact && t}
+                        </span>
+                      ))}
+                      {project.tech.length > (compact ? 4 : 4) && (
+                        <span className={`px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold text-white/40 uppercase tracking-wider`}>
+                          +{project.tech.length - (compact ? 4 : 4)}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
         {/* 4. Locked Overlay */}
         {project.isLocked && (
-          <div className="absolute inset-0 z-40 bg-black/50 flex items-center justify-center flex-col gap-3 md:gap-4 rounded-[2.5rem] md:rounded-[3rem] text-center p-6">
+          <div className="absolute inset-0 z-40 bg-black/50 flex items-center justify-center flex-col gap-3 md:gap-4 rounded-[2rem] md:rounded-[2.5rem] text-center p-6">
             <div style={{ transform: isTouchDevice ? "none" : "translateZ(60px)" }} className="w-12 h-12 md:w-14 md:h-14 bg-white/5 border border-white/10 rounded-full flex items-center justify-center">
               <Hammer className="w-4 h-4 md:w-5 md:h-5 text-zinc-500" />
             </div>

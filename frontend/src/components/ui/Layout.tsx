@@ -53,12 +53,16 @@ interface SectionProps {
   children: React.ReactNode;
   className?: string;
   containerClassName?: string;
-  sectionRef?: React.RefObject<HTMLElement | null>;
+  sectionRef?: React.RefObject<any>;
 }
 
 export const Section: React.FC<SectionProps> = ({ id, children, className = "", containerClassName = "", sectionRef }) => {
   return (
-    <section ref={sectionRef} id={id} className={`py-40 relative overflow-hidden transition-colors duration-700 ${className}`}>
+    <section 
+      ref={sectionRef} 
+      id={id} 
+      className={`py-40 relative transition-colors duration-700 bg-black ${className}`}
+    >
       <div className={`max-w-7xl mx-auto px-6 lg:px-16 relative z-10 ${containerClassName}`}>
         {children}
       </div>
