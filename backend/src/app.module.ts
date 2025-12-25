@@ -36,7 +36,7 @@ import { SecurityModule } from './security/security.module';
     ProjectsModule,
     ContactModule,
     AuthModule,
-    OpenTelemetryModule,
+    // OpenTelemetryModule,
     SecurityModule,
   ],
   controllers: [AppController],
