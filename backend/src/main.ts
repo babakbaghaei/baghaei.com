@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
   // Use pino-logger
-  app.useLogger(app.get(Logger));
+  // app.useLogger(app.get(Logger));
 
   // Global Exception Filter
   const httpAdapterHost = app.get(HttpAdapterHost);
