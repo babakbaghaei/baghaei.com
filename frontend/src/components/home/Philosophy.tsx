@@ -19,12 +19,24 @@ export default function Philosophy() {
   const [selection, setSelection] = useState({ startX: 0, startY: 0, x: 0, y: 0, w: 0, h: 0 });
 
   const springConfig = { stiffness: 100, damping: 30, mass: 0.5 };
-  const xOuter = useSpring(useTransform(mouseX, [-500, 500], [-60, 60]), springConfig);
-  const yOuter = useSpring(useTransform(mouseY, [-500, 500], [-60, 60]), springConfig);
-  const xInner = useSpring(useTransform(mouseX, [-500, 500], [-40, 40]), springConfig);
-  const yInner = useSpring(useTransform(mouseY, [-500, 500], [-40, 40]), springConfig);
-  const xText = useSpring(useTransform(mouseX, [-500, 500], [-20, 20]), springConfig);
-  const yText = useSpring(useTransform(mouseY, [-500, 500], [-20, 20]), springConfig);
+  
+  const outerXTransform = useTransform(mouseX, [-500, 500], [-60, 60]);
+  const xOuter = useSpring(outerXTransform, springConfig);
+  
+  const outerYTransform = useTransform(mouseY, [-500, 500], [-60, 60]);
+  const yOuter = useSpring(outerYTransform, springConfig);
+  
+  const innerXTransform = useTransform(mouseX, [-500, 500], [-40, 40]);
+  const xInner = useSpring(innerXTransform, springConfig);
+  
+  const innerYTransform = useTransform(mouseY, [-500, 500], [-40, 40]);
+  const yInner = useSpring(innerYTransform, springConfig);
+  
+  const textXTransform = useTransform(mouseX, [-500, 500], [-20, 20]);
+  const xText = useSpring(textXTransform, springConfig);
+  
+  const textYTransform = useTransform(mouseY, [-500, 500], [-20, 20]);
+  const yText = useSpring(textYTransform, springConfig);
 
   const crosshairX = useSpring(0, { stiffness: 1000, damping: 60 });
   const crosshairY = useSpring(0, { stiffness: 1000, damping: 60 });

@@ -82,6 +82,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
   const rotateX = useTransform(tiltY, [-0.5, 0.5], [12, -12]);
   const rotateY = useTransform(tiltX, [-0.5, 0.5], [-12, 12]);
 
+  const borderBackground = useMotionTemplate`radial-gradient(300px circle at ${mouseX}px ${mouseY}px, ${project.borderColor}, transparent 80%)`;
+
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
@@ -175,7 +177,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
               className="absolute inset-0 p-[2px] pointer-events-none rounded-[2.5rem] md:rounded-[3rem]"
               style={{
                 opacity: borderOpacity,
-                background: useMotionTemplate`radial-gradient(300px circle at ${mouseX}px ${mouseY}px, ${project.borderColor}, transparent 80%)`,
+                background: borderBackground,
                 WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', 
                 WebkitMaskComposite: 'xor', 
                 maskComposite: 'exclude',

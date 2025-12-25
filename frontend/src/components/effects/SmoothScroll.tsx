@@ -5,6 +5,11 @@ import Lenis from 'lenis';
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // Disable on touch devices to avoid interference with native mobile scrolling
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    if (isTouchDevice) return;
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -12,10 +17,9 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 1.2,
+      touchMultiplier: 2,
       infinite: false,
-      // Performance tweaks
-      autoRaf: true, // Let Lenis handle requestAnimationFrame efficiently
+      autoRaf: true,
     });
 
     // Handle frame updates efficiently

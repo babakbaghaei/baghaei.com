@@ -1,8 +1,5 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import ErrorLayout from '@/components/layout/ErrorLayout';
-
 export default function Error({
   error,
   reset,
@@ -10,16 +7,14 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
-  }, [error]);
-
   return (
-    <ErrorLayout 
-      code="۵۰۰" 
-      title="اختلال فنی." 
-      description="خطایی در پردازش درخواست رخ داد. تیم فنی در حال بررسی موضوع است."
-    />
+    <div style={{ background: 'black', color: 'white', padding: '20px', fontFamily: 'sans-serif' }}>
+      <h2>خطای کلاینت رخ داد</h2>
+      <p>متن خطا: <span style={{ color: 'red' }}>{error.message}</span></p>
+      <p>کد دیجیت: {error.digest}</p>
+      <button onClick={() => reset()}>تلاش دوباره</button>
+      <hr />
+      <p>نکته: اگر این صفحه را می‌بینید، احتمالاً کش مرورگر شما قدیمی است.</p>
+    </div>
   );
 }

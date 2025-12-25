@@ -11,6 +11,14 @@ export default function BackgroundGrid() {
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
 
+  const spotlightBackground = useTransform([x, y], ([cx, cy]: any) => 
+    `radial-gradient(600px circle at ${cx}px ${cy}px, rgba(255,255,255,0.3), transparent 80%)`
+  );
+
+  const ambientBackground = useTransform([x, y], ([cx, cy]: any) => 
+    `radial-gradient(800px circle at ${cx}px ${cy}px, white, transparent 100%)`
+  );
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -36,9 +44,7 @@ export default function BackgroundGrid() {
       <motion.div 
         className="absolute inset-0 opacity-[0.15]"
         style={{
-          background: useTransform([x, y], ([cx, cy]: any) => 
-            `radial-gradient(600px circle at ${cx}px ${cy}px, rgba(255,255,255,0.3), transparent 80%)`
-          ),
+          background: spotlightBackground,
           maskImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
           maskSize: '40px 40px',
           WebkitMaskImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
@@ -50,9 +56,7 @@ export default function BackgroundGrid() {
       <motion.div 
         className="absolute inset-0 opacity-[0.03]"
         style={{
-          background: useTransform([x, y], ([cx, cy]: any) => 
-            `radial-gradient(800px circle at ${cx}px ${cy}px, white, transparent 100%)`
-          )
+          background: ambientBackground
         }}
       />
     </div>
