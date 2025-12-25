@@ -18,6 +18,7 @@ export class SecurityService {
    * Apply security middleware to the application
    */
   applySecurityMiddleware(app: NestExpressApplication) {
+    /*
     // Use Helmet to secure HTTP headers
     app.use(helmet({
       contentSecurityPolicy: {
@@ -49,6 +50,7 @@ export class SecurityService {
         whitelist: [],
       })
     );
+    */
 
     // Enable CORS with specific origin in production
     const corsOptions = {
