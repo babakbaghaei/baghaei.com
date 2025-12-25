@@ -21,7 +21,6 @@ import { SecurityModule } from './security/security.module';
       ttl: 60000,
       limit: 10,
     }]),
-    /*
     LoggerModule.forRoot({
       pinoHttp: {
         transport: {
@@ -32,13 +31,12 @@ import { SecurityModule } from './security/security.module';
         },
       },
     }),
-    */
     PrometheusModule.register(),
     PrismaModule,
     ProjectsModule,
     ContactModule,
     AuthModule,
-    // OpenTelemetryModule,
+    OpenTelemetryModule,
     SecurityModule,
   ],
   controllers: [AppController],

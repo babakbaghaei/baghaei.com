@@ -18,7 +18,6 @@ export class SecurityService {
    * Apply security middleware to the application
    */
   applySecurityMiddleware(app: NestExpressApplication) {
-    /*
     // Use Helmet to secure HTTP headers
     app.use(helmet({
       contentSecurityPolicy: {
@@ -44,6 +43,7 @@ export class SecurityService {
     // Sanitize data to prevent mongo injection
     app.use(mongoSanitize());
 
+    /*
     // Prevent parameter pollution
     app.use(
       hpp({
