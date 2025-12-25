@@ -24,11 +24,11 @@ export const StatItem: React.FC<StatItemProps> = ({ label, value, className = ""
   const initialIsTenPlus = !isMotionValue && (value === '10+' || value === '۱۰+');
 
   // Animated properties
+  // The transform will handle the mapping from 0/1 to the desired scale
   const targetScale = useTransform(isTenPlus, [0, 1], [1, 1.15]);
-  const scale = useSpring(initialIsTenPlus ? 1.15 : targetScale, { stiffness: 300, damping: 15 });
+  const scale = useSpring(targetScale, { stiffness: 300, damping: 15 });
   
-  const targetWeight = useTransform(isTenPlus, [0, 1], [700, 900]);
-  const fontWeight = targetWeight;
+  const fontWeight = useTransform(isTenPlus, [0, 1], [700, 900]);
 
   return (
     <div 
