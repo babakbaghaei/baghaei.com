@@ -10,11 +10,11 @@ interface SocialLink {
 }
 
 const socialLinks: SocialLink[] = [
-  { icon: Mail, href: 'mailto:baabakbaghaaei@gmail.com', label: 'Email' },
-  { icon: Linkedin, href: 'https://linkedin.com/in/babakbaghaei', label: 'LinkedIn' },
-  { icon: Github, href: 'https://github.com/babakbaghaei', label: 'GitHub' },
-  { icon: Send, href: 'https://t.me/babak_bagha_ei', label: 'Telegram' },
-  { icon: Instagram, href: 'https://instagram.com/babak__baghaei', label: 'Instagram' },
+  { icon: Mail, href: 'mailto:baabakbaghaaei@gmail.com', label: 'ایمیل' },
+  { icon: Linkedin, href: 'https://linkedin.com/in/babakbaghaei', label: 'لینکدین' },
+  { icon: Github, href: 'https://github.com/babakbaghaei', label: 'گیت‌هاب' },
+  { icon: Send, href: 'https://t.me/babak_bagha_ei', label: 'تلگرام' },
+  { icon: Instagram, href: 'https://instagram.com/babak__baghaei', label: 'اینستاگرام' },
 ];
 
 export const SocialLinks: React.FC = () => {

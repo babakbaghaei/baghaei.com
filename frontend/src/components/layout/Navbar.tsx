@@ -60,69 +60,69 @@ export default function Navbar() {
   };
 
   return (
-    <nav 
-      className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
-        scrolled || pathname !== '/' ? 'py-4 backdrop-blur-xl border-b border-zinc-900 bg-black/80' : 'py-8 bg-transparent'
-      }`} 
-      role="navigation"
-    >
-      <motion.div className="absolute top-0 left-0 right-0 h-[2px] bg-white origin-center" style={{ scaleX }} />
+    <>
+          <nav 
+            className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
+              scrolled || pathname !== '/' ? 'py-4 border-b border-zinc-900 bg-black' : 'py-8 bg-transparent'
+            }`} 
+            role="navigation"
+          >
+      
+        <div className="max-w-7xl mx-auto px-6 lg:px-16 flex justify-between items-center relative">
+          <Link 
+            href="https://baghaei.com" 
+            onClick={(e) => {
+              if (pathname === '/' && typeof window !== 'undefined' && window.location.hostname === 'baghaei.com') {
+                e.preventDefault();
+                window.scrollTo({
+                  top: 0,
+                  behavior: 'smooth'
+                });
+              }
+            }}
+            className="flex items-center gap-4 group cursor-pointer relative z-[110]"
+          >
+            <Logo className="w-8 h-8 text-white" />
+            <span className="text-base md:text-lg font-bold text-white uppercase hidden sm:inline-block font-display">گروه فناوری بقایی</span>
+          </Link>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-16 flex justify-between items-center relative">
-        <Link 
-          href="https://baghaei.com" 
-          onClick={(e) => {
-            if (pathname === '/' && typeof window !== 'undefined' && window.location.hostname === 'baghaei.com') {
-              e.preventDefault();
-              window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-              });
-            }
-          }}
-          className="flex items-center gap-4 group cursor-pointer relative z-[110]"
-        >
-          <Logo className="w-8 h-8 text-white" />
-          <span className="text-base md:text-lg font-bold text-white uppercase hidden sm:inline-block font-display">گروه فناوری بقایی</span>
-        </Link>
+          <div className="hidden md:flex items-center gap-10">
+            <div className="flex gap-8 text-[13px] font-bold uppercase text-zinc-400">
+              {navLinks.map((link) => (
+                <NavItem 
+                  key={link.id} 
+                  label={link.label}
+                  isActive={activeSection === link.id}
+                  onClick={() => scrollTo(link.id)}
+                />
+              ))}
+            </div>
+            
+            <div className="h-6 w-px bg-zinc-800" />
+                                <Magnetic intensity={0.2}>
+                                  <button 
+                                    onClick={() => { play('pop'); scrollTo('contact'); }} 
+                                    onMouseEnter={() => play('hover')}
+                                    className="px-8 py-2.5 bg-white !text-black text-[10px] font-display uppercase rounded-full hover:scale-105 active:scale-95 transition-all"
+                                    style={{ fontWeight: 500 }}
+                                  >
+                                    شروع همکاری
+                                  </button>
+                                </Magnetic>
+                                </div>
 
-        <div className="hidden md:flex items-center gap-10">
-          <div className="flex gap-8 text-[13px] font-bold uppercase text-zinc-400">
-            {navLinks.map((link) => (
-              <NavItem 
-                key={link.id} 
-                label={link.label}
-                isActive={activeSection === link.id}
-                onClick={() => scrollTo(link.id)}
-              />
-            ))}
-          </div>
-          
-          <div className="h-6 w-px bg-zinc-800" />
-          <Magnetic intensity={0.2}>
+          <div className="md:hidden flex items-center gap-4 relative z-[210]">
             <button 
-              onClick={() => { play('pop'); scrollTo('contact'); }} 
-              onMouseEnter={() => play('hover')}
-              className="px-8 py-2.5 bg-white !text-black text-[10px] !font-black font-display uppercase rounded-full hover:scale-105 active:scale-95 transition-all"
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('toggle-mobile-menu'));
+              }} 
+              className="p-3 bg-white !text-black rounded-full active:scale-90 transition-transform shadow-xl"
             >
-              شروع همکاری
+              <Menu className="w-5 h-5" />
             </button>
-          </Magnetic>
+          </div>
         </div>
-
-        <div className="md:hidden flex items-center gap-4">
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-3 bg-white !text-black rounded-full">
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-
-      <MobileMenu 
-        isOpen={isMobileMenuOpen} 
-        links={navLinks} 
-        onClose={() => setIsMobileMenuOpen(false)} 
-        onLinkClick={scrollTo} 
-      />
-    </nav>
+      </nav>
+    </>
   );
 }

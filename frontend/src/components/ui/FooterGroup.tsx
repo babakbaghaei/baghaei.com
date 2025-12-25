@@ -22,7 +22,7 @@ export const FooterGroup: React.FC<FooterGroupProps> = ({
 
   return (
     <div className={`space-y-10 ${alignClasses}`}>
-      <h4 className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.4em]">
+      <h4 className="text-[10px] font-black text-zinc-700 uppercase">
         {title}
       </h4>
       <div className="flex flex-col gap-6 text-xl font-bold font-display text-white">

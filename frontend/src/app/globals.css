@@ -1,3 +1,91 @@
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakh-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakh-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakh-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakh-Heavy.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakh-Fat.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  src: url('/fonts/IRANSans.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  src: url('/fonts/IRANSans_UltraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  src: url('/fonts/IRANSans_Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  src: url('/fonts/IRANSans_Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  src: url('/fonts/IRANSans_Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  src: url('/fonts/IRANSans_Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @import "tailwindcss";
 
 /* DARK MODE ONLY - GLOBAL VARIABLES */
@@ -13,13 +101,13 @@
 @theme {
   --color-background: var(--bg);
   --color-foreground: var(--fg);
-  --font-sans: var(--font-iransans), sans-serif;
-  --font-display: var(--font-yekanbakh), sans-serif;
+  --font-sans: 'IRANSans', sans-serif;
+  --font-display: 'YekanBakh', sans-serif;
 }
 
 /* Global Reset */
 html {
-  direction: ltr; /* Force scrollbar to right */
+  direction: ltr; 
   overflow-x: hidden;
   width: 100%;
 }
@@ -30,7 +118,6 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  scroll-behavior: smooth;
   overflow-x: hidden;
   width: 100%;
 }
@@ -38,45 +125,25 @@ body {
 @layer base {
   body {
     @apply antialiased;
-    font-family: var(--font-iransans), sans-serif !important;
+    font-family: 'IRANSans', sans-serif;
     position: relative;
     overflow-x: hidden;
-    direction: rtl; /* Restore RTL for content */
-  }
-
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent; 
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2); 
-    border-radius: 10px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.4); 
-  }
-
-  ::selection {
-    background: #ffffff;
-    color: #000000;
+    direction: rtl;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display {
     color: var(--fg);
-    font-family: var(--font-yekanbakh), sans-serif !important;
+    font-family: 'YekanBakh', sans-serif !important;
     line-height: 1.1;
   }
+}
 
-  .font-en { font-family: "Poppins", sans-serif !important; }
-  .weight-plus-1 { -webkit-text-stroke: 2px currentColor; }
-  .weight-plus-2 { -webkit-text-stroke: 4px currentColor; }
+.font-black {
+  font-weight: 900 !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
 }
 
 section, main {
@@ -92,19 +159,7 @@ section, main {
 .btn-primary {
   background-color: #ffffff !important;
   color: #000000 !important;
-  @apply px-10 py-4 rounded-full !font-black font-display transition-all duration-300 hover:scale-105 active:scale-95;
-}
-
-.btn-secondary {
-  border: 1px solid var(--border) !important;
-  color: #ffffff !important;
-  @apply px-10 py-4 rounded-full !font-black font-display transition-all duration-300 hover:bg-zinc-900 active:scale-95;
-}
-
-.glass {
-  background-color: rgba(0, 0, 0, 0.8) !important;
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border) !important;
+  @apply px-10 py-4 rounded-full transition-all duration-300 hover:scale-105 active:scale-95;
 }
 
 .noise-bg {
@@ -115,4 +170,9 @@ section, main {
   pointer-events: none;
   background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
   will-change: transform;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }

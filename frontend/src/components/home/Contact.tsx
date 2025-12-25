@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useTransition, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { submitContactForm } from '@/app/actions';
 import { Mail, Send, Check, Loader2 } from 'lucide-react';
 import { Section, Heading } from '../ui/Layout';
@@ -12,6 +12,10 @@ export default function Contact() {
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const { play } = useSound();
+
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,11 +35,11 @@ export default function Contact() {
   };
 
   return (
-    <Section id="contact" className="border-t border-zinc-900">
+    <Section sectionRef={sectionRef} id="contact" className="border-t border-zinc-900">
       {/* Background Icon */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+      <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
         <Mail className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
-      </div>
+      </motion.div>
 
       <div className="flex flex-col items-start gap-12">
         <Heading align="right" subtitle="گفتگو">شروع یک</Heading>

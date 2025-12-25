@@ -45,7 +45,7 @@ export default function CookieConsent() {
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           className="fixed bottom-4 left-4 right-4 md:left-12 md:right-auto md:max-w-md z-[9999]"
         >
-          <div className="bg-zinc-950/90 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden group">
+          <div className="bg-zinc-950 border border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden group">
             <div className="relative z-10 space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">

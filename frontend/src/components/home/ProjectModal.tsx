@@ -68,53 +68,47 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-12" data-lenis-prevent>
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-0 md:p-12" data-lenis-prevent>
+          {/* Backdrop - Solid black to hide everything behind */}
           <motion.div 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }} 
             onClick={onClose} 
-            className="absolute inset-0 bg-black/90 backdrop-blur-xl cursor-pointer" 
+            className="absolute inset-0 bg-black cursor-pointer" 
           />
           
           {/* Expanding Card */}
           <motion.div 
             layoutId={`project-${project.id}`}
-            className="bg-zinc-950 w-full max-w-6xl h-[90vh] rounded-[3rem] border border-white/10 shadow-2xl relative flex flex-col z-10" 
+            className="bg-[#0a0a0a] w-full max-w-6xl h-full md:h-[80vh] md:rounded-[3rem] border-x border-white/10 md:border border-white/10 shadow-2xl relative flex flex-col z-10 overflow-hidden" 
             transition={{ type: 'spring', stiffness: 300, damping: 35 }}
           >
             {/* Ambient Background Glow */}
             <div 
-              className="absolute top-0 right-0 w-[600px] h-[600px] opacity-20 blur-[120px] pointer-events-none z-0" 
+              className="absolute top-0 right-0 w-[600px] h-[600px] opacity-10 pointer-events-none z-0" 
               style={{ background: project.color }} 
             />
             
-            {/* Content Container - FORCE INTERNAL SCROLL */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="flex-1 overflow-y-auto custom-scrollbar relative z-10" 
-              dir="ltr"
-            >
-              <div dir="rtl" className="p-8 md:p-12 lg:p-20 pt-10">
-                {/* Header Controls */}
-                <div className="flex justify-between items-center mb-12 sticky top-0 z-50">
+            {/* Content Container */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10" dir="ltr">
+              <div dir="rtl" className="p-6 md:p-12 lg:p-20">
+                {/* Header Controls - Improved for mobile */}
+                <div className="flex justify-between items-center mb-12 sticky top-0 bg-zinc-950/80 backdrop-blur-md py-4 z-50">
                   <Button 
                     variant="outline"
                     onClick={onClose}
                     leftIcon={<ArrowLeft className="w-4 h-4 rotate-180" />}
-                    className="!bg-white/5 border-white/10 hover:bg-white/10"
+                    className="!bg-white/5 border-white/10 hover:bg-white/10 text-xs"
                   >
                     بازگشت
                   </Button>
                   
                   <button 
                     onClick={onClose}
-                    className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
                   >
-                    <X className="w-6 h-6 text-white" />
+                    <X className="w-5 h-5 md:w-6 md:h-6 text-white" />
                   </button>
                 </div>
 
@@ -173,7 +167,7 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                   {/* Sidebar Info Area */}
                   <div className="lg:col-span-4 space-y-12 border-r border-white/5 pr-12 lg:pr-16 text-right">
                     <div className="space-y-6">
-                      <div className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em] font-display">Key Metrics</div>
+                      <div className="text-[10px] font-black text-zinc-600 uppercase font-display">شاخص‌های کلیدی</div>
                       <div className="space-y-10">
                         {project.metrics.map((metric, i) => (
                           <div key={i} className="space-y-2">
@@ -187,7 +181,7 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                     {/* Technologies in Modal */}
                     {project.tech && (
                       <div className="space-y-6">
-                        <div className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em] font-display">Technologies</div>
+                        <div className="text-[10px] font-black text-zinc-600 uppercase font-display">تکنولوژی‌ها</div>
                         <div className="flex flex-wrap gap-3 justify-start">
                           {project.tech.map((t, i) => (
                             <span key={i} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold text-zinc-300 uppercase tracking-widest flex items-center gap-2">
@@ -200,13 +194,13 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                     )}
                     
                     <div className="pt-12 flex flex-col items-end gap-6">
-                      <div className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.4em] font-display">Crafted by</div>
+                      <div className="text-[10px] font-black text-zinc-700 uppercase font-display">توسعه داده شده توسط</div>
                       <Logo className="w-16 h-16 text-white/20" />
                     </div>
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       )}

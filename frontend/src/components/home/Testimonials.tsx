@@ -1,11 +1,31 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { User, MessageSquare, Quote } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionTemplate } from 'framer-motion';
 import { Section, Heading } from '../ui/Layout';
-import { Card } from '../ui/Card';
+import { Card, useCardTilt } from '../ui/Card';
 import { useSound } from '@/lib/utils/sounds';
+
+const ReactiveQuote = () => {
+  const { tiltX, tiltY } = useCardTilt();
+  
+  const hX = useTransform(tiltX, [-0.5, 0.5], [-10, 10]);
+  const hY = useTransform(tiltY, [-0.5, 0.5], [-10, 10]);
+  const sX = useTransform(tiltX, [-0.5, 0.5], [15, -15]);
+  const sY = useTransform(tiltY, [-0.5, 0.5], [15, -15]);
+  
+  const filter = useMotionTemplate`drop-shadow(${hX}px ${hY}px 2px rgba(255,255,255,0.1)) drop-shadow(${sX}px ${sY}px 8px rgba(0,0,0,0.8))`;
+
+  return (
+    <motion.div 
+      className="absolute top-4 right-4 pointer-events-none"
+      style={{ filter }}
+    >
+      <Quote className="w-12 h-12 text-white opacity-[0.04]" />
+    </motion.div>
+  );
+};
 
 const testimonials = [
   { id: 1, content: "طراحی سیستم یکپارچه نمایش اطلاعات پرواز فرودگاه کیش، با دقت مهندسی فوق‌العاده و پایداری کامل در شرایط عملیاتی سخت.", author: "سیستم FIDS", company: "Airport Infrastructure", color: 'rgba(30, 64, 175, 0.4)' },
@@ -19,12 +39,16 @@ const testimonials = [
 export default function Testimonials() {
   const { play } = useSound();
 
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+
   return (
-    <Section id="testimonials" className="border-t border-zinc-900">
+    <Section sectionRef={sectionRef} id="testimonials" className="border-t border-zinc-900">
       {/* Background Icon */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+      <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
         <MessageSquare className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
-      </div>
+      </motion.div>
 
       <Heading subtitle="برترین‌ها">اعتماد</Heading>
 
@@ -38,16 +62,17 @@ export default function Testimonials() {
             transition={{ delay: index * 0.1 }}
             className="flex flex-col h-full"
           >
-            {/* Message Bubble - Standardized */}
-            <div 
-              className="relative flex-1 p-8 rounded-[2.5rem] rounded-br-lg bg-zinc-900/50 border border-white/5 shadow-2xl transition-all duration-500 hover:bg-zinc-900 group"
+            {/* Message Bubble - Restored shape with 3D lighting */}
+            <Card 
+              glowColor={t.color}
+              roundedClass="rounded-[2.5rem] rounded-br-lg"
+              className="flex-1"
+              maskedContent={<ReactiveQuote />}
             >
-              <Quote className="absolute top-4 right-4 w-12 h-12 text-white opacity-[0.02] pointer-events-none" />
-              
-              <p className="text-sm md:text-base font-medium font-sans leading-relaxed text-zinc-300 text-right relative z-10">
+              <p style={{ transform: "translateZ(20px)" }} className="text-sm md:text-base font-medium font-sans leading-relaxed text-zinc-300 text-right relative z-10">
                 «{t.content}»
               </p>
-            </div>
+            </Card>
 
             {/* Sender Info - Avatar to the right of info */}
             <div className="mt-6 flex items-center justify-start gap-4 px-4 w-full">

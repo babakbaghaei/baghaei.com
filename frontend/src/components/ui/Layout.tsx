@@ -2,7 +2,6 @@
 
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import TextDecrypt from '../effects/TextDecrypt';
 
 interface HeadingProps {
   children: React.ReactNode;
@@ -35,16 +34,12 @@ export const Heading: React.FC<HeadingProps> = ({
         className="h-[2px] bg-white"
       />
       <h2 className="text-5xl md:text-8xl font-bold weight-plus-1 font-display text-white leading-none uppercase">
-        {typeof children === 'string' ? (
-          <TextDecrypt text={children} trigger={isInView} />
-        ) : (
-          children
-        )}
+        {children}
         {subtitle && (
           <>
             <br />
             <span className="text-zinc-800">
-              <TextDecrypt text={`${subtitle}.`} trigger={isInView} delay={300} />
+              {subtitle}.
             </span>
           </>
         )}
@@ -58,11 +53,12 @@ interface SectionProps {
   children: React.ReactNode;
   className?: string;
   containerClassName?: string;
+  sectionRef?: React.RefObject<HTMLElement | null>;
 }
 
-export const Section: React.FC<SectionProps> = ({ id, children, className = "", containerClassName = "" }) => {
+export const Section: React.FC<SectionProps> = ({ id, children, className = "", containerClassName = "", sectionRef }) => {
   return (
-    <section id={id} className={`py-40 relative overflow-hidden transition-colors duration-700 ${className}`}>
+    <section ref={sectionRef} id={id} className={`py-40 relative overflow-hidden transition-colors duration-700 ${className}`}>
       <div className={`max-w-7xl mx-auto px-6 lg:px-16 relative z-10 ${containerClassName}`}>
         {children}
       </div>

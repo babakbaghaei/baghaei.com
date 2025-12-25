@@ -1,30 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import localFont from "next/font/local";
 import Script from "next/script";
-import SmoothScroll from "@/components/effects/SmoothScroll";
 import BackgroundGrid from "@/components/effects/BackgroundGrid";
 import CookieConsent from "@/components/layout/CookieConsent";
-
-// Optimized font loading
-const iransans = localFont({
-  src: [
-    { path: "../../public/fonts/IRANSans.woff2", weight: "normal", style: "normal" },
-  ],
-  variable: "--font-iransans",
-  display: 'swap',
-  preload: true,
-});
-
-const yekanbakh = localFont({
-  src: [
-    { path: "../../public/fonts/YekanBakh-Regular.woff2", weight: "400", style: "normal" },
-    { path: "../../public/fonts/YekanBakh-Bold.woff2", weight: "700", style: "normal" },
-  ],
-  variable: "--font-yekanbakh",
-  display: 'swap',
-  preload: true,
-});
+import { RootMobileMenu } from "@/components/layout/RootMobileMenu";
+import { CustomCursor } from "@/components/ui/CustomCursor";
 
 export const metadata: Metadata = {
   title: {
@@ -80,7 +60,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   themeColor: 'black',
   width: 'device-width',
   initialScale: 1,
@@ -95,9 +75,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl" className={`dark ${iransans.variable} ${yekanbakh.variable}`}>
-      <body className="antialiased bg-black selection:bg-white selection:text-black">
-        {/* Google Analytics */}
+    <html lang="fa" dir="rtl" className="dark">
+      <body className="antialiased bg-black selection:bg-white selection:text-black cursor-none">
+        <CustomCursor />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-YSHJT31R0K"
           strategy="afterInteractive"
@@ -113,10 +93,9 @@ export default function RootLayout({
         
         <div className="noise-bg opacity-[0.03] pointer-events-none" />
         <BackgroundGrid />
-        <SmoothScroll>
-          {children}
-          <CookieConsent />
-        </SmoothScroll>
+        {children}
+        <CookieConsent />
+        <RootMobileMenu />
       </body>
     </html>
   );

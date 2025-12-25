@@ -1,6 +1,6 @@
 'use server'
 
-import { refresh } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 
 export async function submitContactForm(formData: FormData) {
   const name = formData.get('name')
@@ -10,6 +10,7 @@ export async function submitContactForm(formData: FormData) {
 
   // Use the internal server URL for backend communication
   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+  console.log('Submitting to:', `${backendUrl}/contact`);
 
   try {
     const response = await fetch(`${backendUrl}/contact`, {
@@ -24,14 +25,15 @@ export async function submitContactForm(formData: FormData) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Failed to submit form');
+      const errorText = await response.text();
+      console.error('Backend error response:', errorText);
+      throw new Error(`Server error: ${response.status}`);
     }
 
-    refresh();
+    revalidatePath('/');
     return { success: true };
   } catch (error: any) {
-    console.error('Form submission error:', error);
+    console.error('Form submission action error:', error);
     return { success: false, error: error.message || 'Failed to send message' };
   }
 }

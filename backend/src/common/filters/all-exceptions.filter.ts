@@ -26,10 +26,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const message = 
       exception instanceof HttpException 
         ? exception.getResponse() 
-        : 'Internal server error';
+        : (exception as Error).message || 'Internal server error';
 
     this.logger.error(
-      `Status: ${httpStatus} Error: ${JSON.stringify(message)}`,
+      `Status: ${httpStatus} Error: ${typeof message === 'object' ? JSON.stringify(message) : message}`,
+      exception instanceof Error ? exception.stack : '',
     );
 
     const responseBody = {

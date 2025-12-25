@@ -21,7 +21,7 @@ export const CareerModal: React.FC<CareerModalProps> = ({ job, onClose }) => {
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }} 
           onClick={onClose} 
-          className="absolute inset-0 bg-black/95 backdrop-blur-3xl cursor-pointer" 
+          className="absolute inset-0 bg-black/95 cursor-pointer" 
         />
         
         <motion.div 

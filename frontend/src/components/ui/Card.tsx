@@ -1,37 +1,170 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useState, useEffect, createContext, useContext } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate, MotionValue } from 'framer-motion';
+
+interface CardContextType {
+  tiltX: MotionValue<number>;
+  tiltY: MotionValue<number>;
+}
+
+const CardContext = createContext<CardContextType | null>(null);
+
+export const useCardTilt = () => {
+  const context = useContext(CardContext);
+  if (!context) return { tiltX: useMotionValue(0), tiltY: useMotionValue(0) };
+  return context;
+};
 
 interface CardProps {
   children: React.ReactNode;
+  maskedContent?: React.ReactNode;
   className?: string;
   glowColor?: string;
   isHoverable?: boolean;
+  roundedClass?: string;
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
+  maskedContent,
   className = "",
   glowColor = "rgba(255,255,255,0.1)",
-  isHoverable = true
+  isHoverable = true,
+  roundedClass = "rounded-[3rem]"
 }) => {
-  return (
-    <motion.div
-      whileHover={isHoverable ? { y: -5 } : {}}
-      className={`relative bg-zinc-900/50 border border-white/10 rounded-[3rem] p-10 transition-all duration-500 hover:border-white/20 ${className}`}
-    >
-      {/* Background Glow Effect */}
-      <div className="absolute inset-0 z-0 overflow-hidden rounded-[3rem] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-        <div
-          className="absolute w-[400px] h-[400px] -translate-x-1/2 -translate-y-1/2 blur-[80px]"
-          style={{ background: `radial-gradient(circle at center, ${glowColor} 0%, transparent 80%)` }}
-        />
-      </div>
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-      <div className="relative z-10">
-        {children}
+  const mouseX = useMotionValue(-1000);
+  const mouseY = useMotionValue(-1000);
+
+  const springConfig = { stiffness: 400, damping: 30, restDelta: 0.001 };
+  const tiltX = useSpring(0, springConfig);
+  const tiltY = useSpring(0, springConfig);
+  const scale = useSpring(1, springConfig);
+  const innerGlowOpacity = useSpring(0, springConfig);
+  const borderOpacity = useSpring(0.2, springConfig);
+
+  const rotateX = useTransform(tiltY, [-0.5, 0.5], [15, -15]);
+  const rotateY = useTransform(tiltX, [-0.5, 0.5], [-15, 15]);
+
+  const sheenAngle = useTransform([tiltX, tiltY], ([x, y]) => {
+    const angleRad = Math.atan2(x as number, -(y as number));
+    return (angleRad * 180) / Math.PI;
+  });
+
+  const contrastFactor = useTransform([tiltX, tiltY], ([x, y]) => {
+    const d = Math.sqrt(Math.pow(x as number, 2) + Math.pow(y as number, 2));
+    return Math.min(d * 2.5, 1);
+  });
+
+  const colorA = glowColor;
+  const colorB = useTransform(contrastFactor, [0, 1], [glowColor, 'rgba(255,255,255,0.4)']);
+
+  const innerBackground = useMotionTemplate`linear-gradient(
+    ${sheenAngle}deg, 
+    ${colorA} 0%, 
+    ${colorA} 50%,
+    ${colorB} 100%
+  )`;
+
+  const borderBackground = useMotionTemplate`radial-gradient(400px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.5), transparent 80%)`;
+
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
+
+  useEffect(() => {
+    if (isTouchDevice || !isHoverable) return;
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const isMouseOver = e.clientX >= rect.left && 
+                         e.clientX <= rect.right && 
+                         e.clientY >= rect.top && 
+                         e.clientY <= rect.bottom;
+
+      setIsHovered(isMouseOver);
+      mouseX.set(x);
+      mouseY.set(y);
+
+      innerGlowOpacity.set(isMouseOver ? 0.8 : 0);
+      borderOpacity.set(isMouseOver ? 1 : 0.2);
+      scale.set(isMouseOver ? 1.02 : 1);
+
+      if (isMouseOver) {
+        tiltX.set(x / rect.width - 0.5);
+        tiltY.set(y / rect.height - 0.5);
+      } else {
+        tiltX.set(0);
+        tiltY.set(0);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMouseMove);
+  }, [isTouchDevice, isHoverable]);
+
+  return (
+    <CardContext.Provider value={{ tiltX, tiltY }}>
+      <div 
+        ref={containerRef}
+        data-cursor="card"
+        className={`relative group ${className} ${roundedClass} select-none`}
+        style={{ perspective: "2000px" }}
+      >
+        <motion.div
+          style={{ 
+            rotateX, 
+            rotateY, 
+            scale, 
+            transformStyle: "preserve-3d",
+            willChange: isHovered ? "transform" : "auto",
+            transition: "none"
+          }}
+          className={`relative w-full h-full ${roundedClass}`}
+        >
+          {/* 1. Background Layer (Masked) */}
+          <div className={`absolute inset-0 ${roundedClass} bg-[#0c0c0e] border border-white/5 shadow-2xl overflow-hidden z-0`}>
+            <motion.div 
+              style={{
+                opacity: innerGlowOpacity,
+                background: innerBackground,
+                mixBlendMode: 'screen',
+              }}
+              className="absolute inset-0 w-full h-full pointer-events-none" 
+            />
+            
+            <motion.div 
+              className={`absolute inset-0 pointer-events-none ${roundedClass} z-20`}
+              style={{
+                opacity: borderOpacity,
+                padding: '1px',
+                background: borderBackground,
+                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', 
+                WebkitMaskComposite: 'xor', 
+                maskComposite: 'exclude',
+              }}
+            />
+
+            {/* Masked Content Slot (for background icons) */}
+            <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
+              {maskedContent}
+            </div>
+          </div>
+
+          {/* 2. Content Layer (Unmasked, for Popping) */}
+          <div className={`relative z-10 p-10 h-full`} style={{ transformStyle: "preserve-3d" }}>
+            {children}
+          </div>
+        </motion.div>
       </div>
-    </motion.div>
+    </CardContext.Provider>
   );
 };

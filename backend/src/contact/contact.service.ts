@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { TelegramService } from '../notifications/telegram.service';
@@ -38,8 +38,8 @@ ${createContactDto.message}
 
       return { success: true, messageId: message.id };
     } catch (error: any) {
-      this.logger.error(`Failed to save contact message: ${error.message}`);
-      throw new Error('Could not save the message. Please try again later.');
+      this.logger.error(`Failed to save contact message: ${error.message}`, error.stack);
+      throw new InternalServerErrorException(`Could not save message: ${error.message}`);
     }
   }
 }

@@ -23,7 +23,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const { play } = useSound();
-  const baseStyles = "relative flex items-center justify-center gap-3 px-8 py-3 rounded-full font-black font-display text-sm transition-all duration-300 active:scale-95 disabled:opacity-70 overflow-hidden group";
+  const baseStyles = "relative flex items-center justify-center gap-3 px-8 py-3 rounded-full font-display text-sm transition-all duration-300 active:scale-95 disabled:opacity-70 overflow-hidden group";
   
   const variants = {
     primary: "bg-white !text-black hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.1)]",
@@ -37,11 +37,13 @@ export const Button: React.FC<ButtonProps> = ({
       whileHover={{ y: -2 }}
       whileTap={{ y: 0 }}
       onHoverStart={() => play('hover')}
+      data-cursor={variant === 'primary' ? 'black' : 'link'}
       onClick={(e) => {
         play('click');
         if (props.onClick) props.onClick(e as any);
       }}
       className={`${baseStyles} ${variants[variant]} ${className}`}
+      style={{ fontWeight: 400, ...props.style }}
       disabled={isLoading || props.disabled}
       {...(props as any)}
     >

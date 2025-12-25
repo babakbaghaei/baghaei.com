@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import ProjectModal from './ProjectModal';
 import { Project, ProjectCard } from '../ui/ProjectCard';
 import { Section, Heading } from '../ui/Layout';
@@ -10,6 +11,11 @@ import { ArrowLeft, Box } from 'lucide-react';
 export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+
   const [canScrollLeft, setCanScrollLeft] = useState(true);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -35,18 +41,20 @@ export default function Projects() {
   };
 
   return (
-    <Section id="projects" className="overflow-visible">
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+    <Section sectionRef={sectionRef} id="projects" className="overflow-visible !px-0">
+      <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
         <Box className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
+      </motion.div>
+
+      <div className="px-6 lg:px-16">
+        <Heading subtitle="منتخب">پروژه‌های</Heading>
       </div>
 
-      <Heading subtitle="منتخب">پروژه‌های</Heading>
-
-      <div className="relative overflow-visible">
+      <div className="relative group/projects-container">
         <div 
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className="flex overflow-x-auto pb-20 pl-8 md:pl-48 no-scrollbar relative z-10"
+          className="flex overflow-x-auto pb-20 pr-4 md:pr-8 pl-12 md:pl-48 no-scrollbar relative z-10 gap-0"
         >
           {PROJECTS_DATA.map((p) => (
             <ProjectCard 
@@ -57,17 +65,7 @@ export default function Projects() {
           ))}
         </div>
         
-        <div className={`absolute left-0 top-0 bottom-20 w-32 md:w-64 bg-gradient-to-r from-black via-black/60 to-transparent z-20 pointer-events-none flex items-center justify-start pl-6 transition-opacity duration-700 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`}>
-          <button onClick={() => scroll('left')} className="pointer-events-auto w-12 h-12 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md bg-white/5 hover:bg-white/10 transition-colors">
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </button>
-        </div>
 
-        <div className={`absolute right-0 top-0 bottom-20 w-32 md:w-64 bg-gradient-to-l from-black via-black/60 to-transparent z-20 pointer-events-none flex items-center justify-end pr-6 transition-opacity duration-700 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`}>
-          <button onClick={() => scroll('right')} className="pointer-events-auto w-12 h-12 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md bg-white/5 hover:bg-white/10 transition-colors">
-            <ArrowLeft className="w-5 h-5 text-white rotate-180" />
-          </button>
-        </div>
       </div>
 
       <ProjectModal project={selectedProject} isOpen={!!selectedProject} onClose={() => setSelectedProject(null)} />

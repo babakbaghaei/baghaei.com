@@ -13,7 +13,7 @@ export const StatItem: React.FC<StatItemProps> = ({ label, value, className = ""
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="text-3xl font-bold font-display text-white">
-        <Counter value={value} />
+        {/[^\d\.\%\+\s]/.test(value.replace(/[۰-۹]/g, '0')) ? value : <Counter value={value} />}
       </div>
       <div className="text-[10px] text-zinc-500 font-black uppercase font-display">
         {label}
