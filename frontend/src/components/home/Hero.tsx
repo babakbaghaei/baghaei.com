@@ -35,8 +35,8 @@ export default function Hero() {
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center pt-32 overflow-hidden">
       {/* Background Icon */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0">
-        <Compass className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+        <Compass className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-16 text-center relative z-10">

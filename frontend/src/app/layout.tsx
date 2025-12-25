@@ -84,7 +84,9 @@ export const viewport = {
   themeColor: 'black',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
+  minimumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

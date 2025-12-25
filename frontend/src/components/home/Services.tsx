@@ -28,8 +28,8 @@ export default function Services() {
   return (
     <Section id="services">
       {/* Section Background Icon */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0">
-        <Layers className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+        <Layers className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
       </div>
 
       <Heading subtitle="خدمات">تخصص و</Heading>

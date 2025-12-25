@@ -33,8 +33,8 @@ export default function Contact() {
   return (
     <Section id="contact" className="border-t border-zinc-900">
       {/* Background Icon */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0">
-        <Mail className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+        <Mail className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
       </div>
 
       <div className="flex flex-col items-start gap-12">
@@ -46,20 +46,20 @@ export default function Contact() {
             <input 
               type="text" name="name" required 
               placeholder="نام و نام خانوادگی"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display"
+              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
             />
             <span className="inline"> هستم. می‌خواهم در مورد </span>
             <input 
               type="text" name="message" required 
               placeholder="موضوع یا شرح پروژه"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display"
+              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
             />
             <span className="inline"> با شما همکاری کنم. </span>
             <span className="inline">می‌توانید به من در </span>
             <input 
               type="text" name="phone" required 
               placeholder="شماره تماس"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display"
+              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
               dir="ltr"
             />
             <span className="inline"> پیام دهید.</span>

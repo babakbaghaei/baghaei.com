@@ -36,8 +36,8 @@ export default function Projects() {
 
   return (
     <Section id="projects" className="overflow-visible">
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0">
-        <Box className="w-[600px] h-[600px] text-white" strokeWidth={0.5} />
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+        <Box className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
       </div>
 
       <Heading subtitle="منتخب">پروژه‌های</Heading>
