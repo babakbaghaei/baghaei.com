@@ -40,8 +40,10 @@ export class SecurityService {
       },
     }));
 
+    /*
     // Sanitize data to prevent mongo injection
     app.use(mongoSanitize());
+    */
 
     /*
     // Prevent parameter pollution
