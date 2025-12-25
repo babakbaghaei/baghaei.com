@@ -40,26 +40,6 @@ export class SecurityService {
       },
     }));
 
-    // Rate limiting to prevent brute force attacks
-    app.use(
-      rateLimit({
-        windowMs: 15 * 60 * 1000, // 15 minutes
-        max: this.configService.get<number>('SECURITY_RATE_LIMIT_MAX', 100), // limit each IP to 100 requests per windowMs
-        message: 'Too many requests from this IP, please try again later.',
-        standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-        legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-      })
-    );
-
-    // Slow down requests from same IP
-    app.use(
-      slowDown({
-        windowMs: 15 * 60 * 1000, // 15 minutes
-        delayAfter: 50, // Begin slowing down after 50 requests
-        delayMs: 500, // Slow down by 500ms increments
-      })
-    );
-
     // Sanitize data to prevent mongo injection
     app.use(mongoSanitize());
 
