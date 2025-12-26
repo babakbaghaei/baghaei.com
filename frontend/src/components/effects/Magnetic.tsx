@@ -3,7 +3,7 @@
 import React, { useRef, useCallback, useEffect } from 'react'
 import { motion, useSpring } from 'framer-motion';
 
-export default function Magnetic({ children, intensity = 0.6 }: { children: React.ReactNode, intensity?: number }) {
+export default function Magnetic({ children, intensity = 0.6, disabled = false }: { children: React.ReactNode, intensity?: number, disabled?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const isLocalActive = useRef(false);
   
@@ -12,7 +12,7 @@ export default function Magnetic({ children, intensity = 0.6 }: { children: Reac
   const y = useSpring(0, springConfig);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!ref.current) return;
+    if (!ref.current || disabled) return;
     
     const rect = ref.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
