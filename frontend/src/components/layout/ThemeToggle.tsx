@@ -1,42 +1,24 @@
-'use client';
+"use client"
 
-import React, { useEffect, useState } from 'react';
-import { Sun, Moon } from 'lucide-react';
+import * as React from "react"
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 
-export default function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
+import { Button } from "@/components/ui/Button"
 
-  useEffect(() => {
-    const isDarkNow = document.documentElement.classList.contains('dark');
-    setIsDark(isDarkNow);
-  }, []);
+export function ThemeToggle() {
+ const { setTheme, theme } = useTheme()
 
-  const toggle = () => {
-    const newDark = !isDark;
-    setIsDark(newDark);
-    
-    if (newDark) {
-      document.documentElement.classList.add('dark');
-      document.body.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
-
-  return (
-    <button 
-      onClick={toggle}
-      className="p-4 rounded-full border border-zinc-200 dark:border-zinc-800 transition-all hover:bg-zinc-100 dark:hover:bg-zinc-900 z-[120] relative group"
-      aria-label="Toggle Theme"
-    >
-      {isDark ? (
-        <Sun className="w-5 h-5 text-white group-hover:text-yellow-400 transition-colors" />
-      ) : (
-        <Moon className="w-5 h-5 text-black group-hover:text-zinc-600 transition-colors" />
-      )}
-    </button>
-  );
+ return (
+  <Button
+   variant="ghost"
+   size="icon"
+   onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+   className="rounded-full w-9 h-9 relative flex items-center justify-center"
+  >
+   <Sun className="h-[1.1rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+   <Moon className="h-[1.1rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 absolute" />
+   <span className="sr-only">تغییر تم</span>
+  </Button>
+ )
 }

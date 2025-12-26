@@ -10,93 +10,113 @@ import Magnetic from '@/components/effects/Magnetic';
 import { useSound } from '@/lib/utils/sounds';
 
 export default function Contact() {
-  const [isPending, startTransition] = useTransition();
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const { play } = useSound();
+ const [isPending, startTransition] = useTransition();
+ const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+ const { play } = useSound();
 
-  // Use GLOBAL scroll to avoid hydration issues with refs
-  const { scrollYProgress } = useScroll();
-  const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+ // Use GLOBAL scroll to avoid hydration issues with refs
+ const { scrollYProgress } = useScroll();
+ const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    startTransition(async () => {
-      const result = await submitContactForm(formData);
-      if (result.success) {
-        setStatus('success');
-        play('pop');
-        setTimeout(() => setStatus('idle'), 5000);
-        (e.target as HTMLFormElement).reset();
-      } else {
-        setStatus('error');
-      }
-    });
-  };
+ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+ e.preventDefault();
+ const formData = new FormData(e.currentTarget);
+ 
+ startTransition(async () => {
+  const result = await submitContactForm(formData);
+  if (result.success) {
+  setStatus('success');
+  play('pop');
+  setTimeout(() => setStatus('idle'), 5000);
+  (e.target as HTMLFormElement).reset();
+  } else {
+  setStatus('error');
+  }
+ });
+ };
 
-  return (
-    <Section id="contact" className="border-t border-zinc-900">
-      {/* Background Icon */}
-      <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
-        <Mail className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white" strokeWidth={0.5} />
-      </motion.div>
+ return (
+ <Section id="contact" className="border-t border-border">
+  {/* Background Icon */}
+  <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+  <Mail className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
+  </motion.div>
 
-      <div className="flex flex-col items-start gap-12">
-        <Heading align="right" subtitle="گفتگو">شروع یک</Heading>
+  <div className="flex flex-col items-start gap-12">
+  <Heading align="right" subtitle="گفتگو">شروع یک</Heading>
 
-        <form onSubmit={handleSubmit} className="relative max-w-6xl w-full">
-          <div className="text-xl md:text-4xl font-medium font-display leading-[2.2] md:leading-[1.8] text-white text-right">
-            <span className="inline">سلام، من </span>
-            <input 
-              type="text" name="name" required 
-              placeholder="نام و نام خانوادگی"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
-            />
-            <span className="inline"> هستم. می‌خواهم در مورد </span>
-            <input 
-              type="text" name="message" required 
-              placeholder="موضوع یا شرح پروژه"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
-            />
-            <span className="inline"> با شما همکاری کنم. </span>
-            <span className="inline">می‌توانید به من در </span>
-            <input 
-              type="text" name="phone" required 
-              placeholder="شماره تماس"
-              className="border-b-2 border-zinc-800 bg-transparent px-2 focus:outline-none focus:border-white transition-colors placeholder:text-zinc-800 w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
-              dir="ltr"
-            />
-            <span className="inline"> پیام دهید.</span>
-          </div>
+  <form onSubmit={handleSubmit} className="relative max-w-6xl w-full">
+   <div className="text-xl md:text-4xl font-medium font-display leading-[2.2] md:leading-[1.8] text-foreground text-right">
+   <span className="inline">سلام، من </span>
+   <input 
+    type="text" name="name" required 
+    placeholder="نام و نام خانوادگی"
+    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً نام خود را وارد کنید')}
+    onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
+   />
+   <span className="inline"> هستم. می‌خواهم در مورد </span>
+   <input 
+    type="text" name="message" required 
+    placeholder="موضوع یا شرح پروژه"
+    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً موضوع یا متن پیام را بنویسید')}
+    onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
+   />
+   <span className="inline"> با شما همکاری کنم. </span>
+   <span className="inline">می‌توانید به من در </span>
+   <input 
+    type="text" name="phone" required 
+    placeholder="شماره تماس یا ایمیل"
+    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً شماره تماس یا ایمیل خود را وارد کنید')}
+    onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
+    dir="ltr"
+   />
+   <span className="inline"> پیام دهید.</span>
+   </div>
 
-          <div className="mt-16 flex flex-col items-start gap-12">
-            <Magnetic>
-              <Button
-                type="submit"
-                isLoading={isPending}
-                disabled={status === 'success'}
-                className="px-16 py-8 text-xl"
-                rightIcon={
-                  status === 'success' ? (
-                    <Check className="w-6 h-6 text-green-800" strokeWidth={3} />
-                  ) : (
-                    <Send className="w-6 h-6" />
-                  )
-                }
-              >
-                {status === 'success' ? 'ارسال شد' : 'ارسال'}
-              </Button>
-            </Magnetic>
+   <div className="mt-16 flex flex-col items-start gap-12">
+   <Magnetic disabled={status === 'success'}>
+    <Button
+    type="submit"
+    isLoading={isPending}
+    disabled={status === 'success'}
+    className="px-12 py-6 text-lg"
+    rightIcon={
+     status === 'success' ? (
+     <Check className="w-5 h-5 text-green-800" strokeWidth={3} />
+     ) : (
+     <Send className="w-5 h-5" />
+     )
+    }
+    >
+    {status === 'success' ? 'ارسال شد' : 'ارسال'}
+    </Button>
+   </Magnetic>
 
-            {status === 'error' && (
-              <motion.p initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="text-red-600 font-bold uppercase tracking-widest text-sm font-display">
-                خطا در ارسال. مجدداً تلاش کنید.
-              </motion.p>
-            )}
-          </div>
-        </form>
-      </div>
-    </Section>
-  );
+   <AnimatePresence>
+    {status === 'success' && (
+     <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 10 }}
+      className="flex items-center gap-3 text-green-600 dark:text-green-400 font-medium"
+     >
+      <div className="w-2 h-2 rounded-full bg-current animate-pulse" />
+      <p>پیام شما با موفقیت دریافت شد. به زودی با شما تماس خواهیم گرفت.</p>
+     </motion.div>
+    )}
+   </AnimatePresence>
+
+   {status === 'error' && (
+    <motion.p initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="text-destructive font-bold uppercase tracking-widest text-sm font-display">
+    خطا در ارسال. مجدداً تلاش کنید.
+    </motion.p>
+   )}
+   </div>
+  </form>
+  </div>
+ </Section>
+ );
 }

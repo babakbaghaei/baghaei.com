@@ -14,18 +14,18 @@ const Contact = dynamic(() => import('@/components/home/Contact'), { ssr: false 
 const Footer = dynamic(() => import('@/components/layout/Footer'), { ssr: false });
 
 export default function HomeContent() {
-  return (
-    <main className="min-h-screen relative bg-black overflow-x-hidden">
-      <Navbar />
-      <Hero />
-      <div className="space-y-0">
-        <Philosophy />
-        <Projects />
-        <Services />
-        <Testimonials />
-        <Contact />
-      </div>
-      <Footer />
-    </main>
-  );
+ return (
+  <main className="min-h-screen relative bg-black overflow-x-hidden">
+   <Navbar />
+   <Hero />
+   <div className="space-y-0">
+    <Philosophy />
+    <Projects />
+    <Services />
+    <Testimonials />
+    <Contact />
+   </div>
+   <Footer />
+  </main>
+ );
 }
