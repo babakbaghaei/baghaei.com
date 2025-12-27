@@ -15,7 +15,9 @@ export class TelegramService {
 
   async sendMessage(message: string) {
     if (!this.botToken || !this.chatId) {
-      this.logger.warn('Telegram credentials not configured. Skipping notification.');
+      this.logger.warn(
+        'Telegram credentials not configured. Skipping notification.',
+      );
       return;
     }
 
@@ -28,7 +30,11 @@ export class TelegramService {
       });
       this.logger.log('Telegram notification sent successfully.');
     } catch (error: any) {
-      this.logger.error(`Failed to send Telegram notification: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(
+        `Failed to send Telegram notification: ${errorMessage}`,
+      );
     }
   }
 }

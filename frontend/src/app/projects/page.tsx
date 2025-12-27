@@ -13,7 +13,7 @@ export default function AllProjectsPage() {
  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
  return (
-  <main className="min-h-screen bg-black">
+  <main className="min-h-screen bg-background">
    <Navbar />
    
    <Section className="pt-48 pb-20">

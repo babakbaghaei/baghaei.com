@@ -10,10 +10,10 @@ export async function submitContactForm(formData: FormData) {
 
  // Use the internal server URL for backend communication
  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
- console.log('Submitting to:', `${backendUrl}/contact`);
+ console.log('Submitting to:', `${backendUrl}/api/v1/contact`);
 
  try {
-  const response = await fetch(`${backendUrl}/contact`, {
+  const response = await fetch(`${backendUrl}/api/v1/contact`, {
    method: 'POST',
    headers: { 'Content-Type': 'application/json' },
    body: JSON.stringify({
@@ -32,8 +32,9 @@ export async function submitContactForm(formData: FormData) {
 
   revalidatePath('/');
   return { success: true };
- } catch (error: any) {
+ } catch (error: unknown) {
+  const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
   console.error('Form submission action error:', error);
-  return { success: false, error: error.message || 'Failed to send message' };
+  return { success: false, error: errorMessage };
  }
 }

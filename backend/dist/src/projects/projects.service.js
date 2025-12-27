@@ -8,51 +8,65 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectsService = void 0;
 const common_1 = require("@nestjs/common");
+const cache_manager_1 = require("@nestjs/cache-manager");
 const prisma_service_1 = require("../prisma/prisma.service");
+const security_service_1 = require("../security/security.service");
 let ProjectsService = class ProjectsService {
     prisma;
-    constructor(prisma) {
+    securityService;
+    cacheManager;
+    constructor(prisma, securityService, cacheManager) {
         this.prisma = prisma;
+        this.securityService = securityService;
+        this.cacheManager = cacheManager;
     }
-    async project(projectWhereUniqueInput) {
-        return this.prisma.project.findUnique({
-            where: projectWhereUniqueInput,
-        });
-    }
-    async projects(params) {
-        const { skip, take, cursor, where, orderBy } = params;
+    async findAll() {
         return this.prisma.project.findMany({
-            skip,
-            take,
-            cursor,
-            where,
-            orderBy,
+            orderBy: { createdAt: 'desc' },
         });
     }
-    async createProject(data) {
+    async findOne(id) {
+        const project = await this.prisma.project.findUnique({
+            where: { id },
+        });
+        if (!project) {
+            throw new common_1.NotFoundException(`Project with ID ${id} not found`);
+        }
+        return project;
+    }
+    async create(createProjectDto) {
+        const sanitizedData = this.securityService.sanitizeInput(createProjectDto);
+        await this.cacheManager.del('all_projects');
         return this.prisma.project.create({
-            data,
+            data: sanitizedData,
         });
     }
-    async updateProject(params) {
-        const { where, data } = params;
+    async update(id, updateProjectDto) {
+        const sanitizedData = this.securityService.sanitizeInput(updateProjectDto);
+        await this.cacheManager.del('all_projects');
         return this.prisma.project.update({
-            data,
-            where,
+            where: { id },
+            data: sanitizedData,
         });
     }
-    async deleteProject(where) {
+    async remove(id) {
+        await this.cacheManager.del('all_projects');
         return this.prisma.project.delete({
-            where,
+            where: { id },
         });
     }
 };
 exports.ProjectsService = ProjectsService;
 exports.ProjectsService = ProjectsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(2, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        security_service_1.SecurityService, Object])
 ], ProjectsService);
 //# sourceMappingURL=projects.service.js.map

@@ -14,72 +14,84 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectsController = void 0;
 const common_1 = require("@nestjs/common");
+const cache_manager_1 = require("@nestjs/cache-manager");
 const projects_service_1 = require("./projects.service");
+const transform_interceptor_1 = require("../common/interceptors/transform.interceptor");
+const roles_guard_1 = require("../common/guards/roles.guard");
+const roles_decorator_1 = require("../common/decorators/roles.decorator");
+const client_1 = require("@prisma/client");
+const passport_1 = require("@nestjs/passport");
+const create_project_dto_1 = require("./dto/create-project.dto");
+const update_project_dto_1 = require("./dto/update-project.dto");
 let ProjectsController = class ProjectsController {
     projectsService;
     constructor(projectsService) {
         this.projectsService = projectsService;
     }
-    async getAllProjects() {
-        return this.projectsService.projects({
-            where: { published: true },
-            orderBy: { createdAt: 'desc' },
-        });
+    findAll() {
+        return this.projectsService.findAll();
     }
-    async getProjectById(id) {
-        return this.projectsService.project({ id: Number(id) });
+    findOne(id) {
+        return this.projectsService.findOne(+id);
     }
-    async createProject(projectData) {
-        return this.projectsService.createProject(projectData);
+    create(createProjectDto) {
+        return this.projectsService.create(createProjectDto);
     }
-    async updateProject(id, projectData) {
-        return this.projectsService.updateProject({
-            where: { id: Number(id) },
-            data: projectData,
-        });
+    update(id, updateProjectDto) {
+        return this.projectsService.update(+id, updateProjectDto);
     }
-    async deleteProject(id) {
-        return this.projectsService.deleteProject({ id: Number(id) });
+    remove(id) {
+        return this.projectsService.remove(+id);
     }
 };
 exports.ProjectsController = ProjectsController;
 __decorate([
     (0, common_1.Get)(),
+    (0, common_1.UseInterceptors)(cache_manager_1.CacheInterceptor),
+    (0, cache_manager_1.CacheKey)('all_projects'),
+    (0, cache_manager_1.CacheTTL)(60000),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], ProjectsController.prototype, "getAllProjects", null);
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], ProjectsController.prototype, "getProjectById", null);
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], ProjectsController.prototype, "createProject", null);
+    __metadata("design:paramtypes", [create_project_dto_1.CreateProjectDto]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "create", null);
 __decorate([
     (0, common_1.Put)(':id'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], ProjectsController.prototype, "updateProject", null);
+    __metadata("design:paramtypes", [String, update_project_dto_1.UpdateProjectDto]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], ProjectsController.prototype, "deleteProject", null);
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "remove", null);
 exports.ProjectsController = ProjectsController = __decorate([
     (0, common_1.Controller)('projects'),
+    (0, common_1.UseInterceptors)(transform_interceptor_1.TransformInterceptor),
     __metadata("design:paramtypes", [projects_service_1.ProjectsService])
 ], ProjectsController);
 //# sourceMappingURL=projects.controller.js.map

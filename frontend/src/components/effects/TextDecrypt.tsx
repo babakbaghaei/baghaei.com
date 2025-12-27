@@ -14,15 +14,11 @@ const chars = '-/_*+!<>@#$%&?0123456789';
 
 export default function TextDecrypt({ text, speed = 40, delay = 0, trigger = false, className = "" }: TextDecryptProps) {
  const [displayText, setDisplayText] = useState('');
- const [isAnimating, setIsAnimating] = useState(false);
 
  const decrypt = useCallback(() => {
   let iteration = 0;
-  let interval: NodeJS.Timeout;
-
-  clearInterval(interval!);
-
-  interval = setInterval(() => {
+  
+  const interval = setInterval(() => {
    setDisplayText(
     text
      .split('')
@@ -37,22 +33,24 @@ export default function TextDecrypt({ text, speed = 40, delay = 0, trigger = fal
 
    if (iteration >= text.length) {
     clearInterval(interval);
-    setIsAnimating(false);
    }
 
    iteration += 1 / 3;
   }, speed);
+  
+  return () => clearInterval(interval);
  }, [text, speed]);
 
  useEffect(() => {
   if (trigger) {
    const timer = setTimeout(() => {
-    setIsAnimating(true);
     decrypt();
    }, delay);
    return () => clearTimeout(timer);
   } else {
-   setDisplayText(text.split('').map(() => chars[Math.floor(Math.random() * chars.length)]).join(''));
+   // Initial encrypted state
+   const encrypted = text.split('').map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
+   setDisplayText(encrypted);
   }
  }, [trigger, text, delay, decrypt]);
 

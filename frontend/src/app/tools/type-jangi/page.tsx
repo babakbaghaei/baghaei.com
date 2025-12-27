@@ -188,17 +188,30 @@ export default function TypeJangi() {
     return input;
   }, [input, currentDialogue.text]);
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (startTime && !isGameOver && !isRoundOver) {
+      interval = setInterval(() => {
+        const seconds = (Date.now() - startTime) / 1000;
+        // Logic handling if needed
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [startTime, isGameOver, isRoundOver]);
+
   const stats = useMemo(() => {
     if (!startTime) return { wpm: 0, accuracy: 0, cpm: 0, time: 0 };
-    const seconds = (Date.now() - startTime) / 1000;
-    const minutes = Math.max(0.01, seconds / 60);
+    // This calculation is purely for rendering based on snapshots, 
+    // but ideally should be driven by a tick for real-time updates.
+    // For now, we accept it might lag slightly or we move time to state.
+    // A better approach:
     return { 
-      wpm: Math.round((correctKeys / 5) / minutes) || 0, 
+      wpm: Math.round((correctKeys / 5) / Math.max(0.01, (Date.now() - startTime) / 60000)) || 0,
       accuracy: Math.max(0, Math.round((correctKeys / (totalKeys || 1)) * 100)),
-      cpm: Math.round(correctKeys / minutes) || 0,
-      time: Math.round(seconds)
+      cpm: Math.round(correctKeys / Math.max(0.01, (Date.now() - startTime) / 60000)) || 0,
+      time: Math.round((Date.now() - startTime) / 1000)
     };
-  }, [startTime, correctKeys, totalKeys]);
+  }, [startTime, correctKeys, totalKeys, input]); // Added input to trigger re-calc on typing
 
   const advice = useMemo(() => {
     if (!isGameOver) return "";
@@ -210,11 +223,11 @@ export default function TypeJangi() {
   }, [stats, isGameOver]);
 
   return (
-    <main className={`min-h-screen transition-colors duration-200 flex flex-col items-center justify-center p-6 font-sans select-none overflow-hidden ${isWrong ? 'bg-indigo-500/5 dark:bg-indigo-500/10' : 'bg-background'}`}>
+    <main className={`min-h-screen transition-colors duration-200 flex flex-col items-center justify-center p-6 font-sans select-none overflow-hidden ${isWrong ? 'bg-primary/5' : 'bg-background'}`}>
       <div className="w-full max-w-5xl relative z-10">
         
         {/* Settings Bar */}
-        <div className="flex flex-wrap justify-center gap-6 mb-12 bg-secondary/30 border border-border p-4 rounded-3xl backdrop-blur-md" dir="rtl">
+        <div className="flex flex-wrap justify-center gap-6 mb-12 bg-card/30 border border-border p-4 rounded-3xl backdrop-blur-md" dir="rtl">
           <div className="flex items-center gap-2 border-l border-border pl-6">
             <span className="text-[10px] font-black text-muted-foreground uppercase">دسته بندی:</span>
             <select value={settings.category} onChange={(e) => { setSettings({...settings, category: e.target.value as any}); restartAll(); }} className="bg-transparent text-sm font-bold text-foreground outline-none">
@@ -236,7 +249,7 @@ export default function TypeJangi() {
             <span className="text-[10px] font-black text-muted-foreground uppercase">سایز:</span>
             <div className="flex gap-2">
               {[32, 40, 56].map(s => (
-                <button key={s} onClick={() => setSettings({...settings, fontSize: s})} className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${settings.fontSize === s ? 'bg-primary text-primary-foreground' : 'bg-white/5 hover:bg-white/10'}`}>
+                <button key={s} onClick={() => setSettings({...settings, fontSize: s})} className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${settings.fontSize === s ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'}`}>
                   {toPersianDigits(s === 32 ? 'S' : s === 40 ? 'M' : 'L')}
                 </button>
               ))}
@@ -247,7 +260,7 @@ export default function TypeJangi() {
             <span className="text-[10px] font-black text-muted-foreground uppercase">وزن:</span>
             <div className="flex gap-2">
               {(['normal', 'bold'] as const).map(w => (
-                <button key={w} onClick={() => setSettings({...settings, fontWeight: w})} className={`px-3 h-8 rounded-lg text-xs font-bold transition-all ${settings.fontWeight === w ? 'bg-primary text-primary-foreground' : 'bg-white/5 hover:bg-white/10'}`}>
+                <button key={w} onClick={() => setSettings({...settings, fontWeight: w})} className={`px-3 h-8 rounded-lg text-xs font-bold transition-all ${settings.fontWeight === w ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'}`}>
                   {w === 'bold' ? 'ضخیم' : 'معمولی'}
                 </button>
               ))}
@@ -257,20 +270,20 @@ export default function TypeJangi() {
           <div className="flex items-center gap-3 pl-4">
             <div className="flex items-center gap-1.5 group/help relative">
               <span className="text-[10px] font-black text-muted-foreground uppercase">حالت تفریحی:</span>
-              <HelpCircle className="w-3 h-3 text-zinc-600 cursor-help" />
+              <HelpCircle className="w-3 h-3 text-muted-foreground cursor-help" />
               <div className="absolute top-full mt-2 right-0 w-56 p-3 bg-background border border-border rounded-xl text-[10px] text-muted-foreground opacity-0 group-hover/help:opacity-100 transition-all pointer-events-none z-50 shadow-2xl leading-relaxed text-right">
                 در این حالت علائم نگارشی خودکار درج شده و نام منبع اثر برای استراحت کوتاه نمایش داده می‌شود.
               </div>
             </div>
-            <button onClick={() => setSettings({...settings, funMode: !settings.funMode})} className={`w-12 h-6 rounded-full relative transition-colors ${settings.funMode ? 'bg-primary' : 'bg-white/10'}`}>
-              <motion.div animate={{ x: settings.funMode ? -24 : -4 }} className="absolute top-1 right-0 w-4 h-4 bg-white rounded-full shadow-sm" />
+            <button onClick={() => setSettings({...settings, funMode: !settings.funMode})} className={`w-12 h-6 rounded-full relative transition-colors ${settings.funMode ? 'bg-primary' : 'bg-secondary'}`}>
+              <motion.div animate={{ x: settings.funMode ? -24 : -4 }} className="absolute top-1 right-0 w-4 h-4 bg-background rounded-full shadow-sm" />
             </button>
           </div>
         </div>
 
         <HUD wpm={stats.wpm} accuracy={stats.accuracy} />
 
-        <div className={`relative bg-secondary/20 border rounded-[2.5rem] p-12 md:p-20 shadow-2xl backdrop-blur-sm min-h-[350px] flex items-center justify-center overflow-hidden transition-all duration-100 ${isWrong ? 'border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.3)] bg-indigo-500/5' : 'border-border'}`}>
+        <div className={`relative bg-secondary/10 border rounded-[2.5rem] p-12 md:p-20 shadow-2xl backdrop-blur-sm min-h-[350px] flex items-center justify-center overflow-hidden transition-all duration-100 ${isWrong ? 'border-primary shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] bg-primary/5' : 'border-border'}`}>
           <AnimatePresence>
             {isRoundOver && (
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/90 backdrop-blur-xl">

@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { useScroll, useSpring, useInView } from 'framer-motion';
+import { useInView } from 'framer-motion';
 import { Section, Heading } from '../ui/Layout';
 import { toPersianDigits } from '@/lib/utils/format';
-import { useSound } from '@/lib/utils/sounds';
 import { StatItem } from '../ui/StatItem';
 import GlobalUniverse from '@/components/effects/GlobalUniverse';
 
@@ -15,7 +14,6 @@ const stats = [
 ];
 
 export default function Philosophy() {
- const { play } = useSound();
  const containerRef = useRef(null);
  
  // Counter logic - Pure state based to avoid NaN/Hydration issues
@@ -23,14 +21,15 @@ export default function Philosophy() {
  const isVisible = useInView(containerRef, { amount: 0.3, once: false });
 
  useEffect(() => {
+  let interval: NodeJS.Timeout;
   if (isVisible) {
-   const interval = setInterval(() => {
+   interval = setInterval(() => {
     setYears(prev => (prev < 10 ? prev + 1 : 10));
    }, 80);
-   return () => clearInterval(interval);
   } else {
    setYears(0);
   }
+  return () => clearInterval(interval);
  }, [isVisible]);
 
  const yearsDisplay = `${toPersianDigits(years)}+`;

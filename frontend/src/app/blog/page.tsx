@@ -32,7 +32,7 @@ const blogPosts = [
 
 export default function BlogPage() {
  return (
-  <main className="min-h-screen bg-black text-white">
+  <main className="min-h-screen bg-background text-foreground">
    <Navbar />
    
    <Section className="pt-48">
@@ -40,27 +40,27 @@ export default function BlogPage() {
     
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-20">
      {blogPosts.map((post) => (
-      <Card key={post.id} className="group cursor-pointer">
+      <Card key={post.id} className="group cursor-pointer hover:border-primary/50 transition-colors">
        <div className="space-y-6">
         <div className="flex justify-between items-center">
-         <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 font-display">
+         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground font-display">
           {post.category}
          </span>
-         <div className="flex items-center gap-4 text-[10px] text-zinc-600 font-display">
+         <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-display">
           <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {post.readTime}</span>
           <span className="flex items-center gap-1"><User className="w-3 h-3" /> {post.author}</span>
          </div>
         </div>
         
-        <h3 className="text-3xl font-bold font-display leading-tight group-hover:text-zinc-400 transition-colors">
+        <h3 className="text-3xl font-bold font-display leading-tight group-hover:text-primary transition-colors">
          {post.title}
         </h3>
         
-        <p className="text-zinc-500 font-sans leading-relaxed text-lg line-clamp-3">
+        <p className="text-muted-foreground font-sans leading-relaxed text-lg line-clamp-3">
          {post.excerpt}
         </p>
         
-        <div className="pt-6 flex items-center gap-4 text-xs font-black uppercase text-white font-display">
+        <div className="pt-6 flex items-center gap-4 text-xs font-black uppercase text-foreground font-display">
          <span>مطالعه مقاله</span>
          <ArrowLeft className="w-4 h-4 transition-transform group-hover:translate-x-[-4px]" />
         </div>

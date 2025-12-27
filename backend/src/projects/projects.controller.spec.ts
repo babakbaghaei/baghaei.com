@@ -1,26 +1,31 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProjectsController } from './projects.controller';
 import { ProjectsService } from './projects.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 describe('ProjectsController', () => {
   let controller: ProjectsController;
+
+  const mockProjectsService = {
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
+  };
+
+  const mockCacheManager = {
+    get: jest.fn(),
+    set: jest.fn(),
+    del: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProjectsController],
       providers: [
-        ProjectsService,
-        {
-          provide: PrismaService,
-          useValue: {
-            project: jest.fn(),
-            projects: jest.fn(),
-            createProject: jest.fn(),
-            updateProject: jest.fn(),
-            deleteProject: jest.fn(),
-          },
-        },
+        { provide: ProjectsService, useValue: mockProjectsService },
+        { provide: CACHE_MANAGER, useValue: mockCacheManager },
       ],
     }).compile();
 

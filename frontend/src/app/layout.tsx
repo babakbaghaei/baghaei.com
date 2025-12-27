@@ -1,10 +1,36 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import localFont from "next/font/local";
 import Script from "next/script";
 import BackgroundGrid from "@/components/effects/BackgroundGrid";
 import CookieConsent from "@/components/layout/CookieConsent";
 import { RootMobileMenu } from "@/components/layout/RootMobileMenu";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+
+const iransans = localFont({
+ src: [
+  { path: "../../public/fonts/IRANSans/IRANSans_UltraLight.ttf", weight: "200", style: "normal" },
+  { path: "../../public/fonts/IRANSans/IRANSans_Light.ttf", weight: "300", style: "normal" },
+  { path: "../../public/fonts/IRANSans/IRANSans.ttf", weight: "400", style: "normal" },
+  { path: "../../public/fonts/IRANSans/IRANSans_Medium.ttf", weight: "500", style: "normal" },
+  { path: "../../public/fonts/IRANSans/IRANSans_Bold.ttf", weight: "700", style: "normal" },
+  { path: "../../public/fonts/IRANSans/IRANSans_Black.ttf", weight: "900", style: "normal" },
+ ],
+ variable: "--font-iransans",
+});
+
+const yekanbakh = localFont({
+ src: [
+  { path: "../../public/fonts/YekanBakh/YekanBakh-Thin.ttf", weight: "100", style: "normal" },
+  { path: "../../public/fonts/YekanBakh/YekanBakh-Light.ttf", weight: "300", style: "normal" },
+  { path: "../../public/fonts/YekanBakh/YekanBakh-Regular.ttf", weight: "400", style: "normal" },
+  { path: "../../public/fonts/YekanBakh/YekanBakh-Medium.ttf", weight: "500", style: "normal" },
+  { path: "../../public/fonts/YekanBakh/YekanBakh-Bold.ttf", weight: "700", style: "normal" },
+  { path: "../../public/fonts/YekanBakh/YekanBakh-Heavy.ttf", weight: "800", style: "normal" },
+  { path: "../../public/fonts/YekanBakh/YekanBakh-Fat.ttf", weight: "900", style: "normal" },
+ ],
+ variable: "--font-yekanbakh",
+});
 
 export const metadata: Metadata = {
  title: {
@@ -61,7 +87,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
- themeColor: 'black',
+ themeColor: [
+  { media: '(prefers-color-scheme: light)', color: 'white' },
+  { media: '(prefers-color-scheme: dark)', color: 'black' },
+ ],
  width: 'device-width',
  initialScale: 1,
  maximumScale: 1,
@@ -75,8 +104,8 @@ export default function RootLayout({
  children: React.ReactNode;
 }>) {
  return (
-  <html lang="fa" dir="rtl" suppressHydrationWarning>
-   <body className="antialiased bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+  <html lang="fa" dir="rtl" suppressHydrationWarning className={`${iransans.variable} ${yekanbakh.variable}`}>
+   <body className="antialiased bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans">
     <ThemeProvider
      attribute="class"
      defaultTheme="dark"
@@ -93,6 +122,47 @@ export default function RootLayout({
        function gtag(){dataLayer.push(arguments);}
        gtag('js', new Date());
        gtag('config', 'G-YSHJT31R0K');
+      `}
+     </Script>
+     <Script id="json-ld" type="application/ld+json" strategy="afterInteractive">
+      {`
+       {
+        "@context": "https://schema.org",
+        "@graph": [
+         {
+          "@type": "Organization",
+          "name": "گروه فناوری بقایی",
+          "url": "https://baghaei.com",
+          "logo": "https://baghaei.com/logo.svg",
+          "sameAs": [
+           "https://linkedin.com/in/babakbaghaei",
+           "https://github.com/baghaei"
+          ],
+          "contactPoint": {
+           "@type": "ContactPoint",
+           "telephone": "+98-912-000-0000",
+           "contactType": "sales",
+           "areaServed": "IR",
+           "availableLanguage": ["Persian", "English"]
+          }
+         },
+         {
+          "@type": "Person",
+          "name": "بابک بقایی",
+          "url": "https://baghaei.com",
+          "image": "https://baghaei.com/og-image.png",
+          "jobTitle": "Lead Software Architect",
+          "worksFor": {
+           "@type": "Organization",
+           "name": "گروه فناوری بقایی"
+          },
+          "sameAs": [
+           "https://linkedin.com/in/babakbaghaei",
+           "https://github.com/baghaei"
+          ]
+         }
+        ]
+       }
       `}
      </Script>
      

@@ -41,18 +41,27 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var AuthService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = __importStar(require("bcrypt"));
-let AuthService = class AuthService {
+const config_1 = require("@nestjs/config");
+const client_1 = require("@prisma/client");
+const security_service_1 = require("../security/security.service");
+let AuthService = AuthService_1 = class AuthService {
     prisma;
     jwtService;
-    constructor(prisma, jwtService) {
+    configService;
+    securityService;
+    logger = new common_1.Logger(AuthService_1.name);
+    constructor(prisma, jwtService, configService, securityService) {
         this.prisma = prisma;
         this.jwtService = jwtService;
+        this.configService = configService;
+        this.securityService = securityService;
     }
     async validateUser(email, pass) {
         const user = await this.prisma.user.findUnique({ where: { email } });
@@ -67,23 +76,36 @@ let AuthService = class AuthService {
         return {
             access_token: this.jwtService.sign(payload),
             refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+            user: {
+                id: user.id.toString(),
+                email: user.email,
+                name: user.name || undefined,
+                role: user.role,
+            },
         };
     }
-    async register(user) {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
+    async register(registerDto) {
+        const sanitizedData = this.securityService.sanitizeInput(registerDto);
+        const hashedPassword = await bcrypt.hash(sanitizedData.password, 10);
         return this.prisma.user.create({
             data: {
-                email: user.email,
+                email: sanitizedData.email,
                 password: hashedPassword,
-                name: user.name,
+                name: sanitizedData.name,
+                role: client_1.Role.USER,
             },
         });
     }
+    async logout(refreshToken) {
+        this.logger.log('User logged out');
+    }
 };
 exports.AuthService = AuthService;
-exports.AuthService = AuthService = __decorate([
+exports.AuthService = AuthService = AuthService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        config_1.ConfigService,
+        security_service_1.SecurityService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

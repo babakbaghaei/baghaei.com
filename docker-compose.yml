@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Database Service
   db:
     image: postgres:15-alpine
     container_name: baghaei-db
@@ -11,38 +12,67 @@ services:
       POSTGRES_DB: ${DATABASE_NAME:-baghaei_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # Backend Service (NestJS)
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: baghaei-backend
     restart: always
     environment:
       DATABASE_URL: postgresql://${DATABASE_USER:-postgres}:${DATABASE_PASSWORD:-password}@db:5432/${DATABASE_NAME:-baghaei_db}?schema=public
       PORT: 8000
-      JWT_SECRET: ${JWT_SECRET:-secret}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
     depends_on:
-      - db
-    ports:
-      - "8000:8000"
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
 
+  # Frontend Service (Next.js)
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: baghaei-frontend
     restart: always
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:8000
-    depends_on:
-      - backend
+      # In Docker network, frontend talks to backend service via http://backend:8000
+      # But client-side fetches go through Nginx (public URL)
+      NEXT_PUBLIC_API_URL: https://baghaei.com
+    networks:
+      - app-network
+
+  # Reverse Proxy (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: baghaei-nginx
+    restart: always
     ports:
-      - "3000:3000"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # Uncomment for SSL
+      # - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   postgres_data:

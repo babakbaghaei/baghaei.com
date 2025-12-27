@@ -1,217 +1,83 @@
 # گروه فناوری بقایی | Baghaei Tech Group
 
-وب‌سایت شرکتی مدرن با طراحی Apple-inspired برای گروه فناوری بقایی
+وب‌سایت شرکتی مدرن و پلتفرم فناوری در سطح Enterprise، طراحی شده برای مقیاس‌پذیری، امنیت و عملکرد بالا.
 
-## ✨ ویژگی‌های پیاده‌سازی شده
+## 🚀 ویژگی‌های کلیدی
 
-### 🎯 SEO و بهینه‌سازی
-- ✅ Meta Tags کامل (Open Graph, Twitter Cards)
-- ✅ Favicon و Apple Touch Icons
-- ✅ Canonical URLs
-- ✅ Robots.txt
-- ✅ Sitemap-ready structure
-- ✅ Semantic HTML5
+### 🎨 Frontend (Next.js 16)
+- **معماری:** Next.js 16 (App Router) با React 19.
+- **استایلینگ:** Tailwind CSS v4 با سیستم تمینگ پیشرفته (Light/Dark Mode).
+- **پرفورمنس:** 
+  - Server-Side Rendering (SSR) کامل برای سئو.
+  - فونت‌های بهینه‌سازی شده با `next/font/local` (بدون CLS).
+  - ایمیج‌های بهینه و Lazy Loading.
+- **امنیت:** CSP سخت‌گیرانه، HSTS، و محافظت در برابر XSS.
 
-### ⚡ عملکرد و سرعت
-- ✅ Lazy Loading برای تصاویر
-- ✅ Preconnect/DNS Prefetch
-- ✅ Service Worker برای PWA
-- ✅ Browser Caching (via .htaccess)
-- ✅ Gzip Compression
-- ✅ Optimized animations
+### 🛡️ Backend (NestJS)
+- **معماری:** NestJS با ساختار ماژولار و Clean Architecture.
+- **دیتابیس:** PostgreSQL با ORM قدرتمند Prisma (کاملاً Type-Safe).
+- **امنیت:**
+  - **Sanitization:** سرویس اختصاصی `SecurityService` برای پاکسازی تمام ورودی‌ها.
+  - **Middleware:** محافظت در برابر NoSQL Injection و Parameter Pollution.
+  - **Rate Limiting:** محدودسازی درخواست‌ها برای جلوگیری از DDoS.
+- **مانیتورینگ:** ماژول Health Check برای بررسی وضعیت دیتابیس و API.
 
-### ♿ دسترسی‌پذیری (A11Y)
-- ✅ ARIA labels و roles
-- ✅ Keyboard navigation
-- ✅ Focus management
-- ✅ Screen reader support
-- ✅ Reduced motion support
-- ✅ High contrast mode support
-- ✅ Semantic HTML structure
+### ⚙️ DevOps & CI/CD
+- **داکر:** Dockerfileهای بهینه شده (Multi-stage build) برای کاهش حجم نهایی.
+- **CI/CD:** پایپ‌لاین کامل GitHub Actions برای بیلد و تست خودکار (Frontend + Backend).
+- **Deployment:** اسکریپت دیپلوی امن با پشتیبانی از SSH Keys و Zero-downtime (PM2).
 
-### 🔒 امنیت
-- ✅ Content Security Policy headers
-- ✅ X-Frame-Options
-- ✅ X-Content-Type-Options
-- ✅ X-XSS-Protection
-- ✅ Referrer Policy
-- ✅ Permissions Policy
+## 🛠 ابزارهای جانبی
+- **تایپِ جنگی:** ابزار تست سرعت تایپ با استایل یکپارچه.
+- **چرخونه تصمیم:** ابزار انتخاب تصادفی با انیمیشن‌های Canvas.
+- **دستیار چک‌نویس:** تبدیل عدد به حروف برای امور بانکی.
 
-### 📱 Progressive Web App (PWA)
-- ✅ Web App Manifest
-- ✅ Service Worker
-- ✅ Offline support
-- ✅ Installable
-- ✅ App shortcuts
+## 📦 نصب و راه‌اندازی
 
-### 💻 کد با کیفیت
-- ✅ Modular JavaScript architecture
-- ✅ Error handling
-- ✅ Code documentation
-- ✅ Performance optimizations
-- ✅ Clean code practices
+### پیش‌نیازها
+- Node.js 20+
+- PostgreSQL
+- Docker (اختیاری)
 
-## 🚀 پیشنهادات بهبود بیشتر
+### راه‌اندازی لوکال
 
-### 1. Build Process
+1. **کلون کردن مخزن:**
+   ```bash
+   git clone https://github.com/baghaei/baghaei.com.git
+   cd baghaei.com
+   ```
+
+2. **Backend:**
+   ```bash
+   cd backend
+   cp .env.example .env
+   npm install
+   npx prisma generate
+   npx prisma migrate dev
+   npm run start:dev
+   ```
+
+3. **Frontend:**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+### تست‌ها
 ```bash
-# پیشنهاد استفاده از:
-- Vite یا Webpack برای bundling
-- PostCSS برای Tailwind CSS
-- Minification و Tree-shaking
-- Source maps برای production
+# Backend Unit Tests
+cd backend && npm test
+
+# Frontend E2E Tests
+cd frontend && npx playwright test
 ```
 
-### 2. Testing
-```bash
-# اضافه کردن تست‌ها:
-- Jest برای unit tests
-- Playwright/Cypress برای E2E tests
-- Lighthouse CI برای performance
-- Accessibility testing (axe-core)
-```
-
-### 3. CI/CD
-```yaml
-# GitHub Actions یا GitLab CI:
-- Automated testing
-- Build optimization
-- Deployment automation
-- Performance monitoring
-```
-
-### 4. Analytics & Monitoring
-```javascript
-// اضافه کردن:
-- Google Analytics 4
-- Error tracking (Sentry)
-- Performance monitoring
-- User behavior analytics
-```
-
-### 5. Content Management
-- Headless CMS (Strapi, Contentful)
-- Dynamic content loading
-- Multi-language support (i18n)
-
-### 6. Advanced Features
-- [ ] Dark mode toggle (manual)
-- [ ] Multi-language (EN/FA)
-- [ ] Blog/News section
-- [ ] Contact form with validation
-- [ ] Newsletter subscription
-- [ ] Live chat integration
-- [ ] Cookie consent banner
-- [ ] GDPR compliance
-
-### 7. Performance Enhancements
-- [ ] Image optimization (WebP, AVIF)
-- [ ] Critical CSS inlining
-- [ ] Resource hints (preload, prefetch)
-- [ ] CDN integration
-- [ ] HTTP/2 Server Push
-
-### 8. Developer Experience
-- [ ] TypeScript migration
-- [ ] ESLint + Prettier
-- [ ] Husky pre-commit hooks
-- [ ] Component library
-- [ ] Storybook for components
-
-## 📁 ساختار پروژه
-
-```
-Home/
-├── index.html              # صفحه اصلی
-├── manifest.json           # PWA manifest
-├── robots.txt              # SEO robots
-├── .htaccess              # Apache configuration
-├── sw.js                  # Service Worker
-├── assets/
-│   ├── css/
-│   │   └── style.css      # استایل‌های سفارشی
-│   ├── js/
-│   │   └── app.js         # کد JavaScript اصلی
-│   └── img/               # تصاویر (نیاز به اضافه کردن)
-│       ├── favicon.svg
-│       ├── favicon.png
-│       ├── apple-touch-icon.png
-│       ├── icon-192.png
-│       └── icon-512.png
-└── README.md              # این فایل
-```
-
-## 🛠️ راه‌اندازی
-
-### Development
-```bash
-# استفاده از یک local server:
-python -m http.server 8000
-# یا
-npx serve
-# یا
-php -S localhost:8000
-```
-
-### Production
-1. آپلود فایل‌ها به سرور
-2. تنظیم SSL certificate
-3. فعال‌سازی HTTPS redirect در .htaccess
-4. تست Service Worker
-5. بررسی Performance با Lighthouse
-
-## 📊 Metrics هدف
-
-- **Lighthouse Score**: 90+ در همه دسته‌بندی‌ها
-- **First Contentful Paint**: < 1.5s
-- **Time to Interactive**: < 3.5s
-- **Cumulative Layout Shift**: < 0.1
-- **Accessibility Score**: 100
-
-## 🔧 تنظیمات مورد نیاز
-
-### فایل‌های تصویری که باید اضافه شوند:
-- `assets/img/favicon.svg` (32x32)
-- `assets/img/favicon.png` (32x32)
-- `assets/img/apple-touch-icon.png` (180x180)
-- `assets/img/icon-192.png` (192x192)
-- `assets/img/icon-512.png` (512x512)
-- `assets/img/og-image.jpg` (1200x630)
-
-### متغیرهای محیطی (اگر نیاز باشد):
-```env
-# .env.example
-SITE_URL=https://baghaei.group
-ANALYTICS_ID=G-XXXXXXXXXX
-CONTACT_EMAIL=business@baghaei.group
-```
-
-## 📝 نکات مهم
-
-1. **Tailwind CSS**: در حال حاضر از CDN استفاده می‌شود. برای production، بهتر است build شود.
-2. **تصاویر**: تمام تصاویر باید بهینه‌سازی شوند (WebP format).
-3. **Fonts**: فونت Vazirmatn از Google Fonts لود می‌شود. برای performance بهتر، self-host کنید.
-4. **Service Worker**: در production، cache strategy را بر اساس نیاز تنظیم کنید.
-
-## 🤝 مشارکت
-
-برای بهبود پروژه:
-1. Fork کنید
-2. Branch جدید بسازید (`git checkout -b feature/AmazingFeature`)
-3. Commit کنید (`git commit -m 'Add some AmazingFeature'`)
-4. Push کنید (`git push origin feature/AmazingFeature`)
-5. Pull Request باز کنید
+## 🔒 امنیت
+این پروژه با رعایت اصول "Security by Design" توسعه یافته است:
+- تمام ورودی‌های کاربر (Contact, Auth, Projects) قبل از پردازش Sanitize می‌شوند.
+- هدرهای امنیتی (Helmet) به صورت پیش‌فرض فعال هستند.
+- هیچ Secretی در کد منبع وجود ندارد.
 
 ## 📄 لایسنس
-
-تمامی حقوق محفوظ است © ۱۴۰۳ گروه فناوری بقایی
-
-## 📞 تماس
-
-- **Email**: business@baghaei.group
-- **Website**: https://baghaei.group
-
----
-
-**نکته**: این پروژه با تمرکز بر بهترین practices در توسعه وب مدرن ساخته شده است.
-
+تمامی حقوق محفوظ است © ۱۴۰۳ گروه فناوری بقایی.

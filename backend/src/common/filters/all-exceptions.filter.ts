@@ -23,9 +23,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message = 
-      exception instanceof HttpException 
-        ? exception.getResponse() 
+    const message =
+      exception instanceof HttpException
+        ? exception.getResponse()
         : (exception as Error).message || 'Internal server error';
 
     this.logger.error(
@@ -38,6 +38,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
       message: typeof message === 'object' ? (message as any).message : message,
+      requestId: ctx.getRequest().headers['x-request-id'] || 'N/A',
     };
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);

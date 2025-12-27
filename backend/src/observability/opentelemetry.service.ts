@@ -1,11 +1,19 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { Resource } from '@opentelemetry/resources';
-import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
+} from '@opentelemetry/semantic-conventions';
 
 @Injectable()
 export class OpenTelemetryService implements OnModuleInit, OnModuleDestroy {
@@ -46,7 +54,9 @@ export class OpenTelemetryService implements OnModuleInit, OnModuleDestroy {
         this.logger.log('OpenTelemetry SDK shut down successfully');
       }
     } catch (error) {
-      this.logger.error(`Error shutting down OpenTelemetry SDK: ${error.message}`);
+      this.logger.error(
+        `Error shutting down OpenTelemetry SDK: ${error.message}`,
+      );
     }
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function Logo({ className = "w-10 h-10" }: { className?: string }) {
  return (
@@ -44,25 +44,36 @@ export default function Logo({ className = "w-10 h-10" }: { className?: string }
    `}</style>
 
    {/* Glitch Layer 1 */}
-   <img 
-    src="/logo.svg" 
-    alt=""
-    className="glitch-layer-1 absolute inset-0 w-full h-full opacity-0 mix-blend-screen pointer-events-none transition-opacity duration-100 invert sepia(100%) saturate(500%) hue-rotate(280deg)"
-   />
+   <div className="glitch-layer-1 absolute inset-0 opacity-0 mix-blend-screen pointer-events-none transition-opacity duration-100 invert sepia(100%) saturate(500%) hue-rotate(280deg)">
+    <Image 
+     src="/logo.svg" 
+     alt=""
+     fill
+     priority
+    />
+   </div>
 
    {/* Glitch Layer 2 */}
-   <img 
-    src="/logo.svg" 
-    alt=""
-    className="glitch-layer-2 absolute inset-0 w-full h-full opacity-0 mix-blend-screen pointer-events-none transition-opacity duration-100 invert sepia(100%) saturate(500%) hue-rotate(150deg)"
-   />
+   <div className="glitch-layer-2 absolute inset-0 opacity-0 mix-blend-screen pointer-events-none transition-opacity duration-100 invert sepia(100%) saturate(500%) hue-rotate(150deg)">
+    <Image 
+     src="/logo.svg" 
+     alt=""
+     fill
+     priority
+    />
+   </div>
 
    {/* Main Logo */}
-   <img 
-    src="/logo.svg" 
-    alt="Logo" 
-    className={`w-full h-full object-contain relative z-10 brightness-0 dark:invert`}
-   />
+   <div className="relative z-10 w-full h-full brightness-0 dark:invert">
+    <Image 
+     src="/logo.svg" 
+     alt="Logo" 
+     width={100}
+     height={100}
+     className="w-full h-full object-contain"
+     priority
+    />
+   </div>
   </div>
  );
 }

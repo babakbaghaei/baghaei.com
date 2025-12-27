@@ -8,15 +8,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectsModule = void 0;
 const common_1 = require("@nestjs/common");
+const cache_manager_1 = require("@nestjs/cache-manager");
 const projects_controller_1 = require("./projects.controller");
 const projects_service_1 = require("./projects.service");
+const security_module_1 = require("../security/security.module");
 let ProjectsModule = class ProjectsModule {
 };
 exports.ProjectsModule = ProjectsModule;
 exports.ProjectsModule = ProjectsModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            security_module_1.SecurityModule,
+            cache_manager_1.CacheModule.register({
+                ttl: 60000,
+                max: 100,
+            }),
+        ],
         controllers: [projects_controller_1.ProjectsController],
-        providers: [projects_service_1.ProjectsService]
+        providers: [projects_service_1.ProjectsService],
     })
 ], ProjectsModule);
 //# sourceMappingURL=projects.module.js.map

@@ -1,5 +1,10 @@
 'use client';
 
+import React from 'react';
+import ErrorLayout from '@/components/layout/ErrorLayout';
+import { Button } from '@/components/ui/Button';
+import { useErrorLogger } from '@/lib/hooks/useErrorLogger';
+
 export default function Error({
  error,
  reset,
@@ -7,14 +12,20 @@ export default function Error({
  error: Error & { digest?: string };
  reset: () => void;
 }) {
+ useErrorLogger(error);
+
  return (
-  <div style={{ background: 'black', color: 'white', padding: '20px', fontFamily: 'sans-serif' }}>
-   <h2>خطای کلاینت رخ داد</h2>
-   <p>متن خطا: <span style={{ color: 'red' }}>{error.message}</span></p>
-   <p>کد دیجیت: {error.digest}</p>
-   <button onClick={() => reset()}>تلاش دوباره</button>
-   <hr />
-   <p>نکته: اگر این صفحه را می‌بینید، احتمالاً کش مرورگر شما قدیمی است.</p>
+  <div className="relative">
+   <ErrorLayout 
+    code="۵۰۰"
+    title="خطای غیرمنتظره"
+    description="مشکلی در پردازش درخواست شما پیش آمده است. تیم فنی ما از این موضوع آگاه شده است."
+   />
+   <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20">
+    <Button onClick={() => reset()} variant="outline">
+     تلاش دوباره
+    </Button>
+   </div>
   </div>
  );
 }

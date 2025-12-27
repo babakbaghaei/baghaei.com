@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Logo from './Logo';
-import { useScroll, useSpring, AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { NavItem } from '../ui/NavItem';
 import { Menu, ChevronDown, PenTool, Keyboard, RotateCw as SpinIcon, Layout, Globe, Briefcase, Sparkles } from 'lucide-react';
 import { useSound } from '@/lib/utils/sounds';

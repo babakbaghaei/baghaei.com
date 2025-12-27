@@ -1,7 +1,12 @@
-import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { TelegramService } from '../notifications/telegram.service';
+import { SecurityService } from '../security/security.service';
 
 @Injectable()
 export class ContactService {
@@ -9,37 +14,57 @@ export class ContactService {
 
   constructor(
     private prisma: PrismaService,
-    private telegramService: TelegramService
+    private telegramService: TelegramService,
+    private securityService: SecurityService,
   ) {}
 
   async create(createContactDto: CreateContactDto) {
     try {
+      // Sanitize input data
+
+      const sanitizedData = this.securityService.sanitizeInput(
+        createContactDto,
+      ) as CreateContactDto;
+
       const message = await this.prisma.contactMessage.create({
         data: {
-          name: createContactDto.name,
-          email: createContactDto.email || undefined,
-          phone: createContactDto.phone,
-          message: createContactDto.message,
-        } as any,
+          name: sanitizedData.name,
+
+          email: sanitizedData.email,
+
+          phone: sanitizedData.phone,
+
+          message: sanitizedData.message,
+        },
       });
-      
-      this.logger.log(`New contact message received from ${createContactDto.name}`);
+
+      this.logger.log(
+        `New contact message received from ${sanitizedData.name}`,
+      );
 
       // Send Telegram Notification
       const telegramMsg = `
 <b>🚀 درخواست همکاری جدید</b>
-<b>نام:</b> ${createContactDto.name}
-<b>شماره:</b> ${createContactDto.phone}
-<b>ایمیل:</b> ${createContactDto.email || 'ارائه نشده'}
+<b>نام:</b> ${sanitizedData.name}
+<b>شماره:</b> ${sanitizedData.phone}
+<b>ایمیل:</b> ${sanitizedData.email || 'ارائه نشده'}
 <b>پیام:</b>
-${createContactDto.message}
+${sanitizedData.message}
       `;
       await this.telegramService.sendMessage(telegramMsg);
 
       return { success: true, messageId: message.id };
     } catch (error: any) {
-      this.logger.error(`Failed to save contact message: ${error.message}`, error.stack);
-      throw new InternalServerErrorException(`Could not save message: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : '';
+      this.logger.error(
+        `Failed to save contact message: ${errorMessage}`,
+        errorStack,
+      );
+      throw new InternalServerErrorException(
+        `Could not save message: ${errorMessage}`,
+      );
     }
   }
 }

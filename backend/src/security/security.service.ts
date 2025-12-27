@@ -1,7 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import rateLimit from 'express-rate-limit';
-import slowDown from 'express-slow-down';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import hpp from 'hpp';
@@ -19,40 +17,58 @@ export class SecurityService {
    */
   applySecurityMiddleware(app: NestExpressApplication) {
     // Use Helmet to secure HTTP headers
-    app.use(helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com', 'cdn.tailwindcss.com'],
-          fontSrc: ["'self'", 'fonts.gstatic.com', 'data:'],
-          imgSrc: ["'self'", 'data:', 'https:'],
-          scriptSrc: ["'self'"],
-          connectSrc: ["'self'", 'https://api.segment.io', 'https://*.browser-intake-datadoghq.com'],
+    app.use(
+      helmet({
+        contentSecurityPolicy: {
+          directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: [
+              "'self'",
+              "'unsafe-inline'",
+              'fonts.googleapis.com',
+              'cdn.tailwindcss.com',
+            ],
+            fontSrc: ["'self'", 'fonts.gstatic.com', 'data:'],
+            imgSrc: ["'self'", 'data:', 'https:'],
+            scriptSrc: [
+              "'self'",
+              "'unsafe-inline'",
+              'https://www.googletagmanager.com',
+              'https://www.google-analytics.com',
+            ],
+            connectSrc: [
+              "'self'",
+              'https://api.segment.io',
+              'https://*.browser-intake-datadoghq.com',
+              'https://www.google-analytics.com',
+              'https://analytics.google.com',
+            ],
+          },
         },
-      },
-      hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true,
-      },
-      referrerPolicy: {
-        policy: 'no-referrer',
-      },
-    }));
+        hsts: {
+          maxAge: 31536000,
+          includeSubDomains: true,
+          preload: true,
+        },
+        referrerPolicy: {
+          policy: 'no-referrer',
+        },
+      }),
+    );
 
     /*
     // Sanitize data to prevent mongo injection
-    app.use(mongoSanitize());
     */
+    app.use(mongoSanitize());
 
     /*
     // Prevent parameter pollution
+    */
     app.use(
       hpp({
         whitelist: [],
-      })
+      }),
     );
-    */
 
     // Enable CORS with specific origin in production
     const corsOptions = {
@@ -61,7 +77,7 @@ export class SecurityService {
         'https://admin.baghaei.com',
         'https://blog.baghaei.com',
         'https://projects.baghaei.com',
-        'http://localhost:3000'
+        'http://localhost:3000',
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -77,26 +93,37 @@ export class SecurityService {
    */
   async validateToken(token: string): Promise<boolean> {
     try {
-      return token.length > 10;
+      // Basic JWT structure check (header.payload.signature)
+      const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+      return Promise.resolve(jwtRegex.test(token));
     } catch (error) {
-      this.logger.error(`Token validation failed: ${error.message}`);
-      return false;
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Token validation failed: ${errorMessage}`);
+      return Promise.resolve(false);
     }
   }
 
   /**
    * Sanitize user input to prevent XSS and injection attacks
    */
-  sanitizeInput(input: any): any {
+  sanitizeInput<T>(input: T): T {
     if (typeof input === 'string') {
-      input = validator.escape(input);
-      input = input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+      let sanitized = validator.escape(input);
+      sanitized = sanitized.replace(
+        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+        '',
+      );
+      return sanitized as unknown as T;
     } else if (typeof input === 'object' && input !== null) {
+      const sanitizedObject = Array.isArray(input) ? [] : {};
       for (const key in input) {
-        if (input.hasOwnProperty(key)) {
-          input[key] = this.sanitizeInput(input[key]);
+        if (Object.prototype.hasOwnProperty.call(input, key)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (sanitizedObject as any)[key] = this.sanitizeInput((input as any)[key]);
         }
       }
+      return sanitizedObject as T;
     }
     return input;
   }

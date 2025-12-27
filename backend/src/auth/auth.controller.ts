@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Get, Req, Res, UseGuards, Query, Logger } from '@nestjs/common';
+import { Controller, Post, Body, Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import type { Request, Response } from 'express';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -9,22 +10,23 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() body: { email: string; password: string }) {
-    const user = await this.authService.validateUser(body.email, body.password);
+  async login(@Body() loginDto: LoginDto) {
+    const user = await this.authService.validateUser(loginDto.email, loginDto.password);
     if (!user) {
       throw new Error('Invalid credentials');
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.authService.login(user);
   }
 
   @Post('register')
-  async register(@Body() body: { email: string; password: string; name: string }) {
-    return this.authService.register(body);
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @Post('logout')
   async logout(@Body('refresh_token') refreshToken: string) {
-    this.authService.logout(refreshToken);
+    await this.authService.logout(refreshToken);
     return { message: 'Logged out successfully' };
   }
 }

@@ -112,117 +112,116 @@ export default function SpinWin() {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Modern Typography
-      ctx.save();
-      ctx.translate(centerX, centerY);
-      ctx.rotate(angle + sliceAngle / 2);
-      ctx.textAlign = 'right';
-      ctx.fillStyle = 'white';
-      ctx.font = 'bold 16px IRANSans';
-      const displayText = opt.length > 12 ? opt.substring(0, 10) + '...' : opt;
-      ctx.fillText(displayText, radius - 40, 6);
-      ctx.restore();
-    });
-
-    // Minimal Hub
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
-    ctx.fillStyle = '#000';
-    ctx.fill();
-  }, [options]);
-
-  useEffect(() => {
-    drawWheel();
-  }, [drawWheel]);
-
-  const addOption = () => {
-    if (inputValue.trim() && options.length < 24) {
-      setOptions([...options, inputValue.trim()]);
-      setInputValue('');
-    }
-  };
-
-  const removeOption = useCallback((index: number) => {
-    if (options.length > 1) {
-      setOptions(prev => prev.filter((_, i) => i !== index));
-    }
-  }, [options.length]);
-
-  const updateOption = useCallback((index: number, newVal: string) => {
-    setOptions(prev => {
-      const next = [...prev];
-      next[index] = newVal;
-      return next;
-    });
-  }, []);
-
-  const handleSpin = () => {
-    if (isSpinning || options.length < 2) return;
-    setIsSpinning(true);
-    setWinner(null);
-    const extraRotations = 8 + Math.random() * 5;
-    const randomStop = Math.random() * 360;
-    const newRotation = rotation + (extraRotations * 360) + randomStop;
-    setRotation(newRotation);
-    setTimeout(() => {
-      setIsSpinning(false);
-      const normalizedRotation = newRotation % 360;
-      const sliceDeg = 360 / options.length;
-      const initialAngleAtPointer = (270 - normalizedRotation + 3600) % 360;
-      const winnerIndex = Math.floor(initialAngleAtPointer / sliceDeg);
-      setWinner(options[winnerIndex]);
-      confetti({ particleCount: 150, spread: 70, origin: { y: 0.5 }, colors: THEME_COLORS });
-    }, 5000);
-  };
-
-  return (
-    <main className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 flex flex-col items-center py-12 px-6 md:py-24 relative overflow-x-hidden">
+          // Modern Typography
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate(angle + sliceAngle / 2);
+          ctx.textAlign = 'right';
+          ctx.fillStyle = 'white';
+          ctx.font = 'bold 16px IRANSans';
+          const displayText = opt.length > 12 ? opt.substring(0, 10) + '...' : opt;
+          ctx.fillText(displayText, radius - 40, 6);
+          ctx.restore();
+        });
       
-      <div className="w-full max-w-4xl relative z-10 flex flex-col items-center space-y-20">
+        // Minimal Hub
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.fill();
         
-        {/* Header - Ultra Minimal */}
-        <div className="text-center space-y-4">
-          <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight">چرخونه تصمیم</h1>
-          <p className="text-muted-foreground font-medium text-lg">گزینه‌ها را بنویسید، برنده را سرنوشت تعیین می‌کند.</p>
-        </div>
-
-        {/* The Wheel - Centered Hero */}
-        <div className="relative">
-          {/* Pointer - Modern Needle */}
-          <div className="absolute top-[-25px] left-1/2 -translate-x-1/2 z-20">
-            <div className="w-1.5 h-10 bg-foreground rounded-full shadow-xl" />
-          </div>
-
-          <div className="p-3 rounded-full border-2 border-border shadow-[0_0_100px_rgba(0,0,0,0.05)] dark:shadow-none bg-card">
-            <motion.canvas
-              ref={canvasRef}
-              width={550}
-              height={550}
-              animate={{ rotate: rotation }}
-              transition={{ duration: 5, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-full w-[300px] h-[300px] md:w-[500px] md:h-[500px] cursor-pointer"
-              onClick={handleSpin}
-            />
-          </div>
-
-          {/* Master Button */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-            <button 
-              onClick={handleSpin}
-              disabled={isSpinning}
-              className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-foreground text-background flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
-            >
-              <RotateCw className={`w-8 h-8 ${isSpinning ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
-        </div>
-
-        {/* Options Management - Clean Chip List */}
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
+        ctx.fillStyle = '#000';
+        ctx.fill();
+      }, [options]);
+      
+      useEffect(() => {
+        drawWheel();
+      }, [drawWheel]);
+      
+      const addOption = () => {
+        if (inputValue.trim() && options.length < 24) {
+          setOptions([...options, inputValue.trim()]);
+          setInputValue('');
+        }
+      };
+      
+      const removeOption = useCallback((index: number) => {
+        if (options.length > 1) {
+          setOptions(prev => prev.filter((_, i) => i !== index));
+        }
+      }, [options.length]);
+      
+      const updateOption = useCallback((index: number, newVal: string) => {
+        setOptions(prev => {
+          const next = [...prev];
+          next[index] = newVal;
+          return next;
+        });
+      }, []);
+      
+      const handleSpin = () => {
+        if (isSpinning || options.length < 2) return;
+        setIsSpinning(true);
+        setWinner(null);
+        const extraRotations = 8 + Math.random() * 5;
+        const randomStop = Math.random() * 360;
+        const newRotation = rotation + (extraRotations * 360) + randomStop;
+        setRotation(newRotation);
+        setTimeout(() => {
+          setIsSpinning(false);
+          const normalizedRotation = newRotation % 360;
+          const sliceDeg = 360 / options.length;
+          const initialAngleAtPointer = (270 - normalizedRotation + 3600) % 360;
+          const winnerIndex = Math.floor(initialAngleAtPointer / sliceDeg);
+          setWinner(options[winnerIndex]);
+          confetti({ particleCount: 150, spread: 70, origin: { y: 0.5 }, colors: THEME_COLORS });
+        }, 5000);
+      };
+      
+      return (
+        <main className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 flex flex-col items-center py-12 px-6 md:py-24 relative overflow-x-hidden">
+          
+          <div className="w-full max-w-4xl relative z-10 flex flex-col items-center space-y-20">
+            
+            {/* Header - Ultra Minimal */}
+            <div className="text-center space-y-4">
+              <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight">چرخونه تصمیم</h1>
+              <p className="text-muted-foreground font-medium text-lg">گزینه‌ها را بنویسید، برنده را سرنوشت تعیین می‌کند.</p>
+            </div>
+      
+            {/* The Wheel - Centered Hero */}
+            <div className="relative">
+              {/* Pointer - Modern Needle */}
+              <div className="absolute top-[-25px] left-1/2 -translate-x-1/2 z-20">
+                <div className="w-1.5 h-10 bg-primary rounded-full shadow-xl" />
+              </div>
+      
+              <div className="p-3 rounded-full border-2 border-border shadow-[0_0_100px_rgba(0,0,0,0.05)] bg-card">
+                <motion.canvas
+                  ref={canvasRef}
+                  width={550}
+                  height={550}
+                  animate={{ rotate: rotation }}
+                  transition={{ duration: 5, ease: [0.16, 1, 0.3, 1] }}
+                  className="rounded-full w-[300px] h-[300px] md:w-[500px] md:h-[500px] cursor-pointer"
+                  onClick={handleSpin}
+                />
+              </div>
+      
+              {/* Master Button */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+                <button 
+                  onClick={handleSpin}
+                  disabled={isSpinning}
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                >
+                  <RotateCw className={`w-8 h-8 ${isSpinning ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+            </div>
+              {/* Options Management - Clean Chip List */}
         <div className="w-full max-w-3xl space-y-10" dir="rtl">
           {/* Add Option Input */}
           <div className="relative max-w-md mx-auto">

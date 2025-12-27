@@ -1,15 +1,19 @@
 #!/bin/bash
 
 # Configuration
-SERVER_IP="46.249.99.158"
-SERVER_USER="root"
-SERVER_PASS="zSykyH9jcx7Cden5"
+# SERVER_IP="your-server-ip" # Set in environment variable
+# SERVER_USER="root" # Set in environment variable
 PROJECT_PATH="/root/baghaei.com"
 
-echo "🚀 Starting Deployment Process..."
+if [ -z "$SERVER_IP" ]; then
+    echo "❌ Error: SERVER_IP environment variable is not set."
+    exit 1
+fi
 
-# Use sshpass to run commands on the server
-sshpass -p "$SERVER_PASS" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP << EOF
+echo "🚀 Starting Deployment Process to $SERVER_IP..."
+
+# Use SSH Key-based authentication (Assumes user has set up SSH keys)
+ssh -o StrictHostKeyChecking=no ${SERVER_USER:-root}@$SERVER_IP << EOF
     echo "📂 Navigating to project directory..."
     cd $PROJECT_PATH || { echo "❌ Directory not found"; exit 1; }
 

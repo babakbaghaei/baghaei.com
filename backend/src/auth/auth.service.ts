@@ -4,6 +4,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { Role } from '@prisma/client';
+import { RegisterDto } from './dto/register.dto';
+import { SecurityService } from '../security/security.service';
 
 export interface LoginResponse {
   access_token: string;
@@ -24,18 +26,26 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private securityService: SecurityService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.prisma.user.findUnique({ where: { email } });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     if (user && (await bcrypt.compare(pass, user.password))) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
       return result;
     }
     return null;
   }
 
-  async login(user: any): Promise<LoginResponse> {
+  async login(user: {
+    id: number;
+    email: string;
+    name: string | null;
+    role: Role;
+  }): Promise<LoginResponse> {
     const payload = { email: user.email, sub: user.id, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
@@ -49,13 +59,14 @@ export class AuthService {
     };
   }
 
-  async register(user: any) {
-    const hashedPassword = await bcrypt.hash(user.password, 10);
+  async register(registerDto: RegisterDto) {
+    const sanitizedData = this.securityService.sanitizeInput(registerDto);
+    const hashedPassword = await bcrypt.hash(sanitizedData.password, 10);
     return this.prisma.user.create({
       data: {
-        email: user.email,
+        email: sanitizedData.email,
         password: hashedPassword,
-        name: user.name,
+        name: sanitizedData.name,
         role: Role.USER,
       },
     });

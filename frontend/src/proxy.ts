@@ -1,40 +1,44 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
+ const response = NextResponse.next();
  const url = request.nextUrl.clone();
  const hostname = request.headers.get('host') || '';
  const { pathname } = request.nextUrl;
 
+ // Add Global Security Headers
+ const headers = response.headers;
+ headers.set('X-Frame-Options', 'DENY');
+ headers.set('X-Content-Type-Options', 'nosniff');
+ headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+ headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+ headers.set('X-XSS-Protection', '1; mode=block');
+
  // 1. Subdomain Routing (tools.baghaei.com)
  if (hostname.startsWith('tools.')) {
-  // Prevent infinite loops if already on /tools
   if (!pathname.startsWith('/tools')) {
-   url.pathname = `/tools${pathname}`;
-   return NextResponse.rewrite(url);
+   const toolUrl = new URL(`/tools${pathname}`, request.url);
+   return NextResponse.rewrite(toolUrl);
   }
  }
 
  // 2. Admin Protection
  if (pathname.startsWith('/admin')) {
-  // List of allowed IPs
   const allowedIps = ['46.249.99.158', '127.0.0.1'];
-  
-  // Get client IP from headers (behind proxy like Nginx)
   const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0] || 
            request.headers.get('x-real-ip') || 
            'unknown';
 
-  // Allow local development and specific IP
   const isAllowed = allowedIps.includes(clientIp) || process.env.NODE_ENV === 'development';
 
   if (!isAllowed) {
-   console.warn(`Unauthorized access attempt to ${pathname} from IP: ${clientIp}`);
+   console.warn(`[SECURITY] Unauthorized access attempt to ${pathname} from IP: ${clientIp}`);
    return NextResponse.rewrite(new URL('/forbidden', request.url));
   }
  }
 
- return NextResponse.next();
+ return response;
 }
 
 export const config = {
