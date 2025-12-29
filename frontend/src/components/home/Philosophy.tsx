@@ -1,26 +1,26 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { toPersianDigits } from '@/lib/utils/format';
 
 const PHILOSOPHY_LAYERS = [
   {
     title: "ساختار مهندسی",
-    subtitle: "STRUCTURE",
-    desc: "هر سیستم پایدار، بر پایه‌ی معماری مهندسی‌شده بنا می‌شود. ما خشت اول را با دقت میلی‌متری بنا می‌کنیم.",
+    subtitle: "SYSTEM ARCHITECTURE",
+    desc: "ما سیستم‌ها را نمی‌سازیم، آن‌ها را معماری می‌کنیم. پایداری در مقیاس بالا تصادفی نیست؛ نتیجه‌ی محاسبات دقیق در لایه‌های زیرساختی است.",
     icon: "۰۱"
   },
   {
     title: "امنیت نفوذناپذیر",
-    subtitle: "SECURITY",
-    desc: "در دنیای امروز، امنیت یک ویژگی نیست؛ یک ضرورت حیاتی است. ما لایه‌های دفاعی را در عمق کد تزریق می‌کنیم.",
+    subtitle: "ZERO-TRUST SECURITY",
+    desc: "امنیت در تار و پود کدهای ما تنیده شده است. از رمزنگاری پیشرفته تا لایه‌های حفاظتی چندگانه، ما از دارایی‌های دیجیتال شما محافظت می‌کنیم.",
     icon: "۰۲"
   },
   {
     title: "تکامل هوشمند",
-    subtitle: "EVOLUTION",
-    desc: "نرم‌افزارهای ما ایستا نیستند؛ آن‌ها برای رشد همگام با کسب‌وکار شما و مقیاس‌پذیری جهانی طراحی شده‌اند.",
+    subtitle: "SCALABLE EVOLUTION",
+    desc: "تکنولوژی هرگز متوقف نمی‌شود، ما هم همینطور. محصولات ما برای انطباق با آینده و رشد بی‌پایان در دنیای مدرن طراحی شده‌اند.",
     icon: "۰۳"
   }
 ];
@@ -34,8 +34,8 @@ export default function Philosophy() {
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 50,
-    damping: 25,
+    stiffness: 40,
+    damping: 20,
     restDelta: 0.001
   });
 
@@ -43,30 +43,23 @@ export default function Philosophy() {
     <section 
       ref={containerRef} 
       id="philosophy" 
-      className="relative h-[500vh] bg-zinc-950"
+      className="relative h-[600vh] bg-[#050505]" // Darker, more premium background
       style={{ isolation: 'isolate' }}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         
-        {/* Ambient Background */}
+        {/* Engineering Grid - More pronounced */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 opacity-[0.02]" style={{ 
-            backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), 
-                             linear-gradient(to bottom, #ffffff 1px, transparent 1px)`, 
-            backgroundSize: '80px 80px' 
+          <div className="absolute inset-0 opacity-[0.05]" style={{ 
+            backgroundImage: `linear-gradient(to right, #3b82f6 1px, transparent 1px), 
+                             linear-gradient(to bottom, #3b82f6 1px, transparent 1px)`, 
+            backgroundSize: '120px 120px' 
           }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/80 to-[#050505]" />
         </div>
 
-        {/* Vertical Progress */}
-        <div className="absolute left-8 md:left-12 top-1/2 -translate-y-1/2 h-48 w-px bg-white/5 hidden md:block z-50">
-          <motion.div 
-            style={{ scaleY: smoothProgress, originY: 0 }}
-            className="absolute top-0 left-0 w-full h-full bg-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]"
-          />
-        </div>
-
-        {/* Content Layers */}
-        <div className="relative z-10 h-full w-full">
+        {/* Content Container */}
+        <div className="relative z-10 h-full w-full max-w-[1800px] mx-auto">
           {PHILOSOPHY_LAYERS.map((layer, index) => (
             <PhilosophyLayer 
               key={index} 
@@ -75,6 +68,27 @@ export default function Philosophy() {
               progress={smoothProgress} 
             />
           ))}
+        </div>
+
+        {/* Technical Footer Indicator */}
+        <div className="absolute bottom-10 left-10 md:left-20 flex items-center gap-6 z-50">
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] text-primary font-black tracking-widest uppercase">Process Status</span>
+            <div className="flex gap-1">
+              {[...Array(3)].map((_, i) => (
+                <motion.div 
+                  key={i}
+                  className="h-1 w-8 rounded-full bg-white/10"
+                  style={{ 
+                    backgroundColor: useTransform(smoothProgress, 
+                      [i * 0.33, (i + 1) * 0.33], 
+                      ["rgba(255,255,255,0.1)", "rgba(59,130,246,1)"]
+                    )
+                  }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -86,44 +100,55 @@ function PhilosophyLayer({ layer, index, progress }: { layer: typeof PHILOSOPHY_
   const end = (index + 1) * 0.33;
   const middle = (start + end) / 2;
   
-  const opacity = useTransform(progress, [start, start + 0.08, end - 0.08, end], [0, 1, 1, 0]);
-  const scale = useTransform(progress, [start, middle, end], [0.85, 1, 1.15]);
-  const rotateX = useTransform(progress, [start, middle, end], [15, 0, -15]);
+  // High-end motion values
+  const opacity = useTransform(progress, [start, start + 0.05, end - 0.05, end], [0, 1, 1, 0]);
+  const textY = useTransform(progress, [start, middle, end], [100, 0, -100]);
+  const visualScale = useTransform(progress, [start, middle, end], [0.7, 1, 1.3]);
+  const visualRotate = useTransform(progress, [start, end], [10, -10]);
 
   return (
     <motion.div
       style={{ 
-        opacity, 
-        scale,
-        rotateX,
-        perspective: '1200px',
-        display: useTransform(progress, (v) => (v >= start - 0.05 && v <= end + 0.05 ? 'flex' : 'none')) as any
+        opacity,
+        display: useTransform(progress, (v) => (v >= start - 0.02 && v <= end + 0.02 ? 'flex' : 'none')) as any
       }}
       className="absolute inset-0 items-center justify-center pointer-events-none"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full max-w-7xl px-8 pointer-events-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full h-full items-center px-6 md:px-20">
         
-        {/* Visual Artwork Area */}
-        <div className="order-2 lg:order-1 flex justify-center lg:justify-end relative h-[300px] md:h-[500px]">
-           <LayerVisual index={index} progress={progress} start={start} end={end} />
+        {/* VISUAL AREA (7 Columns) */}
+        <div className="lg:col-span-7 flex justify-center items-center h-full order-2 lg:order-1">
+          <motion.div 
+            style={{ scale: visualScale, rotateY: visualRotate }}
+            className="relative w-full aspect-square max-w-[600px] perspective-[2000px]"
+          >
+            <LayerVisual index={index} progress={progress} start={start} end={end} />
+          </motion.div>
         </div>
 
-        {/* Text Content */}
-        <div className="order-1 lg:order-2 space-y-8 text-right relative z-30" dir="rtl">
-          <div className="space-y-4">
-            <motion.div 
-              className="text-primary font-display font-bold tracking-[0.4em] uppercase text-xs flex items-center justify-end gap-4"
-            >
-              <span className="w-12 h-[1px] bg-primary/30" />
-              PRINCIPLE {layer.icon}
-            </motion.div>
-            <h2 className="text-6xl md:text-8xl font-display font-black tracking-tighter text-white leading-tight">
-              {layer.title}
-            </h2>
-          </div>
-          <p className="text-xl md:text-2xl text-white/40 font-sans leading-relaxed max-w-lg mr-auto">
-            {layer.desc}
-          </p>
+        {/* TEXT AREA (5 Columns) - COMPLETELY RIGHT ALIGNED */}
+        <div className="lg:col-span-5 flex flex-col justify-center items-end text-right order-1 lg:order-2 space-y-8 pointer-events-auto" dir="rtl">
+          <motion.div style={{ y: textY }} className="space-y-6">
+            <div className="flex flex-col items-end gap-2">
+              <span className="text-primary font-display font-black tracking-[0.5em] text-sm bg-primary/10 px-4 py-1 rounded-full">
+                {layer.subtitle}
+              </span>
+              <h2 className="text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-tight text-white leading-[0.9]">
+                {layer.title}
+              </h2>
+            </div>
+            
+            <p className="text-xl md:text-3xl text-white/50 font-sans leading-relaxed max-w-xl font-light">
+              {layer.desc}
+            </p>
+
+            <div className="flex items-center justify-end gap-4 pt-4">
+              <div className="h-[1px] w-24 bg-gradient-to-l from-primary to-transparent" />
+              <span className="text-4xl font-display font-black text-white/20 italic">
+                {layer.icon}
+              </span>
+            </div>
+          </motion.div>
         </div>
       </div>
     </motion.div>
@@ -131,105 +156,162 @@ function PhilosophyLayer({ layer, index, progress }: { layer: typeof PHILOSOPHY_
 }
 
 function LayerVisual({ index, progress, start, end }: { index: number, progress: any, start: number, end: number }) {
-  const artworkProgress = useTransform(progress, [start, end], [0, 1]);
+  const localProgress = useTransform(progress, [start, end], [0, 1]);
 
   if (index === 0) {
-    // STRUCTURE VISUAL: Isometric Grid/Building Lines
+    // SYSTEM ARCHITECTURE: Isometric Technical Assembly
     return (
       <div className="relative w-full h-full flex items-center justify-center">
-        <svg viewBox="0 0 400 400" className="w-full h-full max-w-[400px] opacity-40">
-          {[...Array(6)].map((_, i) => (
+        <svg viewBox="0 0 500 500" className="w-full h-full overflow-visible drop-shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+          {/* Main Frame Lines */}
+          {[...Array(12)].map((_, i) => (
             <motion.path
               key={i}
-              d={`M ${50 + i * 60} 50 L ${50 + i * 60} 350`}
-              stroke="white"
-              strokeWidth="0.5"
-              style={{ pathLength: artworkProgress }}
+              d={`M ${100 + i * 30} 50 L ${100 + i * 30} 450`}
+              stroke="rgba(59,130,246,0.1)"
+              strokeWidth="1"
+              style={{ pathLength: localProgress }}
             />
           ))}
-          {[...Array(6)].map((_, i) => (
-            <motion.path
-              key={i+6}
-              d={`M 50 ${50 + i * 60} L 350 ${50 + i * 60}`}
-              stroke="white"
-              strokeWidth="0.5"
-              style={{ pathLength: artworkProgress }}
+          {/* Isometric Box Assembly */}
+          <motion.g style={{ y: useTransform(localProgress, [0, 1], [50, -50]) }}>
+            {/* Bottom Base */}
+            <motion.path 
+              d="M250 350 L400 280 L250 210 L100 280 Z" 
+              fill="rgba(59,130,246,0.05)" 
+              stroke="rgba(59,130,246,0.5)" 
+              strokeWidth="2"
+              style={{ pathLength: localProgress }}
             />
-          ))}
-          <motion.rect
-            x="110" y="110" width="180" height="180"
-            stroke="var(--primary)"
-            strokeWidth="2"
-            fill="none"
-            style={{ pathLength: artworkProgress, rotate: 45 }}
-          />
+            {/* Floating Layers */}
+            {[1, 2, 3].map((l) => (
+              <motion.path 
+                key={l}
+                d={`M250 ${350 - l*60} L400 ${280 - l*60} L250 ${210 - l*60} L100 ${280 - l*60} Z`} 
+                fill="none" 
+                stroke={l === 3 ? "var(--primary)" : "rgba(255,255,255,0.2)"}
+                strokeWidth={l === 3 ? "3" : "1"}
+                style={{ 
+                  pathLength: localProgress,
+                  y: useTransform(localProgress, [0, 1], [l * 40, 0]),
+                  opacity: useTransform(localProgress, [0, 0.5], [0, 1])
+                }}
+              />
+            ))}
+            {/* Connecting Pillars */}
+            <motion.path 
+              d="M100 280 V100 M400 280 V100 M250 350 V170" 
+              stroke="rgba(255,255,255,0.1)" 
+              strokeDasharray="5 5"
+              style={{ pathLength: localProgress }}
+            />
+          </motion.g>
         </svg>
-        <motion.div 
-          className="absolute inset-0 bg-primary/5 blur-[100px] rounded-full"
-          style={{ scale: artworkProgress }}
-        />
       </div>
     );
   }
 
   if (index === 1) {
-    // SECURITY VISUAL: Rotating Protective Rings
+    // SECURITY: Rotating Binary Core + Scanning Radar
     return (
       <div className="relative w-full h-full flex items-center justify-center">
-        <svg viewBox="0 0 400 400" className="w-full h-full max-w-[400px]">
-          {[...Array(3)].map((_, i) => (
+        <div className="absolute inset-0 flex items-center justify-center">
+          {/* Scanning Radar */}
+          <motion.div 
+            className="w-[120%] h-[120%] border-r-[40px] border-primary/5 rounded-full"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+          />
+        </div>
+        <svg viewBox="0 0 500 500" className="w-full h-full relative z-10">
+          {/* Concentric Security Rings */}
+          {[...Array(4)].map((_, i) => (
             <motion.circle
               key={i}
-              cx="200" cy="200"
-              r={60 + i * 40}
-              stroke={i === 1 ? "var(--primary)" : "white"}
-              strokeWidth={i === 1 ? "2" : "0.5"}
-              strokeDasharray="20 10"
+              cx="250" cy="250"
+              r={80 + i * 40}
+              stroke="rgba(59,130,246,0.3)"
+              strokeWidth={i % 2 === 0 ? "1" : "4"}
+              strokeDasharray={i % 2 === 0 ? "5 10" : "100 50"}
               fill="none"
               animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-              transition={{ duration: 10 + i * 5, repeat: Infinity, ease: "linear" }}
-              style={{ opacity: 0.2 + (i * 0.1) }}
+              transition={{ duration: 15 - i * 2, repeat: Infinity, ease: "linear" }}
             />
           ))}
+          {/* Central Shield/Core */}
           <motion.path
-            d="M200 140 L240 160 V220 L200 260 L160 220 V160 Z"
-            fill="none"
-            stroke="var(--primary)"
-            strokeWidth="3"
-            style={{ pathLength: artworkProgress }}
+            d="M250 180 L310 210 V290 L250 320 L190 290 V210 Z"
+            fill="var(--primary)"
+            style={{ 
+              opacity: useTransform(localProgress, [0.4, 0.6], [0, 0.8]),
+              scale: useTransform(localProgress, [0.4, 0.6], [0.5, 1])
+            }}
+          />
+          {/* Laser Scanners */}
+          <motion.line 
+            x1="0" y1="250" x2="500" y2="250" 
+            stroke="var(--primary)" 
+            strokeWidth="2"
+            style={{ 
+              y: useTransform(localProgress, [0, 1], [-200, 200]),
+              opacity: useTransform(localProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
+            }}
           />
         </svg>
       </div>
     );
   }
 
-  // EVOLUTION VISUAL: Growing Nodes
+  // EVOLUTION: Dynamic Neural Web
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      <svg viewBox="0 0 400 400" className="w-full h-full max-w-[400px]">
-        {[...Array(8)].map((_, i) => (
-          <React.Fragment key={i}>
-            <motion.circle
-              cx={200 + Math.cos(i * 45 * Math.PI / 180) * 120}
-              cy={200 + Math.sin(i * 45 * Math.PI / 180) * 120}
-              r="4"
-              fill="var(--primary)"
-              style={{ opacity: artworkProgress }}
-            />
-            <motion.line
-              x1="200" y1="200"
-              x2={200 + Math.cos(i * 45 * Math.PI / 180) * 120}
-              y2={200 + Math.sin(i * 45 * Math.PI / 180) * 120}
-              stroke="white"
-              strokeWidth="0.5"
-              style={{ pathLength: artworkProgress, opacity: 0.2 }}
-            />
-          </React.Fragment>
-        ))}
+      <svg viewBox="0 0 500 500" className="w-full h-full">
+        {/* Neural Network Nodes */}
+        {[...Array(12)].map((_, i) => {
+          const angle = (i * 30) * Math.PI / 180;
+          const r = 150;
+          const x = 250 + Math.cos(angle) * r;
+          const y = 250 + Math.sin(angle) * r;
+          
+          return (
+            <React.Fragment key={i}>
+              <motion.circle
+                cx={x} cy={y} r="6"
+                fill="var(--primary)"
+                initial={{ opacity: 0 }}
+                style={{ opacity: localProgress }}
+              />
+              <motion.line
+                x1="250" y1="250"
+                x2={x} y2={y}
+                stroke="white"
+                strokeWidth="0.5"
+                style={{ 
+                  pathLength: localProgress, 
+                  opacity: useTransform(localProgress, [0, 0.5], [0, 0.2]) 
+                }}
+              />
+              {/* Secondary connections */}
+              {i % 3 === 0 && (
+                <motion.path
+                  d={`M ${x} ${y} Q 250 250 ${250 + Math.cos(angle + 1) * r} ${250 + Math.sin(angle + 1) * r}`}
+                  fill="none"
+                  stroke="var(--primary)"
+                  strokeWidth="1"
+                  style={{ pathLength: localProgress, opacity: 0.1 }}
+                />
+              )}
+            </React.Fragment>
+          );
+        })}
+        {/* Core Pulsating Intelligence */}
         <motion.circle
-          cx="200" cy="200" r="10"
+          cx="250" cy="250" r="20"
           fill="white"
-          animate={{ scale: [1, 1.2, 1] }}
+          animate={{ 
+            scale: [1, 1.2, 1],
+            boxShadow: ["0 0 20px rgba(59,130,246,0.5)", "0 0 50px rgba(59,130,246,0.8)", "0 0 20px rgba(59,130,246,0.5)"]
+          }}
           transition={{ duration: 2, repeat: Infinity }}
         />
       </svg>
