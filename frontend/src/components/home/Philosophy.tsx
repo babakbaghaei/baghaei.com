@@ -1,125 +1,96 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { Section } from '../ui/Layout';
-import { toPersianDigits } from '@/lib/utils/format';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Section, Heading } from '../ui/Layout';
+import { Layers, Shield, Zap, Target } from 'lucide-react';
 
-const STEPS = [
+const PROCESS_STEPS = [
   {
-    title: "آنالیز",
-    en: "ANALYSIS",
-    desc: "کشف هسته‌ی اصلی چالش‌ها و ترسیم نقشه‌ی راه زیرساخت.",
+    title: "تحلیل و استراتژی",
+    en: "Analysis",
+    desc: "شناسایی دقیق نیازهای بیزنسی و ترسیم نقشه‌راه فنی برای رسیدن به بالاترین بازدهی.",
+    icon: Target
   },
   {
-    title: "معماری",
-    en: "ARCHITECTURE",
-    desc: "مهندسی لایه‌های توزیع‌شده با تمرکز بر پایداری مطلق.",
+    title: "طراحی زیرساخت",
+    en: "Infrastructure",
+    desc: "معماری سیستم‌های توزیع‌شده با تمرکز بر مقیاس‌پذیری جهانی و پایداری ۹۹.۹٪.",
+    icon: Layers
   },
   {
-    title: "توسعه",
-    en: "ENGINEERING",
-    desc: "خلق کدهای تمیز و ایمن با استانداردهای جهانی.",
+    title: "توسعه و امنیت",
+    en: "Engineering",
+    desc: "پیاده‌سازی کدهای بهینه و تست‌محور با رعایت سخت‌گیرانه‌ترین پروتکل‌های امنیتی.",
+    icon: Shield
   },
   {
-    title: "پایش",
-    en: "MONITORING",
-    desc: "استقرار هوشمند و مراقبت لحظه‌ای از نبض سیستم.",
+    title: "استقرار و رشد",
+    en: "Deployment",
+    desc: "تحویل مستمر (CI/CD) و پایش لحظه‌ای سیستم برای اطمینان از عملکرد بی‌نقص.",
+    icon: Zap
   }
 ];
 
 export default function Philosophy() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
   return (
-    <div ref={containerRef} className="relative h-[400vh] bg-background">
-      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
-        
-        {/* Extreme Minimalist Grid */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute right-[15%] top-0 w-px h-full bg-border/20" />
-          <div className="absolute right-[50%] top-0 w-px h-full bg-border/10 hidden md:block" />
-          <div className="absolute left-[15%] top-0 w-px h-full bg-border/20" />
+    <Section id="process" className="relative bg-background border-y border-border/50">
+      {/* Background Glows - matching site style */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-col items-end mb-20">
+          <Heading align="right" subtitle="Methodology">فرآیند مهندسی ما</Heading>
         </div>
 
-        {/* Big Background Text - Minimal Texture */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none">
-          <motion.h2 
-            style={{ scale: useTransform(smoothProgress, [0, 1], [1, 1.5]) }}
-            className="text-[40vw] font-display font-black leading-none"
-          >
-            EXECUTION
-          </motion.h2>
-        </div>
-
-        {/* Content Flow */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 h-full">
-          {STEPS.map((step, i) => (
-            <StepItem key={i} step={step} index={i} progress={smoothProgress} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" dir="rtl">
+          {PROCESS_STEPS.map((step, index) => (
+            <ProcessCard key={index} step={step} index={index} />
           ))}
         </div>
-
-        {/* Minimal Progress Tracker */}
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-4">
-          <span className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.5em]">Process_Flow</span>
-          <div className="w-32 h-px bg-border/30 relative">
-            <motion.div 
-              style={{ scaleX: smoothProgress, originX: 0 }}
-              className="absolute inset-0 bg-primary"
-            />
-          </div>
-        </div>
       </div>
-    </div>
+    </Section>
   );
 }
 
-function StepItem({ step, index, progress }: { step: typeof STEPS[0], index: number, progress: any }) {
-  const start = index * 0.25;
-  const end = (index + 1) * 0.25;
-  const middle = (start + end) / 2;
-
-  // Modern Fade & Blur Transition
-  const opacity = useTransform(progress, [start, start + 0.05, end - 0.05, end], [0, 1, 1, 0]);
-  const scale = useTransform(progress, [start, middle, end], [0.95, 1, 1.05]);
-  const filter = useTransform(progress, [start, start + 0.05, end - 0.05, end], ["blur(10px)", "blur(0px)", "blur(0px)", "blur(10px)"]);
+function ProcessCard({ step, index }: { step: typeof PROCESS_STEPS[0], index: number }) {
+  const Icon = step.icon;
 
   return (
     <motion.div
-      style={{ opacity, scale, filter, display: useTransform(progress, (v) => (v >= start - 0.02 && v <= end + 0.02 ? 'flex' : 'none')) as any }}
-      className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-8 pointer-events-none"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="group relative p-8 rounded-[2rem] bg-secondary/30 border border-border/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-500 flex flex-col items-start text-right h-full"
     >
-      <div className="space-y-2">
-        <motion.span 
-          initial={{ letterSpacing: "1em", opacity: 0 }}
-          whileInView={{ letterSpacing: "0.5em", opacity: 1 }}
-          className="text-primary font-mono text-xs md:text-sm font-bold block"
-        >
-          {step.en}
-        </motion.span>
-        
-        <h2 className="text-7xl md:text-9xl lg:text-[12rem] font-display font-black tracking-tighter text-foreground leading-none">
-          {step.title}
-        </h2>
+      <div className="w-full flex justify-between items-start mb-8">
+        <div className="p-3 rounded-2xl bg-background border border-border group-hover:border-primary/30 transition-colors duration-500">
+          <Icon className="w-6 h-6 text-primary" strokeWidth={1.5} />
+        </div>
+        <span className="text-xs font-mono font-bold text-muted-foreground/30 group-hover:text-primary/40 transition-colors duration-500">
+          STEP_0{index + 1}
+        </span>
       </div>
 
-      <p className="text-xl md:text-3xl text-muted-foreground font-sans max-w-2xl leading-tight font-light" dir="rtl">
-        {step.desc}
-      </p>
-
-      <div className="text-4xl md:text-6xl font-display font-black text-primary/10 italic">
-        {toPersianDigits(index + 1)}
+      <div className="space-y-3 flex-1">
+        <div className="space-y-1">
+          <h3 className="text-2xl font-display font-black text-foreground">
+            {step.title}
+          </h3>
+          <p className="text-[10px] font-display font-bold tracking-[0.2em] text-primary/60 uppercase">
+            {step.en}
+          </p>
+        </div>
+        <p className="text-muted-foreground font-sans text-base leading-relaxed font-light">
+          {step.desc}
+        </p>
       </div>
+
+      {/* Decorative Line */}
+      <div className="w-full h-px bg-gradient-to-l from-border/50 to-transparent mt-8 group-hover:from-primary/30 transition-all duration-500" />
     </motion.div>
   );
 }
