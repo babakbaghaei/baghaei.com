@@ -108,7 +108,7 @@ export default function Projects() {
  };
 
  return (
- <Section id="projects" sectionRef={sectionRef} className="border-t border-border overflow-visible !pb-fib-55">
+ <Section id="projects" sectionRef={sectionRef} className="border-t border-border overflow-visible !pb-fib-55 bg-transparent">
   <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-fib-34 -mt-fib-34 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
   <Box className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
   </motion.div>

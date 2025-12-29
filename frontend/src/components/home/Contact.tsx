@@ -43,7 +43,7 @@ export default function Contact() {
  };
 
  return (
- <Section id="contact" className="border-t border-border">
+ <Section id="contact" className="border-t border-border bg-transparent">
   {/* Background Icon */}
   <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
   <Mail className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />

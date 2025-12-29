@@ -20,8 +20,8 @@ export default function HomeContent() {
  });
 
  return (
-  <main ref={containerRef} className="min-h-screen relative bg-background overflow-clip">
-   <div className="fixed inset-0 z-0 pointer-events-none">
+  <main ref={containerRef} className="min-h-screen relative overflow-clip">
+   <div className="fixed inset-0 z-[-1] pointer-events-none bg-background">
     <GlobalUniverse renderBackground />
    </div>
    

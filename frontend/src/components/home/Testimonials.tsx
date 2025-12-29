@@ -44,9 +44,8 @@ export default function Testimonials() {
   });
   const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
-  return (
-    <Section sectionRef={sectionRef} id="testimonials" className="border-t border-border">
-      {/* Background Icon */}
+   return (
+   <Section sectionRef={sectionRef} id="testimonials" className="border-t border-border bg-transparent">      {/* Background Icon */}
       <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
         <MessageSquare className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
       </motion.div>
