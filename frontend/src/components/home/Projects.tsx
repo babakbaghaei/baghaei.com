@@ -129,7 +129,7 @@ export default function Projects() {
    onScroll={handleScroll}
    className="flex overflow-x-auto pb-20 no-scrollbar relative z-10 gap-0"
   >
-   {PROJECTS_DATA.map((p, i) => (
+   {PROJECTS_DATA.map((p) => (
    <div 
     key={p.id} 
     className="w-[280px] md:w-[320px] h-[420px] md:h-[480px] shrink-0 relative"
@@ -139,8 +139,6 @@ export default function Projects() {
     project={p} 
     onClick={() => { setSelectedProject(p); setActiveId(p.id); }}
     isActive={selectedProject?.id === p.id}
-    index={i}
-    scrollProgress={scrollYProgress}
     />
    </div>
    ))}
@@ -156,7 +154,7 @@ export default function Projects() {
   </div>
   
   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-   {TOOLS_DATA.map((tool, i) => (
+   {TOOLS_DATA.map(tool => (
    <div 
     key={tool.id} 
     className="aspect-square relative"
@@ -174,8 +172,6 @@ export default function Projects() {
     }}
     isActive={selectedProject?.id === tool.id}
     compact
-    index={i}
-    scrollProgress={scrollYProgress}
     />
    </div>
    ))}

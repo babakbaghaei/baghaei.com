@@ -43,8 +43,6 @@ interface ProjectCardProps {
  onClick: () => void;
  compact?: boolean;
  isActive?: boolean;
- index?: number;
- scrollProgress?: any;
 }
 
 const TechIcon = ({ name }: { name: string }) => {
@@ -65,24 +63,12 @@ const TechIcon = ({ name }: { name: string }) => {
  return <Braces className="w-3 h-3" />;
 };
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, compact = false, isActive = false, index = 0, scrollProgress }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, compact = false, isActive = false }) => {
  const cardRef = useRef<HTMLDivElement>(null);
  const [isTouchDevice, setIsTouchDevice] = useState(false);
  const [isHovered, setIsHovered] = useState(false);
  const [isTransitioning, setIsTransitioning] = useState(false);
  
- const fallbackProgress = useMotionValue(0.5);
- const activeProgress = scrollProgress || fallbackProgress;
-
- // PARALLAX LOGIC: Staggered movement - Right-to-Left Descending (RTL Stairs)
- // Index 0 (Right) has 0 base offset, Index 1 has 30px, Index 2 has 60px...
- const colIndex = index % 3;
- const parallaxY = useTransform(
-  activeProgress, 
-  [0, 1], 
-  [colIndex * 20 + 30, colIndex * 20 - 30]
- );
-
  const mouseX = useMotionValue(-1000);
  const mouseY = useMotionValue(-1000);
 
@@ -206,7 +192,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
     style={{ 
      rotateX: isTransitioning ? 0 : rotateX, 
      rotateY: isTransitioning ? 0 : rotateY, 
-     y: parallaxY,
      scale,
      transformStyle: "preserve-3d",
      transition: "none"

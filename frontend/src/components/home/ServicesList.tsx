@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import * as Icons from 'lucide-react';
 
 export interface Service {
@@ -13,40 +13,28 @@ export interface Service {
 }
 
 export default function ServicesList({ services }: { services: Service[] }) {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
-
   return (
-    <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-x-8 gap-y-10">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-x-8 gap-y-10">
       {services.map((service, index) => (
         <ServiceItem 
           key={service.id} 
           service={service} 
-          index={index} 
-          scrollYProgress={scrollYProgress} 
+          index={index}
         />
       ))}
     </div>
   );
 }
 
-function ServiceItem({ service, index, scrollYProgress }: { service: Service, index: number, scrollYProgress: any }) {
+function ServiceItem({ service, index }: { service: Service, index: number }) {
   const Icon = (Icons as any)[service.iconName] || Icons.HelpCircle;
   
-  // Staggered parallax logic: Index 0 (Right) is the highest
-  const colIndex = index % 6;
-  const y = useTransform(
-    scrollYProgress, 
-    [0, 1], 
-    [colIndex * 15 + 20, colIndex * 15 - 20]
-  );
-
   return (
     <motion.div
-      style={{ y }}
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.05 }}
       className="group flex flex-col items-start gap-3"
     >
       <div className="flex items-center gap-3 group-hover:text-primary transition-colors duration-500">

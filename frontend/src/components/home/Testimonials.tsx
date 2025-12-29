@@ -55,70 +55,47 @@ export default function Testimonials() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
         {testimonials.map((t, index) => (
-          <TestimonialCard 
-            key={t.id} 
-            testimonial={t} 
-            index={index} 
-            scrollYProgress={scrollYProgress} 
-          />
+          <motion.div
+            key={t.id}
+            initial={{ opacity: 0, scale: 0.5, y: 40, x: -100, filter: 'blur(10px)' }}
+            whileInView={{ opacity: 1, scale: 1, y: 0, x: 0, filter: 'blur(0px)' }}
+            viewport={{ once: true, amount: 0.2 }}
+            style={{ originX: 0, originY: 1 }}
+            transition={{ 
+              type: 'spring', 
+              stiffness: 200, 
+              damping: 22, 
+              delay: (testimonials.length - index) * 0.1,
+              mass: 1
+            }}
+            className="flex flex-col h-full"
+          >
+            <Card 
+              glowColor={t.color}
+              roundedClass="rounded-[2.5rem] rounded-bl-lg"
+              className="flex-1"
+              bgClassName="!bg-zinc-900/80"
+              maskedContent={<ReactiveQuote />}
+            >
+              <p style={{ transform: "translateZ(30px)" }} className="text-sm md:text-base font-medium font-sans leading-relaxed text-white text-right relative z-10">
+                «{t.content}»
+              </p>
+            </Card>
+
+            <div className="mt-6 flex flex-row-reverse items-center justify-start gap-3 px-2 w-full">
+              <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-white shrink-0 shadow-lg bg-zinc-800">
+                <User className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <div className="font-bold font-display text-sm text-foreground leading-tight">{t.author}</div>
+                <div className="text-[10px] font-bold uppercase text-muted-foreground mt-1 font-display tracking-wider">
+                  {t.company}
+                </div>
+              </div>
+            </div>
+          </motion.div>
         ))}
       </div>
     </Section>
-  );
-}
-
-function TestimonialCard({ testimonial, index, scrollYProgress }: { testimonial: typeof testimonials[0], index: number, scrollYProgress: any }) {
-  // Staggered parallax for testimonials: Stairs descending from Right to Left
-  const colIndex = index % 3;
-  const cardY = useTransform(
-    scrollYProgress, 
-    [0, 1], 
-    [colIndex * 30 + 40, colIndex * 30 - 40]
-  );
-
-  return (
-    <motion.div
-      style={{ y: cardY }}
-      initial={{ opacity: 0, scale: 0.5, x: -100, filter: 'blur(10px)' }}
-      whileInView={{ opacity: 1, scale: 1, x: 0, filter: 'blur(0px)' }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ 
-        type: 'spring', 
-        stiffness: 200, 
-        damping: 22, 
-        delay: (testimonials.length - index) * 0.1,
-        mass: 1
-      }}
-      className="flex flex-col h-full"
-    >
-      {/* Message Bubble - Restored shape with 3D lighting */}
-      <Card 
-        glowColor={testimonial.color}
-        roundedClass="rounded-[2.5rem] rounded-bl-lg"
-        className="flex-1"
-        bgClassName="!bg-zinc-900/80"
-        maskedContent={<ReactiveQuote />}
-      >
-        <p 
-          style={{ transform: "translateZ(30px)" }} 
-          className="text-sm md:text-base font-medium font-sans leading-relaxed text-white text-right relative z-10"
-        >
-          «{testimonial.content}»
-        </p>
-      </Card>
-
-      {/* Sender Info - Avatar to the Left */}
-      <div className="mt-6 flex flex-row-reverse items-center justify-start gap-3 px-2 w-full">
-        <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-white shrink-0 shadow-lg bg-zinc-800">
-          <User className="w-5 h-5" />
-        </div>
-        <div className="text-left">
-          <div className="font-bold font-display text-sm text-foreground leading-tight">{testimonial.author}</div>
-          <div className="text-[10px] font-bold uppercase text-muted-foreground mt-1 font-display tracking-wider">
-            {testimonial.company}
-          </div>
-        </div>
-      </div>
-    </motion.div>
   );
 }
