@@ -8,8 +8,8 @@ export const PROJECTS_DATA: Project[] = [
   role: 'معمار ارشد سیستم و بنیان‌گذار', 
   desc: 'توسعه زیرساخت‌های مقیاس‌پذیر و راهکارهای نوین ابری برای کسب‌وکارهای در حال رشد با تمرکز بر پایداری.', 
   metrics: [{ label: 'پایداری', value: '۹۹.۹٪' }, { label: 'تکنولوژی', value: 'Cloud-Native' }], 
-  color: 'rgba(59, 130, 246, 0.3)', 
-  borderColor: 'rgba(59, 130, 246, 0.8)', 
+  color: 'rgba(245, 158, 11, 0.3)', 
+  borderColor: 'rgba(245, 158, 11, 0.8)', 
   isLocked: false,
   tech: ['Next.js', 'Go', 'Docker', 'Kubernetes']
  },
@@ -20,8 +20,8 @@ export const PROJECTS_DATA: Project[] = [
   role: 'توسعه‌دهنده بازی و طراح مکانیک', 
   desc: 'طراحی و پیاده‌سازی بازی کلاسیک تخت نرد با فیزیک واقعی، هوش مصنوعی پیشرفته و قابلیت بازی آنلاین بلادرنگ.', 
   metrics: [{ label: 'تأخیر', value: '<۵۰ms' }, { label: 'مدل فیزیک', value: 'Custom' }], 
-  color: 'rgba(16, 185, 129, 0.3)', 
-  borderColor: 'rgba(16, 185, 129, 0.8)', 
+  color: 'rgba(120, 67, 40, 0.3)', 
+  borderColor: 'rgba(120, 67, 40, 0.8)', 
   isLocked: false,
   tech: ['Unity', 'C#', 'WebSockets', 'Socket.io']
  },
@@ -32,10 +32,34 @@ export const PROJECTS_DATA: Project[] = [
   role: 'طراح راهکار و معمار نرم‌افزار', 
   desc: 'پلتفرم مدیریت هوشمند تورهای گردشگری با قابلیت ردیابی لحظه‌ای، مدیریت لیدرها و تجربه تورهای تعاملی.', 
   metrics: [{ label: 'دقت ردیابی', value: 'بالا' }, { label: 'کاربری', value: 'هوشمند' }], 
-  color: 'rgba(249, 115, 22, 0.3)', 
-  borderColor: 'rgba(249, 115, 22, 0.8)', 
+  color: 'rgba(20, 83, 45, 0.3)', 
+  borderColor: 'rgba(20, 83, 45, 0.8)', 
   isLocked: false,
   tech: ['React Native', 'Node.js', 'Redis', 'GPS-API']
+ },
+ { 
+  id: 14, 
+  title: 'لایف کوچ اوج', 
+  category: 'سلامت / مربیگری', 
+  role: 'معمار نرم‌افزار و توسعه‌دهنده', 
+  desc: 'پلتفرم اختصاصی اتصال مربیان حرفه‌ای به مراجعین با ابزارهای داخلی مدیریت جلسات و تحلیل پیشرفت.', 
+  metrics: [{ label: 'رضایت', value: '۹۸٪' }, { label: 'جلسات', value: '۵K+' }], 
+  color: 'rgba(254, 243, 199, 0.2)', 
+  borderColor: 'rgba(254, 243, 199, 0.8)', 
+  isLocked: false,
+  tech: ['Next.js', 'FastAPI', 'WebRTC', 'PostgreSQL']
+ },
+ { 
+  id: 9, 
+  title: 'تیونینگ کیوانی', 
+  category: 'خودرو / لوکس', 
+  role: 'معمار نرم‌افزار و طراح هویت دیجیتال', 
+  desc: 'طراحی پلتفرم اختصاصی و سیستم پیکربندی خودروهای فوق‌لوکس تیونینگ شده با استانداردهای جهانی برای برند جهانی Kevany.', 
+  metrics: [{ label: 'خودرو اختصاصی', value: '۱۰۰+' }, { label: 'بازدید جهانی', value: '۱M+' }], 
+  color: 'rgba(153, 27, 27, 0.4)', 
+  borderColor: 'rgba(153, 27, 27, 0.8)', 
+  isLocked: false,
+  tech: ['WebGL', 'Three.js', 'React', 'Next.js']
  },
  { 
   id: 13, 
@@ -48,18 +72,6 @@ export const PROJECTS_DATA: Project[] = [
   borderColor: 'rgba(139, 92, 246, 0.8)', 
   isLocked: false,
   tech: ['React', 'PostgreSQL', 'Prisma', 'Analytics']
- },
- { 
-  id: 14, 
-  title: 'لایف کوچ اوج', 
-  category: 'سلامت / مربیگری', 
-  role: 'معمار نرم‌افزار و توسعه‌دهنده', 
-  desc: 'پلتفرم اختصاصی اتصال مربیان حرفه‌ای به مراجعین با ابزارهای داخلی مدیریت جلسات و تحلیل پیشرفت.', 
-  metrics: [{ label: 'رضایت', value: '۹۸٪' }, { label: 'جلسات', value: '۵K+' }], 
-  color: 'rgba(236, 72, 153, 0.3)', 
-  borderColor: 'rgba(236, 72, 153, 0.8)', 
-  isLocked: false,
-  tech: ['Next.js', 'FastAPI', 'WebRTC', 'PostgreSQL']
  },
  { 
   id: 2, 
@@ -118,7 +130,7 @@ export const PROJECTS_DATA: Project[] = [
   metrics: [{ label: 'دقت نمایش', value: '۹۹.۹٪' }, { label: 'ترافیک روزانه', value: '۲۰K+' }], 
   color: 'rgba(30, 64, 175, 0.4)', 
   borderColor: 'rgba(30, 64, 175, 0.8)', 
-  isLocked: true,
+  isLocked: false,
   tech: ['C++', 'Qt', 'WebSockets', 'Linux']
  },
  { 
@@ -130,7 +142,7 @@ export const PROJECTS_DATA: Project[] = [
   metrics: [{ label: 'دانشجو فعال', value: '۵۰K+' }, { label: 'دوره آموزشی', value: '۲۰۰+' }], 
   color: 'rgba(124, 58, 237, 0.4)', 
   borderColor: 'rgba(124, 58, 237, 0.8)', 
-  isLocked: true,
+  isLocked: false,
   tech: ['React', 'GraphQL', 'AWS', 'Node.js']
  },
  { 
@@ -142,7 +154,7 @@ export const PROJECTS_DATA: Project[] = [
   metrics: [{ label: 'ارسال موفق', value: '۱۰M+' }, { label: 'کسب‌وکار فعال', value: '۲۰۰+' }], 
   color: 'rgba(56, 189, 248, 0.4)', 
   borderColor: 'rgba(56, 189, 248, 0.8)', 
-  isLocked: true,
+  isLocked: false,
   tech: ['Go', 'Kafka', 'Elasticsearch', 'React']
  },
  { 
@@ -154,19 +166,7 @@ export const PROJECTS_DATA: Project[] = [
   metrics: [{ label: 'افزایش عضویت', value: '۴۵٪' }, { label: 'رضایت لوکس', value: '۹۸٪' }], 
   color: 'rgba(225, 29, 72, 0.4)', 
   borderColor: 'rgba(225, 29, 72, 0.8)', 
-  isLocked: true,
+  isLocked: false,
   tech: ['Branding', 'UI/UX', 'Next.js', 'Prisma']
- },
- { 
-  id: 9, 
-  title: 'تیونینگ کیوانی', 
-  category: 'خودرو / لوکس', 
-  role: 'معمار نرم‌افزار و طراح هویت دیجیتال', 
-  desc: 'طراحی پلتفرم اختصاصی و سیستم پیکربندی خودروهای فوق‌لوکس تیونینگ شده با استانداردهای جهانی برای برند جهانی Kevany.', 
-  metrics: [{ label: 'خودرو اختصاصی', value: '۱۰۰+' }, { label: 'بازدید جهانی', value: '۱M+' }], 
-  color: 'rgba(115, 115, 115, 0.4)', 
-  borderColor: 'rgba(212, 175, 55, 0.8)', 
-  isLocked: true,
-  tech: ['WebGL', 'Three.js', 'React', 'Next.js']
  }
 ];

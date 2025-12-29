@@ -3,7 +3,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
 import { 
- Hammer, 
  Database, 
  Cpu, 
  Layers, 
@@ -16,8 +15,7 @@ import {
  Globe,
  Palette,
  Radio,
- Workflow,
- Construction
+ Workflow
 } from 'lucide-react';
 
 export interface Metric {
@@ -219,16 +217,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
      }}
     >
      <div style={{ transform: isHovered && !isTransitioning ? "translateZ(60px)" : "translateZ(0px)", transition: "transform 0.4s ease-out" }} className="space-y-3">
-      <div className="flex items-center justify-between">
-        {project.isLocked && (
-          <span className="text-[8px] font-black uppercase font-display bg-primary/10 text-primary px-2 py-1 rounded-md border border-primary/20 animate-pulse">
-            In Development
-          </span>
-        )}
-        <div className="flex-1" />
+      <div className="flex items-center justify-start">
         {!compact && (
           <span className="text-[10px] font-normal uppercase font-display bg-white/5 px-3 py-1 rounded-full border border-white/5 text-muted-foreground">
-            {project.category}
+            {project.role}
           </span>
         )}
       </div>
@@ -241,13 +233,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
         <p className="text-muted-foreground font-sans text-[11px] leading-relaxed line-clamp-3">
           {project.desc}
         </p>
-      )}
-
-      {!compact && (
-       <div className="mt-2 inline-flex items-center gap-2 text-muted-foreground text-[10px] md:text-xs font-bold font-display">
-        <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
-        <span>{project.role}</span>
-       </div>
       )}
      </div>
   

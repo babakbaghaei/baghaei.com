@@ -11,12 +11,12 @@ export default function Preloader() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Run this only on mount to avoid cascading renders
     const updateDimension = () => {
       setInitialDimension({ width: window.innerWidth, height: window.innerHeight });
     };
     
     updateDimension();
+    window.addEventListener('resize', updateDimension);
     
     const timeout = setTimeout(() => {
       if (index === words.length - 1) {
@@ -26,7 +26,10 @@ export default function Preloader() {
       }
     }, index === 0 ? 1000 : 150);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('resize', updateDimension);
+    };
   }, [index]);
 
   const opacity = {
@@ -35,10 +38,22 @@ export default function Preloader() {
   };
 
   const slideUp = {
-    initial: { top: 0 },
+    initial: { 
+      y: 0 
+    },
     exit: { 
-        top: "-100vh", 
-        transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] as any, delay: 0.2 } 
+      y: "-100%", 
+      transition: { duration: 1.2, ease: [0.76, 0, 0.24, 1], delay: 0.2 } 
+    }
+  };
+
+  const pathVariants = {
+    initial: {
+      d: `M0 0 L${dimension.width} 0 L${dimension.width} ${dimension.height} Q${dimension.width / 2} ${dimension.height + 300} 0 ${dimension.height} L0 0`,
+    },
+    exit: {
+      d: `M0 0 L${dimension.width} 0 L${dimension.width} ${dimension.height} Q${dimension.width / 2} ${dimension.height} 0 ${dimension.height} L0 0`,
+      transition: { duration: 1.2, ease: [0.76, 0, 0.24, 1], delay: 0.2 }
     }
   };
 
@@ -57,13 +72,18 @@ export default function Preloader() {
                 variants={opacity} 
                 initial="initial" 
                 animate="enter"
+                exit={{ opacity: 0, transition: { duration: 0.3 } }}
                 className="flex items-center absolute z-10 text-4xl md:text-6xl font-black font-display tracking-tighter"
               >
                 {words[index]}
                 <span className="block w-3 h-3 bg-white rounded-full mr-4 animate-pulse" />
               </motion.p>
-              <svg className="absolute top-0 w-full h-[calc(100%+300px)] fill-zinc-950">
-                <path d={`M0 0 L${dimension.width} 0 L${dimension.width} ${dimension.height} Q${dimension.width / 2} ${dimension.height + 300} 0 ${dimension.height}  L0 0`} />
+              <svg className="absolute top-0 w-full h-[calc(100%+300px)] fill-zinc-950 pointer-events-none">
+                <motion.path 
+                  variants={pathVariants}
+                  initial="initial"
+                  exit="exit"
+                />
               </svg>
             </>
           )}
