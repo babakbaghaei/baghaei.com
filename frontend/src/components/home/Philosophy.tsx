@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useMemo } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
 import { toPersianDigits } from '@/lib/utils/format';
 
 const PHILOSOPHY_LAYERS = [
@@ -130,32 +130,32 @@ function ContentBlock({ layer, index, progress }: { layer: typeof PHILOSOPHY_LAY
 }
 
 function TechnicalVisualizer({ progress }: { progress: any }) {
-  // Generate random static-like hex data
   const hexLines = useMemo(() => 
     [...Array(20)].map(() => Math.random().toString(16).toUpperCase().substring(2, 30)),
   []);
 
+  // Correctly handle the percentage display using useTransform
+  const percentage = useTransform(progress, [0, 1], [0, 100]);
+  const displayPercentage = useTransform(percentage, (v) => v.toFixed(4));
+
   return (
     <div className="w-full h-full p-12 flex flex-col gap-8">
-      {/* Dynamic Header */}
       <div className="flex justify-between items-start font-mono text-[10px] text-primary/50">
         <div className="space-y-1">
           <div>SYSTEM_OVERRIDE: ACTIVE</div>
           <div>BUFFER_STATUS: STABLE</div>
         </div>
         <div className="text-right space-y-1">
-          <motion.div>COORDS: {useTransform(progress, (v) => (v * 100).toFixed(4))}%</motion.div>
+          <div className="flex gap-1 justify-end">
+            COORDS: <motion.span>{displayPercentage}</motion.span>%
+          </div>
           <div>THREAD_COUNT: 128</div>
         </div>
       </div>
 
-      {/* Main Animation Area */}
       <div className="flex-1 relative border border-white/5 rounded-2xl overflow-hidden bg-black/40">
-        <AnimatePresence mode="wait">
-          <LayerVisual index={progress} />
-        </AnimatePresence>
+        <LayerVisual progress={progress} />
         
-        {/* Scrolling Hex Data Column */}
         <div className="absolute right-4 top-0 bottom-0 w-32 overflow-hidden opacity-20 pointer-events-none">
           <motion.div 
             animate={{ y: [0, -500] }}
@@ -169,7 +169,6 @@ function TechnicalVisualizer({ progress }: { progress: any }) {
         </div>
       </div>
 
-      {/* Footer Metrics */}
       <div className="h-24 flex gap-4">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="flex-1 border border-white/5 rounded-lg p-3 space-y-2">
@@ -188,12 +187,10 @@ function TechnicalVisualizer({ progress }: { progress: any }) {
   );
 }
 
-function LayerVisual({ index }: { index: any }) {
-  // Logic to switch visuals based on scroll position
+function LayerVisual({ progress }: { progress: any }) {
   return (
     <div className="absolute inset-0 flex items-center justify-center">
       <svg viewBox="0 0 400 400" className="w-64 h-64 md:w-96 md:h-96 overflow-visible">
-        {/* Central Core */}
         <motion.circle 
           cx="200" cy="200" r="40" 
           stroke="var(--primary)" strokeWidth="2" fill="none"
@@ -201,7 +198,6 @@ function LayerVisual({ index }: { index: any }) {
           transition={{ duration: 2, repeat: Infinity }}
         />
         
-        {/* Dynamic Orbits based on scroll */}
         {[...Array(3)].map((_, i) => (
           <motion.circle
             key={i}
@@ -217,15 +213,14 @@ function LayerVisual({ index }: { index: any }) {
           />
         ))}
 
-        {/* Data Points */}
         {[...Array(8)].map((_, i) => {
           const angle = (i * 45) * Math.PI / 180;
           return (
             <motion.line
               key={i}
               x1="200" y1="200"
-              x2={200 + Math.cos(angle) * 150}
-              y2={200 + Math.sin(angle) * 150}
+              x2={Number((200 + Math.cos(angle) * 150).toFixed(4))}
+              y2={Number((200 + Math.sin(angle) * 150).toFixed(4))}
               stroke="var(--primary)"
               strokeWidth="1"
               initial={{ pathLength: 0 }}
