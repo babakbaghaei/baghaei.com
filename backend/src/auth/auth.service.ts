@@ -73,6 +73,10 @@ export class AuthService {
   }
 
   async logout(refreshToken?: string): Promise<void> {
-    this.logger.log(`User logged out: ${refreshToken ? 'token provided' : 'no token'}`);
+    await Promise.resolve(
+      this.logger.log(
+        `User logged out: ${refreshToken ? 'token provided' : 'no token'}`,
+      ),
+    );
   }
 }
