@@ -68,10 +68,12 @@ export default function Testimonials() {
 }
 
 function TestimonialCard({ testimonial, index, scrollYProgress }: { testimonial: typeof testimonials[0], index: number, scrollYProgress: any }) {
+  // Staggered parallax for testimonials: Higher on right (low index), Lower on left (high index)
+  const multiplier = 3 - (index % 3);
   const cardY = useTransform(
     scrollYProgress, 
     [0, 1], 
-    [index % 2 === 0 ? 40 : 80, index % 2 === 0 ? -40 : -80]
+    [25 * multiplier, -25 * multiplier]
   );
 
   return (
