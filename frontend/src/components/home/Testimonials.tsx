@@ -69,13 +69,13 @@ export default function Testimonials() {
             }}
             className="flex flex-col h-full"
           >
-   <Card 
-    glowColor={t.color}
-    roundedClass="rounded-[2.5rem] rounded-bl-lg"
-    className="flex-1"
-    bgClassName="!bg-white/[0.03] backdrop-blur-xl border-white/10"
-    maskedContent={<ReactiveQuote />}
-   >              <p style={{ transform: "translateZ(30px)" }} className="text-sm md:text-base font-medium font-sans leading-relaxed text-white text-right relative z-10">
+      <Card 
+        glowColor={t.color}
+        roundedClass="rounded-[2.5rem] rounded-bl-lg"
+        className="flex-1"
+        bgClassName="!glass-panel"
+        maskedContent={<ReactiveQuote />}
+      >              <p style={{ transform: "translateZ(30px)" }} className="text-sm md:text-base font-medium font-sans leading-relaxed text-white text-right relative z-10">
                 «{t.content}»
               </p>
             </Card>

@@ -105,9 +105,13 @@ html {
   color: hsl(var(--primary-foreground));
 }
 
-/* Glassmorphism Utility */
-.glass {
-  @apply bg-background/60 backdrop-blur-xl border border-white/10;
+/* Ultimate Glassmorphism Utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36) !important;
 }
 
 .font-display {
@@ -126,5 +130,3 @@ html {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
-
-/* Noise Background - Removed as per request */

@@ -173,7 +173,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
     ref={cardRef}
     layoutId={`project-${project.id}`}
     onClick={handleCardClick}
-    className="project-card group relative flex flex-col h-full w-full z-10 bg-white/[0.02] backdrop-blur-2xl rounded-[2.2rem] md:rounded-[3rem] cursor-pointer shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] border border-white/10"
+    className="project-card group relative flex flex-col h-full w-full z-10 glass-panel rounded-[2.2rem] md:rounded-[3rem] cursor-pointer"
     style={{ 
      rotateX: isTransitioning ? 0 : rotateX, 
      rotateY: isTransitioning ? 0 : rotateY, 
