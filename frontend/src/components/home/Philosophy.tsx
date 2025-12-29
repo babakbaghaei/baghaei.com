@@ -1,82 +1,125 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Section, Heading } from '../ui/Layout';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { Section } from '../ui/Layout';
+import { toPersianDigits } from '@/lib/utils/format';
 
-const PILLARS = [
+const STEPS = [
   {
-    title: "معماری ساختار",
-    desc: "خلق زیرساخت‌های مهندسی‌شده که برای مقیاس‌های جهانی و ترافیک میلیونی طراحی شده‌اند. پایداری، اتفاقی نیست.",
-    tag: "01"
+    title: "آنالیز",
+    en: "ANALYSIS",
+    desc: "کشف هسته‌ی اصلی چالش‌ها و ترسیم نقشه‌ی راه زیرساخت.",
   },
   {
-    title: "امنیت بنیادین",
-    desc: "امنیت در لایه‌ی صفر کدنویسی تعریف می‌شود. محافظت از دارایی‌های دیجیتال، اولویت اول و همیشگی ماست.",
-    tag: "02"
+    title: "معماری",
+    en: "ARCHITECTURE",
+    desc: "مهندسی لایه‌های توزیع‌شده با تمرکز بر پایداری مطلق.",
   },
   {
-    title: "تکامل هوشمند",
-    desc: "سیستم‌هایی که با کسب‌وکار شما رشد می‌کنند. ما با نگاه به تکنولوژی‌های آینده، راه‌حل‌های امروز را می‌سازیم.",
-    tag: "03"
+    title: "توسعه",
+    en: "ENGINEERING",
+    desc: "خلق کدهای تمیز و ایمن با استانداردهای جهانی.",
+  },
+  {
+    title: "پایش",
+    en: "MONITORING",
+    desc: "استقرار هوشمند و مراقبت لحظه‌ای از نبض سیستم.",
   }
 ];
 
 export default function Philosophy() {
-  return (
-    <Section id="philosophy" className="relative overflow-hidden bg-background">
-      {/* Subtle Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full" />
-      </div>
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col items-end mb-32">
-          <Heading align="right" subtitle="Vision & Values">فلسفه مهندسی ما</Heading>
-          
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-2xl md:text-4xl text-foreground font-display font-light leading-tight text-right max-w-4xl mt-8"
-            dir="rtl"
-          >
-            ما فراتر از کدنویسی، به دنبال <span className="font-black text-primary italic">خلق آثاری ماندگار</span> در دنیای دیجیتال هستیم؛ جایی که نظم ریاضی با خلاقیت انسانی تلاقی می‌کند.
-          </motion.p>
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  return (
+    <div ref={containerRef} className="relative h-[400vh] bg-background">
+      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+        
+        {/* Extreme Minimalist Grid */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute right-[15%] top-0 w-px h-full bg-border/20" />
+          <div className="absolute right-[50%] top-0 w-px h-full bg-border/10 hidden md:block" />
+          <div className="absolute left-[15%] top-0 w-px h-full bg-border/20" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-20" dir="rtl">
-          {PILLARS.map((pillar, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group flex flex-col items-start text-right space-y-6"
-            >
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-mono font-bold text-primary/40 group-hover:text-primary transition-colors duration-500">
-                  [{pillar.tag}]
-                </span>
-                <div className="h-px w-12 bg-border group-hover:w-20 group-hover:bg-primary/50 transition-all duration-500" />
-              </div>
-              
-              <h3 className="text-3xl md:text-4xl font-display font-black text-foreground group-hover:text-primary transition-colors duration-500">
-                {pillar.title}
-              </h3>
-              
-              <p className="text-lg text-muted-foreground font-sans leading-relaxed font-light">
-                {pillar.desc}
-              </p>
-            </motion.div>
+        {/* Big Background Text - Minimal Texture */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none">
+          <motion.h2 
+            style={{ scale: useTransform(smoothProgress, [0, 1], [1, 1.5]) }}
+            className="text-[40vw] font-display font-black leading-none"
+          >
+            EXECUTION
+          </motion.h2>
+        </div>
+
+        {/* Content Flow */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 h-full">
+          {STEPS.map((step, i) => (
+            <StepItem key={i} step={step} index={i} progress={smoothProgress} />
           ))}
         </div>
+
+        {/* Minimal Progress Tracker */}
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-4">
+          <span className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.5em]">Process_Flow</span>
+          <div className="w-32 h-px bg-border/30 relative">
+            <motion.div 
+              style={{ scaleX: smoothProgress, originX: 0 }}
+              className="absolute inset-0 bg-primary"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepItem({ step, index, progress }: { step: typeof STEPS[0], index: number, progress: any }) {
+  const start = index * 0.25;
+  const end = (index + 1) * 0.25;
+  const middle = (start + end) / 2;
+
+  // Modern Fade & Blur Transition
+  const opacity = useTransform(progress, [start, start + 0.05, end - 0.05, end], [0, 1, 1, 0]);
+  const scale = useTransform(progress, [start, middle, end], [0.95, 1, 1.05]);
+  const filter = useTransform(progress, [start, start + 0.05, end - 0.05, end], ["blur(10px)", "blur(0px)", "blur(0px)", "blur(10px)"]);
+
+  return (
+    <motion.div
+      style={{ opacity, scale, filter, display: useTransform(progress, (v) => (v >= start - 0.02 && v <= end + 0.02 ? 'flex' : 'none')) as any }}
+      className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-8 pointer-events-none"
+    >
+      <div className="space-y-2">
+        <motion.span 
+          initial={{ letterSpacing: "1em", opacity: 0 }}
+          whileInView={{ letterSpacing: "0.5em", opacity: 1 }}
+          className="text-primary font-mono text-xs md:text-sm font-bold block"
+        >
+          {step.en}
+        </motion.span>
+        
+        <h2 className="text-7xl md:text-9xl lg:text-[12rem] font-display font-black tracking-tighter text-foreground leading-none">
+          {step.title}
+        </h2>
       </div>
 
-      {/* Decorative Bottom Line */}
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent opacity-50" />
-    </Section>
+      <p className="text-xl md:text-3xl text-muted-foreground font-sans max-w-2xl leading-tight font-light" dir="rtl">
+        {step.desc}
+      </p>
+
+      <div className="text-4xl md:text-6xl font-display font-black text-primary/10 italic">
+        {toPersianDigits(index + 1)}
+      </div>
+    </motion.div>
   );
 }
