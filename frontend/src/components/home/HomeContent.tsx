@@ -1,7 +1,6 @@
 import React from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Hero from '@/components/home/Hero';
-import Philosophy from '@/components/home/Philosophy';
 import Projects from '@/components/home/Projects';
 import Services from '@/components/home/Services';
 import Testimonials from '@/components/home/Testimonials';
@@ -19,7 +18,6 @@ export default function HomeContent() {
     </React.Suspense>
    </Hero>
    <div className="space-y-0">
-    <Philosophy />
     <Projects />
     <Testimonials />
     <Contact />
