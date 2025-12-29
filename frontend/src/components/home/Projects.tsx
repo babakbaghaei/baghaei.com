@@ -86,8 +86,12 @@ export default function Projects() {
  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
  const [activeId, setActiveId] = useState<number | null>(null);
  const scrollContainerRef = useRef<HTMLDivElement>(null);
+ const sectionRef = useRef<HTMLDivElement>(null);
  
- const { scrollYProgress } = useScroll();
+ const { scrollYProgress } = useScroll({
+  target: sectionRef,
+  offset: ["start end", "end start"]
+ });
  const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
  const [canScrollLeft, setCanScrollLeft] = useState(true);
@@ -104,7 +108,7 @@ export default function Projects() {
  };
 
  return (
- <Section id="projects" className="border-t border-border overflow-visible !pb-fib-55">
+ <Section id="projects" sectionRef={sectionRef} className="border-t border-border overflow-visible !pb-fib-55">
   <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-fib-34 -mt-fib-34 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
   <Box className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
   </motion.div>
@@ -125,7 +129,7 @@ export default function Projects() {
    onScroll={handleScroll}
    className="flex overflow-x-auto pb-20 no-scrollbar relative z-10 gap-0"
   >
-   {PROJECTS_DATA.map((p) => (
+   {PROJECTS_DATA.map((p, i) => (
    <div 
     key={p.id} 
     className="w-[280px] md:w-[320px] h-[420px] md:h-[480px] shrink-0 relative"
@@ -135,6 +139,8 @@ export default function Projects() {
     project={p} 
     onClick={() => { setSelectedProject(p); setActiveId(p.id); }}
     isActive={selectedProject?.id === p.id}
+    index={i}
+    scrollProgress={scrollYProgress}
     />
    </div>
    ))}
@@ -150,7 +156,7 @@ export default function Projects() {
   </div>
   
   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-   {TOOLS_DATA.map(tool => (
+   {TOOLS_DATA.map((tool, i) => (
    <div 
     key={tool.id} 
     className="aspect-square relative"
@@ -168,6 +174,8 @@ export default function Projects() {
     }}
     isActive={selectedProject?.id === tool.id}
     compact
+    index={i}
+    scrollProgress={scrollYProgress}
     />
    </div>
    ))}

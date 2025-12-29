@@ -43,6 +43,8 @@ interface ProjectCardProps {
  onClick: () => void;
  compact?: boolean;
  isActive?: boolean;
+ index?: number;
+ scrollProgress?: any;
 }
 
 const TechIcon = ({ name }: { name: string }) => {
@@ -63,12 +65,22 @@ const TechIcon = ({ name }: { name: string }) => {
  return <Braces className="w-3 h-3" />;
 };
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, compact = false, isActive = false }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, compact = false, isActive = false, index = 0, scrollProgress }) => {
  const cardRef = useRef<HTMLDivElement>(null);
  const [isTouchDevice, setIsTouchDevice] = useState(false);
  const [isHovered, setIsHovered] = useState(false);
  const [isTransitioning, setIsTransitioning] = useState(false);
  
+ const fallbackProgress = useMotionValue(0.5);
+ const activeProgress = scrollProgress || fallbackProgress;
+
+ // PARALLAX LOGIC: Staggered movement based on index
+ const parallaxY = useTransform(
+  activeProgress, 
+  [0, 1], 
+  [index % 2 === 0 ? 50 : 100, index % 2 === 0 ? -50 : -100]
+ );
+
  const mouseX = useMotionValue(-1000);
  const mouseY = useMotionValue(-1000);
 
@@ -192,6 +204,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
     style={{ 
      rotateX: isTransitioning ? 0 : rotateX, 
      rotateY: isTransitioning ? 0 : rotateY, 
+     y: parallaxY,
      scale,
      transformStyle: "preserve-3d",
      transition: "none"
