@@ -270,8 +270,8 @@ function LayerVisual({ index, progress, start, end }: { index: number, progress:
         {[...Array(12)].map((_, i) => {
           const angle = (i * 30) * Math.PI / 180;
           const r = 150;
-          const x = 250 + Math.cos(angle) * r;
-          const y = 250 + Math.sin(angle) * r;
+          const x = Number((250 + Math.cos(angle) * r).toFixed(4));
+          const y = Number((250 + Math.sin(angle) * r).toFixed(4));
           
           return (
             <React.Fragment key={i}>
@@ -294,7 +294,7 @@ function LayerVisual({ index, progress, start, end }: { index: number, progress:
               {/* Secondary connections */}
               {i % 3 === 0 && (
                 <motion.path
-                  d={`M ${x} ${y} Q 250 250 ${250 + Math.cos(angle + 1) * r} ${250 + Math.sin(angle + 1) * r}`}
+                  d={`M ${x} ${y} Q 250 250 ${Number((250 + Math.cos((i * 30 + 10) * Math.PI / 180) * r).toFixed(4))} ${Number((250 + Math.sin((i * 30 + 10) * Math.PI / 180) * r).toFixed(4))}`}
                   fill="none"
                   stroke="var(--primary)"
                   strokeWidth="1"
