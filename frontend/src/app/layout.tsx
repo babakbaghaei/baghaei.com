@@ -40,6 +40,8 @@ const yekanbakh = localFont({
  variable: "--font-yekanbakh",
 });
 
+import GlobalUniverse from "@/components/effects/GlobalUniverse";
+
 export const metadata: Metadata = {
  title: {
   default: "گروه فناوری بقایی | معماری نرم‌افزار و هوش مصنوعی",
@@ -175,6 +177,9 @@ export default function RootLayout({
      </Script>
      
      <Preloader />
+     <div className="fixed inset-0 z-[-2] pointer-events-none">
+       <GlobalUniverse renderBackground />
+     </div>
      <div className="noise-bg opacity-[0.03] pointer-events-none" />
      <BackgroundGrid />
      <CustomCursor />

@@ -88,11 +88,11 @@ export const GalaxyBackground = ({ scrollProgress }: { scrollProgress: number })
   const starsRef = useRef<{ x: number, y: number, size: number, opacity: number, parallax: number, twinkle: number }[] | null>(null);
 
   if (!starsRef.current) {
-    starsRef.current = [...Array(600)].map(() => ({
+    starsRef.current = [...Array(1000)].map(() => ({
       x: Math.random() * 5000,
       y: Math.random() * 5000,
-      size: 0.1 + Math.random() * 1.1,
-      opacity: 0.02 + Math.random() * 0.25,
+      size: 0.2 + Math.random() * 1.5,
+      opacity: 0.1 + Math.random() * 0.5,
       parallax: 0.02 + Math.random() * 0.2,
       twinkle: 1 + Math.random() * 4
     }));

@@ -30,7 +30,7 @@ export default function BackgroundGrid() {
  }, [mouseX, mouseY]);
 
  return (
-  <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-background">
+  <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
    {/* Static Grid */}
    <div 
     className="absolute inset-0 opacity-[0.05]" 

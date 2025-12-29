@@ -21,12 +21,6 @@ export default function HomeContent() {
 
  return (
   <main ref={containerRef} className="min-h-screen relative">
-   {/* Background Layer - Fixed and at the very back */}
-   <div className="fixed inset-0 z-[-1] pointer-events-none">
-    <div className="absolute inset-0 bg-background" />
-    <GlobalUniverse renderBackground />
-   </div>
-   
    <Navbar />
    <Hero>
     <Services />
