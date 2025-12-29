@@ -1,19 +1,18 @@
 import { Project } from '@/components/ui/ProjectCard';
 
 export const PROJECTS_DATA: Project[] = [
- { 
-  id: 10, 
-  title: 'پلتفرم کولک', 
-  category: 'زیرساخت / SaaS', 
-  role: 'معمار ارشد سیستم و بنیان‌گذار', 
-  desc: 'توسعه زیرساخت‌های مقیاس‌پذیر و راهکارهای نوین ابری برای کسب‌وکارهای در حال رشد با تمرکز بر پایداری.', 
-  metrics: [{ label: 'پایداری', value: '۹۹.۹٪' }, { label: 'تکنولوژی', value: 'Cloud-Native' }], 
-  color: 'rgba(245, 158, 11, 0.3)', 
-  borderColor: 'rgba(245, 158, 11, 0.8)', 
-  isLocked: false,
-  tech: ['Next.js', 'Go', 'Docker', 'Kubernetes']
- },
- { 
+  {
+   id: 10, 
+   title: 'پلتفرم کولک', 
+   category: 'زیرساخت / SaaS', 
+   role: 'معمار ارشد سیستم و بنیان‌گذار', 
+   desc: 'توسعه زیرساخت‌های مقیاس‌پذیر و راهکارهای نوین ابری برای کسب‌وکارهای در حال رشد با تمرکز بر پایداری.', 
+   metrics: [{ label: 'پایداری', value: '۹۹.۹٪' }, { label: 'تکنولوژی', value: 'Cloud-Native' }], 
+   color: 'rgba(34, 197, 94, 0.3)', 
+   borderColor: 'rgba(34, 197, 94, 0.8)', 
+   isLocked: false,
+   tech: ['Next.js', 'Go', 'Docker', 'Kubernetes']
+  }, { 
   id: 11, 
   title: 'بازی آنلاین تخت نرد', 
   category: 'سرگرمی / Game', 

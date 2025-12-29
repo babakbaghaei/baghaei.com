@@ -80,7 +80,6 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
 
   return (
       <section id="hero" className="relative h-screen flex flex-col items-center justify-center bg-transparent overflow-hidden">
-       <GlobalUniverse renderBackground scrollProgress={progress} />    
       <div className="max-w-7xl mx-auto px-6 lg:px-16 w-full flex flex-col relative z-10">        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 mb-8">
           <div className="order-1 space-y-6 flex flex-col items-start text-right">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="inline-flex items-center gap-3 px-4 py-1.5 bg-secondary/50 border border-border rounded-full">
