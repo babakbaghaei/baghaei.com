@@ -11,7 +11,7 @@ import { ServiceSkeleton } from '@/components/ui/Skeleton';
 
 export default function HomeContent() {
  return (
-  <main className="min-h-screen relative bg-background overflow-x-hidden">
+  <main className="min-h-screen relative bg-background overflow-clip">
    <Navbar />
    <Hero>
     <React.Suspense fallback={<ServiceSkeleton />}>

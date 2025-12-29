@@ -28,15 +28,15 @@ const PHILOSOPHY_LAYERS = [
 export default function Philosophy() {
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Monitoring the scroll progress of the container
+  // High precision scroll tracking
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: 50,
+    damping: 20,
     restDelta: 0.001
   });
 
@@ -44,28 +44,33 @@ export default function Philosophy() {
     <section 
       ref={containerRef} 
       id="philosophy" 
-      className="relative h-[400vh] bg-zinc-950" // Increased height for longer scroll feeling
+      className="relative h-[500vh] bg-zinc-950" // Even more space for smoother pinning
+      style={{ isolation: 'isolate' }}
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+      {/* THE PINNED CONTAINER */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
         
-        {/* Background Grid - Industrial / Engineering look */}
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
-          <div className="absolute inset-0" style={{ 
+        {/* Background Atmosphere */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 opacity-[0.03]" style={{ 
             backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), 
                              linear-gradient(to bottom, #ffffff 1px, transparent 1px)`, 
-            backgroundSize: '60px 60px' 
+            backgroundSize: '100px 100px' 
           }} />
+          {/* Radial Gradient for depth */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)]" />
         </div>
 
-        {/* Global Progress Line */}
-        <div className="absolute left-8 md:left-16 top-1/2 -translate-y-1/2 h-64 w-[2px] bg-white/10 hidden md:block">
+        {/* Global UI Elements */}
+        <div className="absolute left-8 md:left-16 top-1/2 -translate-y-1/2 h-64 w-[1px] bg-white/5 hidden md:block z-50">
           <motion.div 
             style={{ scaleY: smoothProgress, originY: 0 }}
-            className="absolute top-0 left-0 w-full h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+            className="absolute top-0 left-0 w-full h-full bg-primary shadow-[0_0_20px_rgba(255,255,255,0.3)]"
           />
         </div>
 
-        <div className="relative w-full max-w-7xl mx-auto px-6 h-full flex items-center justify-center">
+        {/* Content Layers */}
+        <div className="relative z-10 h-full w-full">
           {PHILOSOPHY_LAYERS.map((layer, index) => (
             <PhilosophyLayer 
               key={index} 
@@ -76,13 +81,12 @@ export default function Philosophy() {
           ))}
         </div>
 
-        {/* Dynamic Label */}
-        <div className="absolute bottom-12 right-12 hidden lg:block overflow-hidden">
+        {/* Vertical Identifier */}
+        <div className="absolute bottom-12 right-12 z-50 overflow-hidden mix-blend-difference">
           <motion.div
-            style={{ y: useTransform(smoothProgress, [0, 1], ["0%", "-100%"]) }}
-            className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase"
+            className="text-[10px] font-black tracking-[0.8em] text-white/30 uppercase vertical-text"
           >
-            Philosophy & Vision
+            Philosophy
           </motion.div>
         </div>
       </div>
@@ -91,73 +95,99 @@ export default function Philosophy() {
 }
 
 function PhilosophyLayer({ layer, index, progress }: { layer: typeof PHILOSOPHY_LAYERS[0], index: number, progress: any }) {
-  // Define active range for each layer
-  const start = index * 0.25;
-  const end = (index + 1) * 0.25;
+  // Map layers to specific segments of the scroll
+  // Layer 0: 0.0 -> 0.33
+  // Layer 1: 0.33 -> 0.66
+  // Layer 2: 0.66 -> 1.0
+  const start = index * 0.33;
+  const end = (index + 1) * 0.33;
+  const middle = (start + end) / 2;
   
-  // Visual transforms
+  // Advanced transforms for "Depth" effect
+  // Entrance: Zoom in + Fade In
+  // Exit: Zoom in even more + Fade Out
   const opacity = useTransform(progress, 
-    [start, start + 0.05, end - 0.05, end], 
+    [start, start + 0.08, end - 0.08, end], 
     [0, 1, 1, 0]
   );
   
-  const scale = useTransform(progress, [start, end], [0.9, 1.1]);
-  const zIndex = useTransform(progress, [start, end], [10, 20]);
-  
-  // Slide effect for titles
-  const titleX = useTransform(progress, [start, end], [50, -50]);
-  
+  const scale = useTransform(progress, 
+    [start, middle, end], 
+    [0.8, 1, 1.2]
+  );
+
+  const z = useTransform(progress,
+    [start, end],
+    [-100, 100]
+  );
+
+  const rotateX = useTransform(progress,
+    [start, middle, end],
+    [10, 0, -10]
+  );
+
   return (
     <motion.div
       style={{ 
         opacity, 
         scale,
-        zIndex,
-        pointerEvents: useTransform(progress, (v) => (v >= start && v <= end ? 'auto' : 'none')) as any
+        z,
+        rotateX,
+        perspective: '1000px',
+        display: useTransform(progress, (v) => (v >= start - 0.05 && v <= end + 0.05 ? 'flex' : 'none')) as any
       }}
-      className="absolute inset-0 flex items-center justify-center"
+      className="absolute inset-0 items-center justify-center pointer-events-none"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full max-w-6xl">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full max-w-7xl px-8 pointer-events-auto">
         
-        {/* BIG BACKDROP NUMBER */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] dark:opacity-[0.04] pointer-events-none select-none">
+        {/* Background Number */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none overflow-hidden">
           <motion.span 
-            style={{ x: useTransform(progress, [start, end], [-100, 100]) }}
-            className="text-[30rem] md:text-[45rem] font-display font-black"
+            style={{ y: useTransform(progress, [start, end], [100, -100]) }}
+            className="text-[40rem] md:text-[60rem] font-display font-black text-white"
           >
             {layer.icon}
           </motion.span>
         </div>
 
-        {/* Visual Graphic Element */}
-        <div className="order-2 lg:order-1 flex justify-center lg:justify-end relative z-10">
-          <div className="relative w-64 h-64 md:w-96 md:h-96 border border-white/10 rounded-full flex items-center justify-center">
-             <motion.div 
-               animate={{ rotate: 360 }}
-               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-               className="absolute inset-4 border-t-2 border-primary/30 rounded-full"
-             />
-             <div className="text-4xl md:text-6xl font-display font-black tracking-tighter text-white/10">
+        {/* Illustration Area */}
+        <div className="order-2 lg:order-1 flex justify-center lg:justify-end relative">
+          <div className="relative w-72 h-72 md:w-[500px] md:h-[500px] flex items-center justify-center">
+             {/* Animated Rings */}
+             {[...Array(3)].map((_, i) => (
+               <motion.div 
+                 key={i}
+                 initial={{ rotate: 0 }}
+                 animate={{ rotate: 360 }}
+                 transition={{ duration: 15 + (i * 5), repeat: Infinity, ease: "linear" }}
+                 className="absolute border border-white/5 rounded-full"
+                 style={{ 
+                   width: `${100 - (i * 20)}%`, 
+                   height: `${100 - (i * 20)}%`,
+                   borderTopColor: i === 0 ? 'rgba(255,255,255,0.2)' : 'transparent'
+                 }}
+               />
+             ))}
+             <div className="text-5xl md:text-8xl font-display font-black tracking-tighter text-white/10 italic">
                {layer.subtitle}
              </div>
           </div>
         </div>
 
         {/* Text Content */}
-        <div className="order-1 lg:order-2 space-y-8 text-right px-4 relative z-20" dir="rtl">
-          <div className="space-y-2">
+        <div className="order-1 lg:order-2 space-y-10 text-right relative z-30" dir="rtl">
+          <div className="space-y-4">
             <motion.div 
-              style={{ x: titleX }}
-              className="text-primary font-display font-bold tracking-widest uppercase text-sm flex items-center justify-end gap-3"
+              className="text-primary font-display font-bold tracking-[0.3em] uppercase text-sm flex items-center justify-end gap-4"
             >
-              <span className="w-8 h-[1px] bg-primary" />
-              LAYER {layer.icon}
+              <span className="w-12 h-[1px] bg-primary/50" />
+              PRINCIPLE {layer.icon}
             </motion.div>
-            <h2 className="text-6xl md:text-8xl font-display font-black tracking-tight text-white leading-none">
+            <h2 className="text-7xl md:text-9xl font-display font-black tracking-tight text-white leading-tight">
               {layer.title}
             </h2>
           </div>
-          <p className="text-xl md:text-2xl text-white/60 font-sans leading-relaxed max-w-md mr-auto">
+          <p className="text-2xl md:text-3xl text-white/50 font-sans leading-relaxed max-w-xl mr-auto font-light">
             {layer.desc}
           </p>
         </div>
