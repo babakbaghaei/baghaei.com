@@ -229,8 +229,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
      className={`flex-1 flex flex-col h-full relative z-10 pointer-events-none text-right ${compact ? 'p-6 justify-center' : 'p-8 md:p-10'}`} 
      style={{
       transformStyle: "preserve-3d",
-      opacity: project.isLocked ? 0.4 : 1,
-      filter: project.isLocked ? 'blur(5px)' : 'none'
+      opacity: 1,
+      filter: 'none'
      }}
     >
      <div style={{ transform: isHovered && !isTransitioning ? "translateZ(60px)" : "translateZ(0px)", transition: "transform 0.4s ease-out" }} className="space-y-3">
