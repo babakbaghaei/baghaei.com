@@ -16,7 +16,8 @@ import {
  Globe,
  Palette,
  Radio,
- Workflow
+ Workflow,
+ Construction
 } from 'lucide-react';
 
 export interface Metric {
@@ -72,25 +73,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
  const mouseX = useMotionValue(-1000);
  const mouseY = useMotionValue(-1000);
 
- // High-end physics: Balanced between Snappy and Smooth
  const springConfig = { stiffness: 300, damping: 40 };
  const tiltX = useSpring(0, springConfig);
  const tiltY = useSpring(0, springConfig);
  const scale = useSpring(1, springConfig);
  
- // Lighting opacities
  const sheenOpacity = useSpring(0, { stiffness: 200, damping: 35 });
  const borderOpacity = useSpring(0.25, { stiffness: 200, damping: 35 });
 
- // 3D Rotations (15 degrees depth like Services cards)
  const rotateX = useTransform(tiltY, [-0.5, 0.5], [15, -15]);
  const rotateY = useTransform(tiltX, [-0.5, 0.5], [-15, 15]);
 
- // 1. BORDER LIGHTING (Spotlight follows mouse globally)
- // This uses the project's color but makes it brighter at the mouse point
  const borderBackground = useMotionTemplate`radial-gradient(400px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.8), ${project.borderColor} 40%, transparent 100%)`;
 
- // 2. INNER REFLECTION (Angular Sheen)
  const sheenAngle = useTransform([tiltX, tiltY], ([x, y]) => {
   const angleRad = Math.atan2(x as number, -(y as number));
   return (angleRad * 180) / Math.PI;
@@ -99,7 +94,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
   const d = Math.sqrt(Math.pow(x as number, 2) + Math.pow(y as number, 2));
   return Math.min(d * 2.5, 1);
  });
- // Brighter version of the project's own color for the sheen highlight (No gray)
  const colorHighlight = useTransform(contrastFactor, [0, 1], [project.color, project.borderColor]);
  const innerBackground = useMotionTemplate`linear-gradient(
   ${sheenAngle}deg, 
@@ -112,7 +106,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
   setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
  }, []);
 
- // Reset logic when modal closes - instant re-enable
  useEffect(() => {
   if (!isActive && isTransitioning) {
     setIsTransitioning(false);
@@ -132,7 +125,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
    const isOver = e.clientX >= rect.left && e.clientX <= rect.right && 
                   e.clientY >= rect.top && e.clientY <= rect.bottom;
 
-   // Proximity detection for border light (active within 600px of card center)
    const centerX = rect.left + rect.width / 2;
    const centerY = rect.top + rect.height / 2;
    const dist = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
@@ -141,35 +133,30 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
    mouseY.set(y);
    setIsHovered(isOver);
    
-   if (!project.isLocked) {
-    // Requirements: Border lights up even before reaching the card
-    // 0.25 base, up to 0.8 when close/hovered
-    borderOpacity.set(dist < 600 ? (isOver ? 0.8 : 0.45) : 0.25);
+   borderOpacity.set(dist < 600 ? (isOver ? 0.8 : 0.45) : 0.25);
     
-    if (isOver) {
-     tiltX.set(x / rect.width - 0.5);
-     tiltY.set(y / rect.height - 0.5);
-     scale.set(1.02);
-     sheenOpacity.set(0.8);
-    } else {
-     tiltX.set(0);
-     tiltY.set(0);
-     scale.set(1);
-     sheenOpacity.set(0);
-    }
+   if (isOver) {
+    tiltX.set(x / rect.width - 0.5);
+    tiltY.set(y / rect.height - 0.5);
+    scale.set(1.02);
+    sheenOpacity.set(0.8);
+   } else {
+    tiltX.set(0);
+    tiltY.set(0);
+    scale.set(1);
+    sheenOpacity.set(0);
    }
   };
 
   window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
   return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
- }, [project.isLocked, isTouchDevice, isTransitioning, tiltX, tiltY, scale, sheenOpacity, borderOpacity, mouseX, mouseY]);
+ }, [isTouchDevice, isTransitioning, tiltX, tiltY, scale, sheenOpacity, borderOpacity, mouseX, mouseY]);
 
  const handleCardClick = () => {
-  if (project.isLocked || isTransitioning) return;
+  if (isTransitioning) return;
   setIsTransitioning(true);
   setIsHovered(false);
   
-  // Instant neutralize for clean layout expansion - Zero Lag
   tiltX.jump(0);
   tiltY.jump(0);
   scale.jump(1);
@@ -188,7 +175,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
     ref={cardRef}
     layoutId={`project-${project.id}`}
     onClick={handleCardClick}
-    className={`project-card group relative flex flex-col h-full w-full z-10 bg-card rounded-[2.2rem] md:rounded-[3rem] ${project.isLocked ? 'cursor-default' : 'cursor-pointer'} shadow-2xl`}
+    className="project-card group relative flex flex-col h-full w-full z-10 bg-card rounded-[2.2rem] md:rounded-[3rem] cursor-pointer shadow-2xl"
     style={{ 
      rotateX: isTransitioning ? 0 : rotateX, 
      rotateY: isTransitioning ? 0 : rotateY, 
@@ -198,9 +185,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
     }}
     transition={{ type: 'spring', stiffness: 200, damping: 30, mass: 0.8 }}
    >
-    {/* 1. Background Layers (Lighting System) */}
+    {/* 1. Background Layers */}
     <div className="absolute inset-0 rounded-[2.2rem] md:rounded-[3rem] overflow-hidden z-0 pointer-events-none">
-     {/* Sheen reflection (Project Color Based) */}
      <motion.div 
       style={{
        opacity: sheenOpacity,
@@ -210,7 +196,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
       className="absolute inset-0 w-full h-full z-0" 
      />
      
-     {/* Border Spotlight (Follows mouse globally) */}
      <motion.div 
       className="absolute inset-0 pointer-events-none rounded-[2.2rem] md:rounded-[3rem] z-20"
       style={{
@@ -224,7 +209,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
      />
     </div>
 
-    {/* 2. Floating Content (3D Depth Elements) */}
+    {/* 2. Floating Content */}
     <div 
      className={`flex-1 flex flex-col h-full relative z-10 pointer-events-none text-right ${compact ? 'p-6 justify-center' : 'p-8 md:p-10'}`} 
      style={{
@@ -234,13 +219,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
      }}
     >
      <div style={{ transform: isHovered && !isTransitioning ? "translateZ(60px)" : "translateZ(0px)", transition: "transform 0.4s ease-out" }} className="space-y-3">
-      {!compact && (
-        <div className="flex items-center justify-start">
-         <span className="text-[10px] font-normal uppercase font-display bg-white/5 px-3 py-1 rounded-full border border-white/5 text-muted-foreground">
-          {project.category}
-         </span>
-        </div>
-      )}
+      <div className="flex items-center justify-between">
+        {project.isLocked && (
+          <span className="text-[8px] font-black uppercase font-display bg-primary/10 text-primary px-2 py-1 rounded-md border border-primary/20 animate-pulse">
+            In Development
+          </span>
+        )}
+        <div className="flex-1" />
+        {!compact && (
+          <span className="text-[10px] font-normal uppercase font-display bg-white/5 px-3 py-1 rounded-full border border-white/5 text-muted-foreground">
+            {project.category}
+          </span>
+        )}
+      </div>
       
       <h3 className={`font-display text-foreground leading-tight font-black ${compact ? 'text-lg md:text-xl' : 'text-2xl md:text-3xl'}`}>
        {project.title}
@@ -277,16 +268,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
       </div>
      )}
     </div>
-
-    {/* 3. Locked Overlay */}
-    {project.isLocked && (
-     <div className="absolute inset-0 z-40 bg-background/80 backdrop-blur-sm flex items-center justify-center flex-col gap-3 rounded-[2.2rem] md:rounded-[3rem] p-6 text-center border border-white/5 shadow-2xl">
-      <div className="w-12 h-12 md:w-14 md:h-14 bg-secondary border border-border rounded-full flex items-center justify-center">
-       <Hammer className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
-      </div>
-      <span className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest font-display">Coming Soon</span>
-     </div>
-    )}
    </motion.div>
   </div>
  );

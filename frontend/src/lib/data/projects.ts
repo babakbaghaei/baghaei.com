@@ -2,6 +2,66 @@ import { Project } from '@/components/ui/ProjectCard';
 
 export const PROJECTS_DATA: Project[] = [
  { 
+  id: 10, 
+  title: 'پلتفرم کولک', 
+  category: 'زیرساخت / SaaS', 
+  role: 'معمار ارشد سیستم و بنیان‌گذار', 
+  desc: 'توسعه زیرساخت‌های مقیاس‌پذیر و راهکارهای نوین ابری برای کسب‌وکارهای در حال رشد با تمرکز بر پایداری.', 
+  metrics: [{ label: 'پایداری', value: '۹۹.۹٪' }, { label: 'تکنولوژی', value: 'Cloud-Native' }], 
+  color: 'rgba(59, 130, 246, 0.3)', 
+  borderColor: 'rgba(59, 130, 246, 0.8)', 
+  isLocked: false,
+  tech: ['Next.js', 'Go', 'Docker', 'Kubernetes']
+ },
+ { 
+  id: 11, 
+  title: 'بازی آنلاین تخت نرد', 
+  category: 'سرگرمی / Game', 
+  role: 'توسعه‌دهنده بازی و طراح مکانیک', 
+  desc: 'طراحی و پیاده‌سازی بازی کلاسیک تخت نرد با فیزیک واقعی، هوش مصنوعی پیشرفته و قابلیت بازی آنلاین بلادرنگ.', 
+  metrics: [{ label: 'تأخیر', value: '<۵۰ms' }, { label: 'مدل فیزیک', value: 'Custom' }], 
+  color: 'rgba(16, 185, 129, 0.3)', 
+  borderColor: 'rgba(16, 185, 129, 0.8)', 
+  isLocked: false,
+  tech: ['Unity', 'C#', 'WebSockets', 'Socket.io']
+ },
+ { 
+  id: 12, 
+  title: 'اسپات لایت (تـورلیدر)', 
+  category: 'گردشگری / هوشمند', 
+  role: 'طراح راهکار و معمار نرم‌افزار', 
+  desc: 'پلتفرم مدیریت هوشمند تورهای گردشگری با قابلیت ردیابی لحظه‌ای، مدیریت لیدرها و تجربه تورهای تعاملی.', 
+  metrics: [{ label: 'دقت ردیابی', value: 'بالا' }, { label: 'کاربری', value: 'هوشمند' }], 
+  color: 'rgba(249, 115, 22, 0.3)', 
+  borderColor: 'rgba(249, 115, 22, 0.8)', 
+  isLocked: false,
+  tech: ['React Native', 'Node.js', 'Redis', 'GPS-API']
+ },
+ { 
+  id: 13, 
+  title: 'پروژه رشد', 
+  category: 'توسعه فردی / EdTech', 
+  role: 'مدیر فنی و طراح محصول', 
+  desc: 'سیستم جامع مدیریت یادگیری و رهگیری شاخص‌های رشد فردی و سازمانی با رویکرد داده‌محور.', 
+  metrics: [{ label: 'نرخ رشد', value: '۳۰٪+' }, { label: 'کاربران', value: 'Enterprise' }], 
+  color: 'rgba(139, 92, 246, 0.3)', 
+  borderColor: 'rgba(139, 92, 246, 0.8)', 
+  isLocked: false,
+  tech: ['React', 'PostgreSQL', 'Prisma', 'Analytics']
+ },
+ { 
+  id: 14, 
+  title: 'لایف کوچ اوج', 
+  category: 'سلامت / مربیگری', 
+  role: 'معمار نرم‌افزار و توسعه‌دهنده', 
+  desc: 'پلتفرم اختصاصی اتصال مربیان حرفه‌ای به مراجعین با ابزارهای داخلی مدیریت جلسات و تحلیل پیشرفت.', 
+  metrics: [{ label: 'رضایت', value: '۹۸٪' }, { label: 'جلسات', value: '۵K+' }], 
+  color: 'rgba(236, 72, 153, 0.3)', 
+  borderColor: 'rgba(236, 72, 153, 0.8)', 
+  isLocked: false,
+  tech: ['Next.js', 'FastAPI', 'WebRTC', 'PostgreSQL']
+ },
+ { 
   id: 2, 
   title: 'پلتفرم راورو', 
   category: 'امنیت سایبری', 
