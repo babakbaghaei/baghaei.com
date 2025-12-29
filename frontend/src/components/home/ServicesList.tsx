@@ -36,12 +36,12 @@ export default function ServicesList({ services }: { services: Service[] }) {
 function ServiceItem({ service, index, scrollYProgress }: { service: Service, index: number, scrollYProgress: any }) {
   const Icon = (Icons as any)[service.iconName] || Icons.HelpCircle;
   
-  // Staggered parallax logic: Higher multiplier for lower indices (Right side)
-  const multiplier = 4 - (index % 4);
+  // Staggered parallax logic: Index 0 (Right) is the highest
+  const colIndex = index % 6;
   const y = useTransform(
     scrollYProgress, 
     [0, 1], 
-    [20 * multiplier, -20 * multiplier]
+    [colIndex * 15 + 20, colIndex * 15 - 20]
   );
 
   return (

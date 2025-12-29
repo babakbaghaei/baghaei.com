@@ -74,13 +74,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
  const fallbackProgress = useMotionValue(0.5);
  const activeProgress = scrollProgress || fallbackProgress;
 
- // PARALLAX LOGIC: Staggered movement - Right is higher, moves more.
- // Multiplier decreases as index increases (0 -> 1 -> 2...)
- const multiplier = 3 - (index % 3); 
+ // PARALLAX LOGIC: Staggered movement - Right-to-Left Descending (RTL Stairs)
+ // Index 0 (Right) has 0 base offset, Index 1 has 30px, Index 2 has 60px...
+ const colIndex = index % 3;
  const parallaxY = useTransform(
   activeProgress, 
   [0, 1], 
-  [30 * multiplier, -30 * multiplier]
+  [colIndex * 20 + 30, colIndex * 20 - 30]
  );
 
  const mouseX = useMotionValue(-1000);
