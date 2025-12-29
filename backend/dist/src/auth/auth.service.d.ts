@@ -37,5 +37,5 @@ export declare class AuthService {
         createdAt: Date;
         updatedAt: Date;
     }>;
-    logout(refreshToken: string): Promise<void>;
+    logout(refreshToken?: string): Promise<void>;
 }

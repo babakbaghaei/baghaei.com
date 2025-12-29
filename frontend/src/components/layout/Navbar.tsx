@@ -159,7 +159,7 @@ export default function Navbar() {
        initial={{ opacity: 0, y: -10 }}
        animate={{ opacity: 1, y: 0 }}
        exit={{ opacity: 0, y: -10 }}
-       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as any }}
        onMouseLeave={() => setIsToolsOpen(false)}
        className="absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-border shadow-2xl z-0"
       >

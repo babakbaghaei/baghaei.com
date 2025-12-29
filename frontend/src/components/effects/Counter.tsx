@@ -23,7 +23,7 @@ export function Counter({ value }: CounterProps) {
   if (isInView && !isNaN(numericPart)) {
    const controls = animate(0, numericPart, {
     duration: 2,
-    ease: [0.16, 1, 0.3, 1],
+    ease: [0.16, 1, 0.3, 1] as any,
     onUpdate: (latest) => {
      const val = Math.floor(latest);
      setDisplayValue(val.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]));

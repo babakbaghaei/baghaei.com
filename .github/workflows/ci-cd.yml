@@ -24,17 +24,40 @@ jobs:
         cache: 'npm'
         cache-dependency-path: backend/package-lock.json
 
-    - name: Install All Dependencies
-      run: npm run install:all
+    - name: Install Dependencies
+      run: cd backend && npm install --legacy-peer-deps
 
     - name: Generate Prisma Client
       run: cd backend && npx prisma generate
 
-    - name: Run All Tests
-      run: npm run test:all
+    - name: Run Backend Tests
+      run: cd backend && npm test
 
-    - name: Build All
-      run: npm run build:all
+    - name: Build Backend
+      run: cd backend && npm run build
+
+  frontend-ci:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install Dependencies
+      run: cd frontend && npm install
+
+    - name: Build Frontend
+      run: cd frontend && npm run build
 
   # Docker Build Verification (Dry Run)
   docker-build:

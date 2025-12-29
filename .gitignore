@@ -38,6 +38,7 @@ backups/
 .vscode/
 *.swp
 *.swo
+.npm-cache/
 
 # Docker
 docker-compose.override.yml

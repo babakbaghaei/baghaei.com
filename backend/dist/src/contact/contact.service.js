@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContactService = void 0;
 const common_1 = require("@nestjs/common");
@@ -56,6 +55,7 @@ exports.ContactService = ContactService = __decorate([
     (0, common_1.Injectable)(),
     __param(2, (0, bullmq_1.InjectQueue)('notifications')),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        security_service_1.SecurityService, typeof (_a = typeof bullmq_2.Queue !== "undefined" && bullmq_2.Queue) === "function" ? _a : Object])
+        security_service_1.SecurityService,
+        bullmq_2.Queue])
 ], ContactService);
 //# sourceMappingURL=contact.service.js.map

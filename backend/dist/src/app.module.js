@@ -44,7 +44,7 @@ const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const config_1 = require("@nestjs/config");
 const throttler_1 = require("@nestjs/throttler");
-const throttler_storage_redis_1 = require("throttler-storage-redis");
+const throttler_storage_redis_1 = require("@nest-lab/throttler-storage-redis");
 const nestjs_pino_1 = require("nestjs-pino");
 const nestjs_prometheus_1 = require("@willsoto/nestjs-prometheus");
 const cache_manager_1 = require("@nestjs/cache-manager");
@@ -73,7 +73,7 @@ exports.AppModule = AppModule = __decorate([
             cache_manager_1.CacheModule.registerAsync({
                 isGlobal: true,
                 imports: [config_1.ConfigModule],
-                useFactory: async (configService) => ({
+                useFactory: (configService) => ({
                     store: redisStore,
                     host: configService.get('REDIS_HOST', 'localhost'),
                     port: configService.get('REDIS_PORT', 6379),
@@ -83,7 +83,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             bullmq_1.BullModule.forRootAsync({
                 imports: [config_1.ConfigModule],
-                useFactory: async (configService) => ({
+                useFactory: (configService) => ({
                     connection: {
                         host: configService.get('REDIS_HOST', 'localhost'),
                         port: configService.get('REDIS_PORT', 6379),

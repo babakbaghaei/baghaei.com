@@ -8,21 +8,21 @@ export declare class ContactService {
     private notificationsQueue;
     constructor(prisma: PrismaService, securityService: SecurityService, notificationsQueue: Queue);
     create(createContactDto: CreateContactDto): Promise<{
-        name: string;
+        id: number;
         email: string | null;
+        name: string;
+        createdAt: Date;
         phone: string;
         message: string;
         isRead: boolean;
-        createdAt: Date;
-        id: number;
     }>;
     findAll(): Promise<{
-        name: string;
+        id: number;
         email: string | null;
+        name: string;
+        createdAt: Date;
         phone: string;
         message: string;
         isRead: boolean;
-        createdAt: Date;
-        id: number;
     }[]>;
 }

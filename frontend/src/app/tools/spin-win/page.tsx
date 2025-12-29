@@ -204,7 +204,7 @@ export default function SpinWin() {
                   width={550}
                   height={550}
                   animate={{ rotate: rotation }}
-                  transition={{ duration: 5, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 5, ease: [0.16, 1, 0.3, 1] as any }}
                   className="rounded-full w-[300px] h-[300px] md:w-[500px] md:h-[500px] cursor-pointer"
                   onClick={handleSpin}
                 />

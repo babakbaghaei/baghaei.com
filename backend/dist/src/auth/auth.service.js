@@ -97,7 +97,7 @@ let AuthService = AuthService_1 = class AuthService {
         });
     }
     async logout(refreshToken) {
-        this.logger.log('User logged out');
+        this.logger.log(`User logged out: ${refreshToken ? 'token provided' : 'no token'}`);
     }
 };
 exports.AuthService = AuthService;
