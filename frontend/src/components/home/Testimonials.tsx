@@ -8,19 +8,14 @@ import { Card, useCardTilt } from '../ui/Card';
 
 const ReactiveQuote = () => {
   const { tiltX, tiltY } = useCardTilt();
-  
   const hX = useTransform(tiltX, [-0.5, 0.5], [-10, 10]);
   const hY = useTransform(tiltY, [-0.5, 0.5], [-10, 10]);
   const sX = useTransform(tiltX, [-0.5, 0.5], [15, -15]);
   const sY = useTransform(tiltY, [-0.5, 0.5], [15, -15]);
-  
   const filter = useMotionTemplate`drop-shadow(${hX}px ${hY}px 2px rgba(255,255,255,0.1)) drop-shadow(${sX}px ${sY}px 8px rgba(0,0,0,0.8))`;
 
   return (
-    <motion.div 
-      className="absolute top-4 right-4 pointer-events-none"
-      style={{ filter }}
-    >
+    <motion.div className="absolute top-4 right-4 pointer-events-none" style={{ filter }}>
       <Quote className="w-12 h-12 text-white opacity-[0.2]" />
     </motion.div>
   );
@@ -37,15 +32,11 @@ const testimonials = [
 
 export default function Testimonials() {
   const sectionRef = useRef(null);
-
-  const { scrollYProgress } = useScroll({ 
-    target: sectionRef, 
-    offset: ["start end", "end start"] 
-  });
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
-   return (
-   <Section sectionRef={sectionRef} id="testimonials" className="border-t border-border bg-transparent">      {/* Background Icon */}
+  return (
+    <Section sectionRef={sectionRef} id="testimonials" className="border-t border-border bg-transparent">
       <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
         <MessageSquare className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
       </motion.div>
@@ -56,39 +47,30 @@ export default function Testimonials() {
         {testimonials.map((t, index) => (
           <motion.div
             key={t.id}
-            initial={{ opacity: 0, scale: 0.5, y: 40, x: -100, filter: 'blur(10px)' }}
-            whileInView={{ opacity: 1, scale: 1, y: 0, x: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, scale: 0.8, y: 40 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
-            style={{ originX: 0, originY: 1 }}
-            transition={{ 
-              type: 'spring', 
-              stiffness: 200, 
-              damping: 22, 
-              delay: (testimonials.length - index) * 0.1,
-              mass: 1
-            }}
+            transition={{ type: 'spring', stiffness: 200, damping: 22, delay: index * 0.1 }}
             className="flex flex-col h-full"
           >
-      <Card 
-        glowColor={t.color}
-        roundedClass="rounded-[2.5rem] rounded-bl-lg"
-        className="flex-1"
-        bgClassName="!glass-panel"
-        maskedContent={<ReactiveQuote />}
-      >              <p style={{ transform: "translateZ(30px)" }} className="text-sm md:text-base font-medium font-sans leading-relaxed text-white text-right relative z-10">
+            <Card 
+              glowColor={t.color}
+              roundedClass="rounded-[2.5rem] rounded-bl-lg"
+              className="flex-1"
+              maskedContent={<ReactiveQuote />}
+            >
+              <p style={{ transform: "translateZ(30px)" }} className="text-sm md:text-base font-medium font-sans leading-relaxed text-white text-right relative z-10">
                 «{t.content}»
               </p>
             </Card>
 
-            <div className="mt-6 flex flex-row-reverse items-center justify-start gap-3 px-2 w-full">
+            <div className="mt-6 flex flex-row-reverse items-center justify-start gap-3 px-4 w-full">
               <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-white shrink-0 shadow-lg bg-zinc-800">
                 <User className="w-5 h-5" />
               </div>
-              <div className="text-left">
+              <div className="text-right">
                 <div className="font-bold font-display text-sm text-foreground leading-tight">{t.author}</div>
-                <div className="text-[10px] font-bold uppercase text-muted-foreground mt-1 font-display tracking-wider">
-                  {t.company}
-                </div>
+                <div className="text-[10px] font-bold uppercase text-muted-foreground mt-1 font-display tracking-wider">{t.company}</div>
               </div>
             </div>
           </motion.div>

@@ -114,8 +114,8 @@ export default function RootLayout({
  children: React.ReactNode;
 }>) {
  return (
-  <html lang="fa" dir="rtl" suppressHydrationWarning className={`${iransans.variable} ${yekanbakh.variable}`}>
-   <body className="antialiased text-foreground selection:bg-primary selection:text-primary-foreground font-sans">
+  <html lang="fa" dir="rtl" suppressHydrationWarning className={`${iransans.variable} ${yekanbakh.variable} bg-background`}>
+   <body className="antialiased text-foreground selection:bg-primary selection:text-primary-foreground font-sans bg-transparent">
     <ThemeProvider
      attribute="class"
      defaultTheme="dark"
@@ -177,7 +177,7 @@ export default function RootLayout({
      </Script>
      
      <Preloader />
-     <div className="fixed inset-0 z-[-2] pointer-events-none bg-background">
+     <div className="fixed inset-0 z-[-2] pointer-events-none">
        <GlobalUniverse renderBackground />
      </div>
      <div className="noise-bg opacity-[0.03] pointer-events-none" />

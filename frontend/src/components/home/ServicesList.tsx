@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import * as Icons from 'lucide-react';
+import { Card } from '../ui/Card';
 
 export interface Service {
   id: number;
@@ -35,16 +36,17 @@ function ServiceItem({ service, index }: { service: Service, index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.05 }}
-      className="group flex flex-col items-start gap-3 p-6 rounded-[2rem] glass-panel hover:bg-white/[0.05] transition-all duration-500"
+      className="group flex flex-col items-start gap-3"
+      style={{ transformStyle: "preserve-3d" }}
     >
-      <div className="flex items-center gap-3 group-hover:text-primary transition-colors duration-500">
+      <div className="flex items-center gap-3 group-hover:text-primary transition-colors duration-500" style={{ transform: "translateZ(40px)" }}>
         <Icon className="w-5 h-5 text-zinc-500 group-hover:text-primary transition-transform duration-500 group-hover:scale-110" strokeWidth={1.2} />
         <h3 className="text-base md:text-lg font-bold font-display text-zinc-200 group-hover:text-white">
           {service.title}
         </h3>
       </div>
 
-      <p className="text-zinc-500 text-xs md:text-sm font-display leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity duration-500 line-clamp-3">
+      <p className="text-zinc-500 text-xs md:text-sm font-display leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity duration-500 line-clamp-3 text-right" dir="rtl" style={{ transform: "translateZ(20px)" }}>
         {service.description}
       </p>
     </motion.div>

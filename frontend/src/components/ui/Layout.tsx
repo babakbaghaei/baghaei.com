@@ -61,7 +61,7 @@ export const Section: React.FC<SectionProps> = ({ id, children, className = "", 
   <section 
    ref={sectionRef} 
    id={id} 
-   className={`py-40 relative transition-colors duration-700 bg-background ${className}`}
+   className={`py-40 relative transition-colors duration-700 ${className}`}
   >
    <div className={`max-w-7xl mx-auto px-6 lg:px-16 relative z-10 ${containerClassName}`}>
     {children}
