@@ -122,7 +122,7 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
             transition={{ delay: 0.2 }}
             className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest font-display"
            >
-            {project.category}
+            {project.role}
            </motion.div>
            <h2 className="text-5xl md:text-8xl font-black font-display text-foreground leading-tight tracking-tighter">
             {project.title}
@@ -132,13 +132,40 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
            </p>
           </div>
 
+          {/* App Store Style Screenshot Gallery - MOVED HERE */}
+          <div className="pt-4 space-y-8">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xl font-black font-display text-foreground">پیش‌نمایش محیط کاربری</h4>
+              <div className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-widest">Scroll to explore →</div>
+            </div>
+            
+            <div className="flex overflow-x-auto gap-6 pb-8 no-scrollbar -mx-6 px-6 md:mx-0 md:px-0 scroll-smooth">
+              {[...Array(4)].map((_, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="flex-none w-[280px] md:w-[350px] aspect-[16/10] rounded-[2rem] bg-secondary/50 border border-border/50 relative overflow-hidden group/img"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent z-0" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-[10px] font-mono text-white/5 uppercase tracking-widest">Screenshot_{i + 1}</span>
+                  </div>
+                  <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-500" />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
           {/* Core Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-12 border-t border-border">
-           <div className="p-8 bg-secondary/30 rounded-[2.5rem] border border-border">
+           <div className="p-8 bg-secondary/20 backdrop-blur-md rounded-[2.5rem] border border-border/50">
             <h4 className="font-black text-xl mb-4 font-display">مسئولیت اجرایی</h4>
             <p className="text-foreground/70 leading-relaxed">{project.role}</p>
            </div>
-           <div className="p-8 bg-secondary/30 rounded-[2.5rem] border border-border">
+           <div className="p-8 bg-secondary/20 backdrop-blur-md rounded-[2.5rem] border border-border/50">
             <h4 className="font-black text-xl mb-4 font-display">دستاورد کلیدی</h4>
             <p className="text-foreground/70 leading-relaxed">بهینه‌سازی حداکثری فرآیندهای عملیاتی و ارتقای سطح پایداری سیستم در مقیاس بالا.</p>
            </div>

@@ -173,7 +173,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
     ref={cardRef}
     layoutId={`project-${project.id}`}
     onClick={handleCardClick}
-    className="project-card group relative flex flex-col h-full w-full z-10 bg-card rounded-[2.2rem] md:rounded-[3rem] cursor-pointer shadow-2xl"
+    className="project-card group relative flex flex-col h-full w-full z-10 bg-white/[0.02] backdrop-blur-2xl rounded-[2.2rem] md:rounded-[3rem] cursor-pointer shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] border border-white/10"
     style={{ 
      rotateX: isTransitioning ? 0 : rotateX, 
      rotateY: isTransitioning ? 0 : rotateY, 
@@ -245,7 +245,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick, comp
      {project.tech && project.tech.length > 0 && (
       <div style={{ transform: isHovered && !isTransitioning ? "translateZ(15px)" : "translateZ(0px)", transition: "transform 0.4s ease-out" }} className={`flex flex-wrap gap-1.5 md:gap-2 mt-auto justify-start`} dir="ltr">
        {project.tech.slice(0, 4).map((t, i) => (
-        <span key={i} className={`rounded-full bg-secondary border border-border font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 ${compact ? 'p-1.5' : 'pl-1.5 pr-2.5 py-1 text-[9px]'}`}>
+        <span key={i} className={`rounded-full bg-white/5 border border-white/5 font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 ${compact ? 'p-1.5' : 'pl-1.5 pr-2.5 py-1 text-[9px]'}`}>
          <TechIcon name={t} />
          {!compact && t}
         </span>

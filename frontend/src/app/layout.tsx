@@ -115,7 +115,7 @@ export default function RootLayout({
 }>) {
  return (
   <html lang="fa" dir="rtl" suppressHydrationWarning className={`${iransans.variable} ${yekanbakh.variable}`}>
-   <body className="antialiased bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans">
+   <body className="antialiased text-foreground selection:bg-primary selection:text-primary-foreground font-sans">
     <ThemeProvider
      attribute="class"
      defaultTheme="dark"
@@ -177,7 +177,7 @@ export default function RootLayout({
      </Script>
      
      <Preloader />
-     <div className="fixed inset-0 z-[-2] pointer-events-none">
+     <div className="fixed inset-0 z-[-2] pointer-events-none bg-background">
        <GlobalUniverse renderBackground />
      </div>
      <div className="noise-bg opacity-[0.03] pointer-events-none" />

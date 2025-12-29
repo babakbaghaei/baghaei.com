@@ -31,11 +31,11 @@ function ServiceItem({ service, index }: { service: Service, index: number }) {
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.05 }}
-      className="group flex flex-col items-start gap-3"
+      className="group flex flex-col items-start gap-3 p-6 rounded-[2rem] bg-white/[0.02] backdrop-blur-2xl border border-white/10 hover:bg-white/[0.05] transition-all duration-500 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]"
     >
       <div className="flex items-center gap-3 group-hover:text-primary transition-colors duration-500">
         <Icon className="w-5 h-5 text-zinc-500 group-hover:text-primary transition-transform duration-500 group-hover:scale-110" strokeWidth={1.2} />
