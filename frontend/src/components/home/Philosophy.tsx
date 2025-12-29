@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { Section, Heading } from '../ui/Layout';
-import { toPersianDigits } from '@/lib/utils/format';
 
 const PHILOSOPHY_ITEMS = [
   {
@@ -28,8 +27,15 @@ const PHILOSOPHY_ITEMS = [
 
 export default function Philosophy() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setIsMounted(true), 0);
+    return () => clearTimeout(timeout);
+  }, []);
+
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: isMounted ? containerRef : undefined,
     offset: ["start end", "end start"]
   });
 
@@ -40,7 +46,11 @@ export default function Philosophy() {
   });
 
   return (
-    <Section id="philosophy" className="relative overflow-hidden bg-background border-y border-border/50">
+    <Section 
+      id="philosophy" 
+      sectionRef={containerRef}
+      className="relative overflow-hidden bg-background border-y border-border/50"
+    >
       {/* Background Decorative Grid - Matching System Design */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
         <div className="absolute inset-0" style={{ 
@@ -78,15 +88,12 @@ export default function Philosophy() {
 }
 
 function PhilosophyCard({ item, index, progress }: { item: typeof PHILOSOPHY_ITEMS[0], index: number, progress: any }) {
-  const cardRef = useRef(null);
-  
   // Refined entrance animation
   const y = useTransform(progress, [0, 1], [100 * (index + 1), -100 * (index + 1)]);
   const opacity = useTransform(progress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
   return (
     <motion.div
-      ref={cardRef}
       style={{ y, opacity }}
       className="group relative p-8 rounded-3xl bg-secondary/30 border border-border/50 backdrop-blur-sm hover:border-primary/30 transition-colors duration-500 overflow-hidden"
     >
