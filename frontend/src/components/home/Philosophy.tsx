@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useMemo } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { toPersianDigits } from '@/lib/utils/format';
 
 const PHILOSOPHY_LAYERS = [
@@ -130,13 +130,29 @@ function ContentBlock({ layer, index, progress }: { layer: typeof PHILOSOPHY_LAY
 }
 
 function TechnicalVisualizer({ progress }: { progress: any }) {
-  const hexLines = useMemo(() => 
-    [...Array(20)].map(() => Math.random().toString(16).toUpperCase().substring(2, 30)),
-  []);
+  const [mounted, setMounted] = React.useState(false);
+  
+  const hexLines = useMemo(() => {
+    const lines = [
+      "A1B2C3D4E5F6G7H8I9J0", "F1E2D3C4B5A698765432", "0123456789ABCDEFFEDC",
+      "B9A8C7D6E5F40321ABCD", "887766554433221100FF", "ABCDEF01234567891122",
+      "99887766554433221100", "F0E1D2C3B4A596877766", "1A2B3C4D5E6F7G8H9I0J",
+      "554433221100FFEEDDCC", "66778899AABBCCDDEEFF", "11223344556677889900",
+      "D1C2B3A4958675645342", "F9E8D7C6B5A4B3C2D1E0", "00112233445566778899",
+      "AABBCCDDEEFF00112233", "5F4E3D2C1B0A98765432", "1234567890ABCDEF1234",
+      "FFFFEEEE000011112222", "0987654321FEDCBA0987"
+    ];
+    if (!mounted) return lines;
+    // On client, we could randomize if needed, but static is safer for stability
+    return lines;
+  }, [mounted]);
 
-  // Correctly handle the percentage display using useTransform
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const percentage = useTransform(progress, [0, 1], [0, 100]);
-  const displayPercentage = useTransform(percentage, (v) => v.toFixed(4));
+  const displayPercentage = useTransform(percentage, (v: number) => v.toFixed(4));
 
   return (
     <div className="w-full h-full p-12 flex flex-col gap-8">
