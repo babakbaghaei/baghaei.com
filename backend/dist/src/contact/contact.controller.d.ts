@@ -4,7 +4,12 @@ export declare class ContactController {
     private readonly contactService;
     constructor(contactService: ContactService);
     create(createContactDto: CreateContactDto): Promise<{
-        success: boolean;
-        messageId: number;
+        name: string;
+        email: string | null;
+        phone: string;
+        message: string;
+        isRead: boolean;
+        createdAt: Date;
+        id: number;
     }>;
 }

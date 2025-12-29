@@ -26,8 +26,10 @@ export default function SideInfo() {
      </div>
      <div className="space-y-2 text-right">
       <div className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Status</div>
-      <div className="text-[10px] font-black font-en text-green-600 uppercase tracking-widest">Stable_Release</div>
-     </div>
+          <div className="flex items-center gap-3">
+           <div className="text-[10px] font-black font-en text-white uppercase tracking-widest">Stable_Release</div>
+           <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+          </div>     </div>
     </div>
    </div>
   </div>

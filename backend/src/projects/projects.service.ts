@@ -1,18 +1,22 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { SecurityService } from '../security/security.service';
-import { CacheManager } from '../common/interfaces/cache-manager.interface';
 
 @Injectable()
 export class ProjectsService {
+  private cacheManager: Cache;
+
   constructor(
     private prisma: PrismaService,
     private securityService: SecurityService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheManager,
-  ) {}
+    @Inject(CACHE_MANAGER) cacheManager: any,
+  ) {
+    this.cacheManager = cacheManager;
+  }
 
   async findAll() {
     return this.prisma.project.findMany({

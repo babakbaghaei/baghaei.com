@@ -6,6 +6,14 @@ import BackgroundGrid from "@/components/effects/BackgroundGrid";
 import CookieConsent from "@/components/layout/CookieConsent";
 import { RootMobileMenu } from "@/components/layout/RootMobileMenu";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { CommandMenu } from "@/components/ui/CommandMenu";
+import PageTransition from "@/components/effects/PageTransition";
+import CustomCursor from "@/components/effects/CustomCursor";
+import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
+import ProgressBar from "@/components/effects/ProgressBar";
+import Preloader from "@/components/effects/Preloader";
+import BackToTop from "@/components/ui/BackToTop";
+import { Suspense } from "react";
 
 const iransans = localFont({
  src: [
@@ -166,9 +174,18 @@ export default function RootLayout({
       `}
      </Script>
      
+     <Preloader />
      <div className="noise-bg opacity-[0.03] pointer-events-none" />
      <BackgroundGrid />
-     {children}
+     <CustomCursor />
+     <Suspense fallback={null}>
+       <ProgressBar />
+     </Suspense>
+     <PageTransition>
+       {children}
+     </PageTransition>
+     <BackToTop />
+     <CommandMenu />
      <CookieConsent />
      <RootMobileMenu />
     </ThemeProvider>

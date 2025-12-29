@@ -26,7 +26,7 @@ model Project {
   description String
   content     String?
   imageUrl    String?
-  tags        String[]
+  tags        String?
   published   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -47,7 +47,7 @@ model ContactMessage {
 model Service {
   id          Int      @id @default(autoincrement())
   order       Int      @default(0)
-  title       String
+  title       String   @unique
   description String
   iconName    String   // Lucide icon name string
   published   Boolean  @default(true)

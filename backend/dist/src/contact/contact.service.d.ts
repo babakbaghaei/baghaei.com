@@ -1,15 +1,28 @@
-import { PrismaService } from '../prisma/prisma.service';
 import { CreateContactDto } from './dto/create-contact.dto';
-import { TelegramService } from '../notifications/telegram.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { SecurityService } from '../security/security.service';
+import { Queue } from 'bullmq';
 export declare class ContactService {
     private prisma;
-    private telegramService;
     private securityService;
-    private readonly logger;
-    constructor(prisma: PrismaService, telegramService: TelegramService, securityService: SecurityService);
+    private notificationsQueue;
+    constructor(prisma: PrismaService, securityService: SecurityService, notificationsQueue: Queue);
     create(createContactDto: CreateContactDto): Promise<{
-        success: boolean;
-        messageId: number;
+        name: string;
+        email: string | null;
+        phone: string;
+        message: string;
+        isRead: boolean;
+        createdAt: Date;
+        id: number;
     }>;
+    findAll(): Promise<{
+        name: string;
+        email: string | null;
+        phone: string;
+        message: string;
+        isRead: boolean;
+        createdAt: Date;
+        id: number;
+    }[]>;
 }

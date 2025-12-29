@@ -1,0 +1,14 @@
+# *
+User-agent: *
+Allow: /
+
+# *
+User-agent: *
+Disallow: /admin
+Disallow: /api
+
+# Host
+Host: https://baghaei.com
+
+# Sitemaps
+Sitemap: https://baghaei.com/sitemap.xml

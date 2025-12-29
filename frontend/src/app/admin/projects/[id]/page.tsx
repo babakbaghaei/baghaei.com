@@ -29,7 +29,7 @@ export default function EditProjectPage() {
 
  return (
   <div className="min-h-screen bg-black text-white p-8 md:p-20">
-   <div className="max-w-7xl mx-auto space-y-12">
+   <div className="max-w-5xl mx-auto space-y-12">
     <header className="border-b border-white/10 pb-8">
      <h1 className="text-3xl font-black font-display uppercase">ویرایش پروژه</h1>
     </header>

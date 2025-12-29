@@ -268,156 +268,20 @@
             const form = utils.$('#consultation-form');
             if (!form) return;
 
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleSubmit(form);
-            });
-        },
-        
-        initPersianDatePicker(persianDateInput, gregorianDateInput) {
-            if (!persianDateInput || !gregorianDateInput) return;
+            const persianDateInput = utils.$('#consultation-date-persian');
+            const gregorianDateInput = utils.$('#consultation-date');
             
-            // Get tomorrow in Persian date
-            const tomorrow = new persianDate();
-            tomorrow.addDay(1);
-            
-            // Initialize date picker
-            $(persianDateInput).pDatepicker({
-                observer: true,
-                format: 'YYYY/MM/DD',
-                altField: gregorianDateInput,
-                altFormat: 'YYYY-MM-DD',
-                minDate: tomorrow,
-                calendarType: 'persian',
-                timePicker: false,
-                initialValue: false,
-                autoClose: true,
-                calendar: {
-                    persian: {
-                        locale: 'fa',
-                        showHint: true,
-                        selectOtherMonths: false
-                    }
-                },
-                onSelect: (unixDate) => {
-                    if (!unixDate) return;
-                    
-                    const selectedDate = new Date(unixDate);
-                    const dayOfWeek = selectedDate.getDay();
-                    
-                    // Working days: Saturday (6) to Wednesday (3)
-                    // Disable: Thursday (4) and Friday (5)
-                    if (dayOfWeek === 4 || dayOfWeek === 5) {
-                        $(persianDateInput).val('');
-                        $(gregorianDateInput).val('');
-                        this.showMessage('لطفا یک روز کاری انتخاب کنید (شنبه تا چهارشنبه)', 'error', utils.$('#consultation-message'));
-                        // Hide time selection if invalid date
-                        const timeContainer = utils.$('#time-selection-container');
-                        if (timeContainer) {
-                            timeContainer.classList.add('hidden');
-                        }
-                    } else {
-                        // Show time selection container
-                        const timeContainer = utils.$('#time-selection-container');
-                        if (timeContainer) {
-                            timeContainer.classList.remove('hidden');
-                        }
-                        this.handleDateChange($(gregorianDateInput).val());
-                    }
-                },
-                checkDate: (unixDate) => {
-                    if (!unixDate) return false;
-                    const date = new Date(unixDate);
-                    const dayOfWeek = date.getDay();
-                    // Only allow Saturday (6) to Wednesday (3)
-                    return dayOfWeek === 6 || dayOfWeek === 0 || dayOfWeek === 1 || dayOfWeek === 2 || dayOfWeek === 3;
-                },
-                disableDays: [4, 5] // Disable Thursday (4) and Friday (5)
-            });
-            
-            // Make input clickable to open date picker
-            $(persianDateInput).on('click focus', function() {
-                $(this).pDatepicker('show');
-            });
-        }
-                // Fallback: simple text input with manual validation
-                // Make input clickable to trigger date picker if available
-                persianDateInput.addEventListener('click', () => {
-                    // Try to trigger date picker if it exists
-                    if (typeof $ !== 'undefined' && $.fn.pDatepicker) {
-                        $(persianDateInput).pDatepicker('show');
-                    }
-                });
-                
-                persianDateInput.addEventListener('focus', () => {
-                    // Try to trigger date picker if it exists
-                    if (typeof $ !== 'undefined' && $.fn.pDatepicker) {
-                        $(persianDateInput).pDatepicker('show');
-                    } else {
-                        const tomorrow = moment().add(1, 'days');
-                        const tomorrowPersian = moment(tomorrow).format('jYYYY/jMM/jDD');
-                        persianDateInput.placeholder = `حداقل: ${tomorrowPersian}`;
-                    }
-                });
-                
-                persianDateInput.addEventListener('blur', () => {
-                    const persianDate = persianDateInput.value.trim();
-                    if (persianDate && /^\d{4}\/\d{2}\/\d{2}$/.test(persianDate)) {
-                        // Convert Persian to Gregorian
-                        const [year, month, day] = persianDate.split('/').map(Number);
-                        const gregorianDate = moment(`${year}/${month}/${day}`, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
-                        
-                        if (gregorianDate && gregorianDate !== 'Invalid date') {
-                            gregorianDateInput.value = gregorianDate;
-                            const selectedDate = new Date(gregorianDate);
-                            const dayOfWeek = selectedDate.getDay();
-                            
-                            // Working days: Saturday (6) to Wednesday (3)
-                            if (dayOfWeek === 4 || dayOfWeek === 5) {
-                                persianDateInput.value = '';
-                                gregorianDateInput.value = '';
-                                this.showMessage('لطفا یک روز کاری انتخاب کنید (شنبه تا چهارشنبه)', 'error', utils.$('#consultation-message'));
-                                // Hide time selection if invalid date
-                                const timeContainer = utils.$('#time-selection-container');
-                                if (timeContainer) {
-                                    timeContainer.classList.add('hidden');
-                                }
-                            } else {
-                                // Show time selection container
-                                const timeContainer = utils.$('#time-selection-container');
-                                if (timeContainer) {
-                                    timeContainer.classList.remove('hidden');
-                                }
-                                this.handleDateChange(gregorianDate);
-                            }
-                        } else {
-                            persianDateInput.value = '';
-                            this.showMessage('تاریخ نامعتبر است. فرمت صحیح: ۱۴۰۳/۰۷/۱۵', 'error', utils.$('#consultation-message'));
-                        }
-                    }
-                });
+            if (persianDateInput && gregorianDateInput) {
+                this.initPersianDatePicker(persianDateInput, gregorianDateInput);
             }
-            
-            // Fallback: use native date picker and convert
+
+            // Fallback: use native date picker if persian picker not available
             if (gregorianDateInput && !persianDateInput) {
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 gregorianDateInput.min = tomorrow.toISOString().split('T')[0];
                 gregorianDateInput.addEventListener('change', (e) => {
-                    const selectedDate = new Date(e.target.value);
-                    const dayOfWeek = selectedDate.getDay();
-                    // Working days: Saturday (6) to Wednesday (3)
-                    if (dayOfWeek === 4 || dayOfWeek === 5) {
-                        e.target.value = '';
-                        this.showMessage('لطفا یک روز کاری انتخاب کنید (شنبه تا چهارشنبه)', 'error', utils.$('#consultation-message'));
-                    } else {
-                        // Show time selection container
-                        const timeContainer = utils.$('#time-selection-container');
-                        if (timeContainer) {
-                            timeContainer.classList.remove('hidden');
-                        }
-                        this.handleDateChange(e.target.value);
-                    }
+                    this.handleDateChange(e.target.value);
                 });
             }
 
@@ -434,6 +298,46 @@
                 e.preventDefault();
                 this.handleSubmit(form);
             });
+        },
+        
+        initPersianDatePicker(persianDateInput, gregorianDateInput) {
+            if (!persianDateInput || !gregorianDateInput) return;
+            
+            // Get tomorrow in Persian date
+            const tomorrow = new persianDate();
+            tomorrow.addDay(1);
+            
+            // Initialize date picker if library is available
+            if (typeof $ !== 'undefined' && $.fn.pDatepicker) {
+                $(persianDateInput).pDatepicker({
+                    observer: true,
+                    format: 'YYYY/MM/DD',
+                    altField: gregorianDateInput,
+                    altFormat: 'YYYY-MM-DD',
+                    minDate: tomorrow,
+                    calendarType: 'persian',
+                    timePicker: false,
+                    initialValue: false,
+                    autoClose: true,
+                    calendar: {
+                        persian: {
+                            locale: 'fa',
+                            showHint: true,
+                            selectOtherMonths: false
+                        }
+                    },
+                    onSelect: (unixDate) => {
+                        if (!unixDate) return;
+                        this.handleDateChange($(gregorianDateInput).val());
+                    }
+                });
+            } else {
+                // Manual fallback listeners
+                persianDateInput.addEventListener('focus', () => {
+                    const tom = moment().add(1, 'days').format('jYYYY/jMM/jDD');
+                    persianDateInput.placeholder = `حداقل: ${tom}`;
+                });
+            }
         },
 
         async handleDateChange(selectedDate) {

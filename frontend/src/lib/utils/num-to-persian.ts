@@ -11,14 +11,14 @@ const levels = ["", "هزار", "میلیون", "میلیارد", "تریلیو�
 export const numToPersian = (num: number | string): string => {
  if (num === 0 || num === "0") return "صفر";
  
- let n = typeof num === "string" ? parseInt(num.replace(/,/g, "")) : num;
+ const n = typeof num === "string" ? parseInt(num.replace(/,/g, "")) : num;
  if (isNaN(n)) return "";
  
- const splitNumber = (num: number): number[] => {
-  let parts = [];
-  while (num > 0) {
-   parts.push(num % 1000);
-   num = Math.floor(num / 1000);
+ const splitNumber = (number: number): number[] => {
+  const parts = [];
+  while (number > 0) {
+   parts.push(number % 1000);
+   number = Math.floor(number / 1000);
   }
   return parts;
  };

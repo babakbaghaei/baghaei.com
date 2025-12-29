@@ -8,57 +8,54 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ContactService_1;
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContactService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
-const telegram_service_1 = require("../notifications/telegram.service");
 const security_service_1 = require("../security/security.service");
-let ContactService = ContactService_1 = class ContactService {
+const bullmq_1 = require("@nestjs/bullmq");
+const bullmq_2 = require("bullmq");
+let ContactService = class ContactService {
     prisma;
-    telegramService;
     securityService;
-    logger = new common_1.Logger(ContactService_1.name);
-    constructor(prisma, telegramService, securityService) {
+    notificationsQueue;
+    constructor(prisma, securityService, notificationsQueue) {
         this.prisma = prisma;
-        this.telegramService = telegramService;
         this.securityService = securityService;
+        this.notificationsQueue = notificationsQueue;
     }
     async create(createContactDto) {
-        try {
-            const sanitizedData = this.securityService.sanitizeInput(createContactDto);
-            const message = await this.prisma.contactMessage.create({
-                data: {
-                    name: sanitizedData.name,
-                    email: sanitizedData.email,
-                    phone: sanitizedData.phone,
-                    message: sanitizedData.message,
-                },
-            });
-            this.logger.log(`New contact message received from ${sanitizedData.name}`);
-            const telegramMsg = `
-<b>🚀 درخواست همکاری جدید</b>
-<b>نام:</b> ${sanitizedData.name}
-<b>شماره:</b> ${sanitizedData.phone}
-<b>ایمیل:</b> ${sanitizedData.email || 'ارائه نشده'}
-<b>پیام:</b>
-${sanitizedData.message}
-      `;
-            await this.telegramService.sendMessage(telegramMsg);
-            return { success: true, messageId: message.id };
-        }
-        catch (error) {
-            this.logger.error(`Failed to save contact message: ${error.message}`, error.stack);
-            throw new common_1.InternalServerErrorException(`Could not save message: ${error.message}`);
-        }
+        const sanitizedData = this.securityService.sanitizeInput(createContactDto);
+        const message = await this.prisma.contactMessage.create({
+            data: sanitizedData,
+        });
+        await this.notificationsQueue.add('contact-message', {
+            name: message.name,
+            email: message.email,
+            phone: message.phone,
+            message: message.message,
+        }, {
+            attempts: 3,
+            backoff: 5000,
+            removeOnComplete: true,
+        });
+        return message;
+    }
+    async findAll() {
+        return this.prisma.contactMessage.findMany({
+            orderBy: { createdAt: 'desc' },
+        });
     }
 };
 exports.ContactService = ContactService;
-exports.ContactService = ContactService = ContactService_1 = __decorate([
+exports.ContactService = ContactService = __decorate([
     (0, common_1.Injectable)(),
+    __param(2, (0, bullmq_1.InjectQueue)('notifications')),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        telegram_service_1.TelegramService,
-        security_service_1.SecurityService])
+        security_service_1.SecurityService, typeof (_a = typeof bullmq_2.Queue !== "undefined" && bullmq_2.Queue) === "function" ? _a : Object])
 ], ContactService);
 //# sourceMappingURL=contact.service.js.map

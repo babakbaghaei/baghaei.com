@@ -5,7 +5,8 @@ import { useInView } from 'framer-motion';
 import { Section, Heading } from '../ui/Layout';
 import { toPersianDigits } from '@/lib/utils/format';
 import { StatItem } from '../ui/StatItem';
-import GlobalUniverse from '@/components/effects/GlobalUniverse';
+
+import EngineeringVisual from '@/components/effects/EngineeringVisual';
 
 const stats = [
  { label: 'شرکت بزرگ', value: '+۵' },
@@ -15,30 +16,42 @@ const stats = [
 
 export default function Philosophy() {
  const containerRef = useRef(null);
+ const isInView = useInView(containerRef, { amount: 0.1 });
  
  // Counter logic - Pure state based to avoid NaN/Hydration issues
- const [years, setYears] = useState(0);
- const isVisible = useInView(containerRef, { amount: 0.3, once: false });
+  const [years, setYears] = useState(0);
 
- useEffect(() => {
-  let interval: NodeJS.Timeout;
-  if (isVisible) {
-   interval = setInterval(() => {
-    setYears(prev => (prev < 10 ? prev + 1 : 10));
-   }, 80);
-  } else {
-   setYears(0);
-  }
-  return () => clearInterval(interval);
- }, [isVisible]);
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isInView) {
+      let start = 0;
+      const end = 10;
+      interval = setInterval(() => {
+        if (start < end) {
+          start += 1;
+          setYears(start);
+        } else {
+          clearInterval(interval);
+        }
+      }, 80);
+    } else {
+      // Reset safely using a timeout to avoid synchronous setState warning
+      const timeout = setTimeout(() => setYears(0), 0);
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+    return () => clearInterval(interval);
+  }, [isInView]);
 
  const yearsDisplay = `${toPersianDigits(years)}+`;
 
  return (
-  <Section id="philosophy" className="!py-0 min-h-screen border-y border-border bg-background select-none overflow-visible relative" containerClassName="h-full min-h-screen flex items-center justify-center py-20 relative">
+  <Section id="philosophy" className="!py-0 min-h-[80vh] border-y border-border bg-background select-none overflow-hidden relative" containerClassName="h-full flex items-center justify-center py-16 relative">
    
-   <div ref={containerRef} className="w-full flex flex-col lg:flex-row items-center gap-20 relative z-40 pointer-events-none">
-    <div className="lg:w-[50%] space-y-12 pointer-events-auto">
+   <div ref={containerRef} className="w-full flex flex-col lg:flex-row items-center gap-12 relative z-40">
+    <div className="lg:w-[50%] space-y-10">
      <Heading align="right" subtitle="از مرز کدها">مهندسی فراتر</Heading>
      <p className="text-xl md:text-2xl font-sans text-muted-foreground leading-relaxed max-w-2xl text-justify text-right">
       ما معتقدیم نرم‌افزار ابزار نیست؛ زیرساخت آینده است. هر خط کد، یک تصمیم راهبردی برای پایداری برند شماست. در گروه بقایی، هنر طراحی و قدرت مهندسی با هم ترکیب می‌شوند تا سیستم‌هایی خلق شوند که در مقیاس‌های میلیونی بدون وقفه عمل می‌کنند.
@@ -49,9 +62,9 @@ export default function Philosophy() {
      </div>
     </div>
 
-    {/* Right side with Solar System */}
-    <div className="lg:w-[50%] flex items-center justify-center relative min-h-[600px] pointer-events-none z-[50] overflow-visible">
-      <GlobalUniverse />
+    {/* Left side with Engineering Visual */}
+    <div className="lg:w-[50%] flex items-center justify-center relative min-h-[500px] z-[50]">
+      <EngineeringVisual />
     </div>
    </div>
   </Section>

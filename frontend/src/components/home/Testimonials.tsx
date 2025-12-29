@@ -77,7 +77,7 @@ export default function Testimonials() {
     glowColor={t.color}
     roundedClass="rounded-[2.5rem] rounded-bl-lg"
     className="flex-1"
-    bgClassName="!bg-[#007AFF] dark:!bg-[#005CBD]"
+    bgClassName="!bg-zinc-900/80"
     maskedContent={<ReactiveQuote />}
    >
     <p 
@@ -89,9 +89,9 @@ export default function Testimonials() {
    </Card>
 
    {/* Sender Info - Avatar to the Left */}
-   <div className="mt-6 flex flex-row-reverse items-center justify-start gap-4 px-4 w-full">
+   <div className="mt-6 flex flex-row-reverse items-center justify-start gap-3 px-2 w-full">
     <div 
-    className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-white shrink-0 shadow-lg bg-zinc-500"
+    className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-white shrink-0 shadow-lg bg-zinc-800"
     >
     <User className="w-5 h-5" />
     </div>

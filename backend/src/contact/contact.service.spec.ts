@@ -63,7 +63,9 @@ describe('ContactService', () => {
 
     const result = await service.create(dto);
 
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(securityService.sanitizeInput).toHaveBeenCalledWith(dto);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(prismaService.contactMessage.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         name: sanitizedDto.name,

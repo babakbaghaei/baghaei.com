@@ -1,76 +1,37 @@
-'use client';
-
 import React from 'react';
+import { getAllPosts } from '@/lib/blog';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Section, Heading } from '@/components/ui/Layout';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { ArrowLeft, Clock, User } from 'lucide-react';
-import Link from 'next/link';
+import BackgroundGrid from '@/components/ui/effects/BackgroundGrid';
+import BlogList from '@/components/blog/BlogList';
 
-const blogPosts = [
- {
-  id: 1,
-  title: 'معماری میکروسرویس در مقیاس میلیونی',
-  excerpt: 'چگونه توانستیم زیرساختی طراحی کنیم که بیش از ۵ میلیون درخواست روزانه را بدون وقفه هندل کند.',
-  date: '۲ دی ۱۴۰۴',
-  author: 'بابک بقایی',
-  category: 'Architecture',
-  readTime: '۱۲ دقیقه'
- },
- {
-  id: 2,
-  title: 'آینده هوش مصنوعی در توسعه نرم‌افزار',
-  excerpt: 'بررسی تاثیر مدل‌های زبانی بزرگ بر فرآیند کدنویسی و مهندسی نرم‌افزار در سال ۲۰۲۶.',
-  date: '۲۸ آذر ۱۴۰۴',
-  author: 'بابک بقایی',
-  category: 'AI',
-  readTime: '۸ دقیقه'
- }
-];
+export const metadata = {
+  title: 'وبلاگ | گروه فناوری بقایی',
+  description: 'تجربیات، تحلیل‌ها و دانش فنی ما در مسیر خلق سیستم‌های پیشرفته.',
+};
 
-export default function BlogPage() {
- return (
-  <main className="min-h-screen bg-background text-foreground">
-   <Navbar />
-   
-   <Section className="pt-48">
-    <Heading subtitle="بینش و دانش">وبلاگ</Heading>
-    
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-20">
-     {blogPosts.map((post) => (
-      <Card key={post.id} className="group cursor-pointer hover:border-primary/50 transition-colors">
-       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground font-display">
-          {post.category}
-         </span>
-         <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-display">
-          <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {post.readTime}</span>
-          <span className="flex items-center gap-1"><User className="w-3 h-3" /> {post.author}</span>
-         </div>
+export default async function BlogPage() {
+  const posts = await getAllPosts();
+
+  return (
+    <main className="min-h-screen bg-background text-foreground relative overflow-hidden flex flex-col">
+      <BackgroundGrid />
+      <Navbar />
+      
+      <section className="pt-32 pb-20 px-6 max-w-5xl mx-auto w-full z-10 flex-grow">
+        <div className="mb-16">
+          <h1 className="text-5xl md:text-7xl font-black font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
+            وبلاگ تخصصی
+          </h1>
+          <p className="text-xl text-zinc-400 max-w-2xl font-display">
+            تجربیات، تحلیل‌ها و دانش فنی ما در مسیر خلق سیستم‌های پیشرفته.
+          </p>
         </div>
-        
-        <h3 className="text-3xl font-bold font-display leading-tight group-hover:text-primary transition-colors">
-         {post.title}
-        </h3>
-        
-        <p className="text-muted-foreground font-sans leading-relaxed text-lg line-clamp-3">
-         {post.excerpt}
-        </p>
-        
-        <div className="pt-6 flex items-center gap-4 text-xs font-black uppercase text-foreground font-display">
-         <span>مطالعه مقاله</span>
-         <ArrowLeft className="w-4 h-4 transition-transform group-hover:translate-x-[-4px]" />
-        </div>
-       </div>
-      </Card>
-     ))}
-    </div>
-   </Section>
 
-   <Footer />
-  </main>
- );
+        <BlogList posts={posts} />
+      </section>
+      
+      <Footer />
+    </main>
+  );
 }

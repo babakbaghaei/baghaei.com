@@ -35,7 +35,7 @@ let AuthController = AuthController_1 = class AuthController {
         return this.authService.register(registerDto);
     }
     async logout(refreshToken) {
-        this.authService.logout(refreshToken);
+        await this.authService.logout(refreshToken);
         return { message: 'Logged out successfully' };
     }
 };

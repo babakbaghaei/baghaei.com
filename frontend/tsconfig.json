@@ -26,6 +26,7 @@
         "./src/*"
       ]
     },
+    "baseUrl": ".",
     "target": "es5"
   },
   "include": [

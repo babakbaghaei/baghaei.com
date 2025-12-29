@@ -13,7 +13,9 @@ interface TextDecryptProps {
 const chars = '-/_*+!<>@#$%&?0123456789';
 
 export default function TextDecrypt({ text, speed = 40, delay = 0, trigger = false, className = "" }: TextDecryptProps) {
- const [displayText, setDisplayText] = useState('');
+ const [displayText, setDisplayText] = useState(() => 
+  trigger ? '' : text.split('').map(() => chars[Math.floor(Math.random() * chars.length)]).join('')
+ );
 
  const decrypt = useCallback(() => {
   let iteration = 0;
@@ -47,10 +49,6 @@ export default function TextDecrypt({ text, speed = 40, delay = 0, trigger = fal
     decrypt();
    }, delay);
    return () => clearTimeout(timer);
-  } else {
-   // Initial encrypted state
-   const encrypted = text.split('').map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
-   setDisplayText(encrypted);
   }
  }, [trigger, text, delay, decrypt]);
 

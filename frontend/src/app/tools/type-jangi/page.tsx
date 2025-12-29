@@ -1,9 +1,25 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Keyboard, RotateCcw, StopCircle, BarChart3, Trophy, HelpCircle } from 'lucide-react';
-import { toPersianDigits } from '@/lib/utils/format';
+import {
+  Keyboard, 
+  RotateCcw, 
+  Trophy, 
+  Target, 
+  Zap, 
+  BarChart3, 
+  History, 
+  Play, 
+  Timer, 
+  Settings, 
+  Info, 
+  ChevronRight,
+  ArrowRight,
+  HelpCircle,
+  StopCircle
+} from 'lucide-react';import { toPersianDigits } from '@/lib/utils/format';
 
 // Categorized Dialogues
 const DIALOGUES_DATA = {
@@ -188,30 +204,28 @@ export default function TypeJangi() {
     return input;
   }, [input, currentDialogue.text]);
 
+  const [currentTime, setCurrentTime] = useState<number>(0);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (startTime && !isGameOver && !isRoundOver) {
       interval = setInterval(() => {
-        const seconds = (Date.now() - startTime) / 1000;
-        // Logic handling if needed
-      }, 1000);
+        setCurrentTime(Date.now());
+      }, 100);
     }
     return () => clearInterval(interval);
   }, [startTime, isGameOver, isRoundOver]);
 
   const stats = useMemo(() => {
-    if (!startTime) return { wpm: 0, accuracy: 0, cpm: 0, time: 0 };
-    // This calculation is purely for rendering based on snapshots, 
-    // but ideally should be driven by a tick for real-time updates.
-    // For now, we accept it might lag slightly or we move time to state.
-    // A better approach:
+    if (!startTime || !currentTime) return { wpm: 0, accuracy: 0, cpm: 0, time: 0 };
+    const durationMinutes = Math.max(0.01, (currentTime - startTime) / 60000);
     return { 
-      wpm: Math.round((correctKeys / 5) / Math.max(0.01, (Date.now() - startTime) / 60000)) || 0,
+      wpm: Math.round((correctKeys / 5) / durationMinutes) || 0,
       accuracy: Math.max(0, Math.round((correctKeys / (totalKeys || 1)) * 100)),
-      cpm: Math.round(correctKeys / Math.max(0.01, (Date.now() - startTime) / 60000)) || 0,
-      time: Math.round((Date.now() - startTime) / 1000)
+      cpm: Math.round(correctKeys / durationMinutes) || 0,
+      time: Math.round((currentTime - startTime) / 1000)
     };
-  }, [startTime, correctKeys, totalKeys, input]); // Added input to trigger re-calc on typing
+  }, [startTime, currentTime, correctKeys, totalKeys]);
 
   const advice = useMemo(() => {
     if (!isGameOver) return "";
@@ -344,9 +358,9 @@ export default function TypeJangi() {
         </AnimatePresence>
 
         <div className="mt-32 text-center pb-20">
-          <a href="/" className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors uppercase flex items-center justify-center gap-4 group">
+          <Link href="/" className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors uppercase flex items-center justify-center gap-4 group">
             <div className="w-12 h-px bg-border group-hover:w-16 transition-all" />BAGHAEI TECH<div className="w-12 h-px bg-border group-hover:w-16 transition-all" />
-          </a>
+          </Link>
         </div>
       </div>
     </main>

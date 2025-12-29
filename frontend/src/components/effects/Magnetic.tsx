@@ -1,87 +1,37 @@
 'use client';
 
-import React, { useRef, useCallback, useEffect } from 'react'
-import { motion, useSpring } from 'framer-motion';
+import React, { useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 
-export default function Magnetic({ children, intensity = 0.6, disabled = false }: { children: React.ReactNode, intensity?: number, disabled?: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isLocalActive = useRef(false);
-  
-  const springConfig = { stiffness: 150, damping: 12, mass: 0.1 };
-  const x = useSpring(0, springConfig);
-  const y = useSpring(0, springConfig);
+export default function Magnetic({ children, disabled = false }: { children: React.ReactNode, disabled?: boolean }) {
+    const ref = useRef<HTMLDivElement>(null);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!ref.current || disabled) return;
-    
-    const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    const dx = e.clientX - centerX;
-    const dy = e.clientY - centerY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    // Increased interaction range and strength
-    const triggerRadius = 200; 
-    const snapRadius = 130; 
-
-    if (distance < triggerRadius) {
-      // Stronger pull for the element
-      x.set(dx * intensity);
-      y.set(dy * intensity);
-
-      if (distance < snapRadius) {
-        if (!isLocalActive.current) {
-          isLocalActive.current = true;
-          // Signal the cursor to snap and possibly go behind
-          window.dispatchEvent(new CustomEvent('cursor-magnet', { 
-            detail: { 
-              active: true, 
-              x: centerX + (dx * intensity), 
-              y: centerY + (dy * intensity),
-              w: rect.width,
-              h: rect.height
-            } 
-          }));
-        }
-      } else if (isLocalActive.current) {
-        isLocalActive.current = false;
-        window.dispatchEvent(new CustomEvent('cursor-magnet', { detail: { active: false } }));
-      }
-    } else if (isLocalActive.current) {
-      isLocalActive.current = false;
-      x.set(0);
-      y.set(0);
-      window.dispatchEvent(new CustomEvent('cursor-magnet', { detail: { active: false } }));
-    } else {
-      x.set(0);
-      y.set(0);
+    const handleMouse = (e: React.MouseEvent) => {
+        if (disabled) return;
+        const { clientX, clientY } = e;
+        const { height, width, left, top } = ref.current!.getBoundingClientRect();
+        const middleX = clientX - (left + width / 2);
+        const middleY = clientY - (top + height / 2);
+        setPosition({ x: middleX * 0.3, y: middleY * 0.3 });
     }
-  }, [intensity, x, y]);
 
-  const handleMouseLeave = useCallback(() => {
-    if (isLocalActive.current) {
-      isLocalActive.current = false;
-      window.dispatchEvent(new CustomEvent('cursor-magnet', { detail: { active: false } }));
+    const reset = () => {
+        setPosition({ x: 0, y: 0 });
     }
-    x.set(0);
-    y.set(0);
-  }, [x, y]);
 
-  useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [handleMouseMove]);
+    const { x, y } = position;
 
-  return (
-    <motion.div
-      ref={ref}
-      onMouseLeave={handleMouseLeave}
-      style={{ x, y }}
-      className="inline-block relative z-[10000]" // Keep button above background but below global top-z if needed
-    >
-      {children}
-    </motion.div>
-  )
+    return (
+        <motion.div
+            style={{ position: 'relative' }}
+            ref={ref}
+            onMouseMove={handleMouse}
+            onMouseLeave={reset}
+            animate={{ x, y }}
+            transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+        >
+            {children}
+        </motion.div>
+    )
 }

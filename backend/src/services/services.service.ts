@@ -4,15 +4,19 @@ import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { SecurityService } from '../security/security.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { CacheManager } from '../common/interfaces/cache-manager.interface';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ServicesService {
+  private cacheManager: Cache;
+
   constructor(
     private prisma: PrismaService,
     private securityService: SecurityService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheManager,
-  ) {}
+    @Inject(CACHE_MANAGER) cacheManager: any,
+  ) {
+    this.cacheManager = cacheManager;
+  }
 
   async findAll() {
     return this.prisma.service.findMany({

@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
 @Injectable()
 export class PrismaService
@@ -9,15 +9,21 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   constructor() {
-    // For Prisma 7, we need to use an adapter
-    const connectionString = process.env.DATABASE_URL!;
-    const adapter = new PrismaPg(new Pool({ connectionString }));
-
-    super({ adapter });
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaPg(pool);
+    super({
+      adapter,
+      log: ['error', 'warn'],
+    });
   }
 
   async onModuleInit() {
-    await this.$connect();
+    try {
+      await this.$connect();
+      console.log('Successfully connected to Neon Database via Adapter.');
+    } catch (error) {
+      console.error('Failed to connect to Neon Database:', error.message);
+    }
   }
 
   async onModuleDestroy() {

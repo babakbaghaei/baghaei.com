@@ -4,7 +4,6 @@ import {
   IsOptional,
   IsBoolean,
   IsArray,
-  IsUrl,
 } from 'class-validator';
 
 export class CreateProjectDto {

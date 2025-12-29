@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Copy, Check, RefreshCcw, Printer, Share2, Landmark, Calendar, PenTool, Info } from 'lucide-react';
+import { Copy, Check, RefreshCcw, Printer, Share2, Landmark, Calendar, PenTool, Info, ArrowRight } from 'lucide-react';
 import { numToPersian } from '@/lib/utils/num-to-persian';
 import { toPersianDigits } from '@/lib/utils/format';
 import { Button } from '@/components/ui/Button';
@@ -365,15 +366,11 @@ export default function ChequeNevis() {
 
    <div className="mt-24 text-center pb-20">
 
-    <a href="/" className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors uppercase flex items-center justify-center gap-4 group">
+              <Link href="/" className="inline-flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-sm font-display mb-8">
 
-    <div className="w-12 h-px bg-border group-hover:w-16 transition-all" />
+                <ArrowRight className="w-4 h-4" /> بازگشت به خانه
 
-    BAGHAEI TECH
-
-    <div className="w-12 h-px bg-border group-hover:w-16 transition-all" />
-
-    </a>
+              </Link>
 
    </div>
 

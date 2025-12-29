@@ -1,70 +1,48 @@
-import {
-  Injectable,
-  Logger,
-  InternalServerErrorException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
 import { CreateContactDto } from './dto/create-contact.dto';
-import { TelegramService } from '../notifications/telegram.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { SecurityService } from '../security/security.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class ContactService {
-  private readonly logger = new Logger(ContactService.name);
-
   constructor(
     private prisma: PrismaService,
-    private telegramService: TelegramService,
     private securityService: SecurityService,
+    @InjectQueue('notifications') private notificationsQueue: Queue,
   ) {}
 
   async create(createContactDto: CreateContactDto) {
-    try {
-      // Sanitize input data
+    const sanitizedData = this.securityService.sanitizeInput(createContactDto);
 
-      const sanitizedData = this.securityService.sanitizeInput(
-        createContactDto,
-      ) as CreateContactDto;
+    // 1. Save to DB (Synchronous - Critical)
+    const message = await this.prisma.contactMessage.create({
+      data: sanitizedData as any,
+    });
 
-      const message = await this.prisma.contactMessage.create({
-        data: {
-          name: sanitizedData.name,
+    // 2. Offload Notification to Queue (Asynchronous - Non-blocking)
+    await this.notificationsQueue.add(
+      'contact-message',
+      {
+        name: message.name,
+        email: message.email,
+        phone: message.phone,
+        message: message.message,
+      },
+      {
+        attempts: 3, // Retry 3 times if fails
+        backoff: 5000, // Wait 5s between retries
+        removeOnComplete: true,
+      },
+    );
 
-          email: sanitizedData.email,
+    return message;
+  }
 
-          phone: sanitizedData.phone,
-
-          message: sanitizedData.message,
-        },
-      });
-
-      this.logger.log(
-        `New contact message received from ${sanitizedData.name}`,
-      );
-
-      // Send Telegram Notification
-      const telegramMsg = `
-<b>🚀 درخواست همکاری جدید</b>
-<b>نام:</b> ${sanitizedData.name}
-<b>شماره:</b> ${sanitizedData.phone}
-<b>ایمیل:</b> ${sanitizedData.email || 'ارائه نشده'}
-<b>پیام:</b>
-${sanitizedData.message}
-      `;
-      await this.telegramService.sendMessage(telegramMsg);
-
-      return { success: true, messageId: message.id };
-    } catch (error: any) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      const errorStack = error instanceof Error ? error.stack : '';
-      this.logger.error(
-        `Failed to save contact message: ${errorMessage}`,
-        errorStack,
-      );
-      throw new InternalServerErrorException(
-        `Could not save message: ${errorMessage}`,
-      );
-    }
+  async findAll() {
+    return this.prisma.contactMessage.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
   }
 }

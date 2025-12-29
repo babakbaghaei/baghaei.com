@@ -8,6 +8,8 @@ import { Section, Heading } from '../ui/Layout';
 import { Button } from '../ui/Button';
 import Magnetic from '@/components/effects/Magnetic';
 import { useSound } from '@/lib/utils/sounds';
+import { toPersianDigits } from '@/lib/utils/format';
+import confetti from 'canvas-confetti';
 
 export default function Contact() {
  const [isPending, startTransition] = useTransition();
@@ -20,17 +22,22 @@ export default function Contact() {
 
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
  e.preventDefault();
- const formData = new FormData(e.currentTarget);
+ const form = e.currentTarget;
+ const formData = new FormData(form);
  
  startTransition(async () => {
   const result = await submitContactForm(formData);
   if (result.success) {
-  setStatus('success');
-  play('pop');
-  setTimeout(() => setStatus('idle'), 5000);
-  (e.target as HTMLFormElement).reset();
+   setStatus('success');
+   form.reset();
+   confetti({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#ffffff', '#000000', '#cccccc']
+   });
   } else {
-  setStatus('error');
+   setStatus('error');
   }
  });
  };
@@ -85,7 +92,7 @@ export default function Contact() {
     className="px-12 py-6 text-lg"
     rightIcon={
      status === 'success' ? (
-     <Check className="w-5 h-5 text-green-800" strokeWidth={3} />
+     <Check className="w-5 h-5 text-black" strokeWidth={3} />
      ) : (
      <Send className="w-5 h-5" />
      )
@@ -101,7 +108,7 @@ export default function Contact() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
-      className="flex items-center gap-3 text-green-600 dark:text-green-400 font-medium"
+      className="flex items-center gap-3 text-zinc-400 font-medium"
      >
       <div className="w-2 h-2 rounded-full bg-current animate-pulse" />
       <p>پیام شما با موفقیت دریافت شد. به زودی با شما تماس خواهیم گرفت.</p>

@@ -45,6 +45,39 @@ const TOOLS_DATA: Project[] = [
     borderColor: 'rgba(139, 92, 246, 0.8)',
     isLocked: false,
     href: '/tools/spin-win'
+  },
+  {
+    id: 104,
+    title: 'رهگیری عادت',
+    category: 'بهره‌وری',
+    role: 'مدیریت روتین',
+    desc: 'سیستم هوشمند برای ثبت و پیگیری عادت‌های روزانه و تحلیل روند پیشرفت فردی.',
+    metrics: [{ label: 'وضعیت', value: 'آزمایشی' }, { label: 'تحلیل', value: 'دقیق' }],
+    color: 'rgba(34, 197, 94, 0.2)',
+    borderColor: 'rgba(34, 197, 94, 0.8)',
+    isLocked: true
+  },
+  {
+    id: 105,
+    title: 'ژورنال نویسی',
+    category: 'ذهن‌آگاهی',
+    role: 'ثبت افکار',
+    desc: 'فضایی امن و مینیمال برای نوشتن افکار روزانه و مدیریت سلامت روان با استفاده از متدهای مدرن.',
+    metrics: [{ label: 'امنیت', value: 'بالا' }, { label: 'رابط', value: 'آرامش' }],
+    color: 'rgba(236, 72, 153, 0.2)',
+    borderColor: 'rgba(236, 72, 153, 0.8)',
+    isLocked: true
+  },
+  {
+    id: 106,
+    title: 'کی سیکس پکس در میارم؟',
+    category: 'سلامت و تناسب',
+    role: 'محاسبه‌گر زمان',
+    desc: 'ابزاری سرگرم‌کننده و علمی برای تخمین زمان رسیدن به شکم شش‌تکه بر اساس شاخص‌های بدنی.',
+    metrics: [{ label: 'دقت', value: 'تخمینی' }, { label: 'انگیزه', value: '۱۰۰٪' }],
+    color: 'rgba(249, 115, 22, 0.2)',
+    borderColor: 'rgba(249, 115, 22, 0.8)',
+    isLocked: true
   }
 ];
 
@@ -71,20 +104,20 @@ export default function Projects() {
  };
 
  return (
- <Section id="projects" className="border-t border-border overflow-visible !pb-20">
-  <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+ <Section id="projects" className="border-t border-border overflow-visible !pb-fib-55">
+  <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-fib-34 -mt-fib-34 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
   <Box className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
   </motion.div>
 
   <Heading subtitle="منتخب">پروژه‌های</Heading>
 
-  <div className="relative group/projects-container mb-12 -mr-2 md:-mr-4">
+  <div className="relative group/projects-container mb-fib-34 -mr-fib-5 md:-mr-fib-8">
   {/* Scroller Fades */}
   <div 
-   className={`absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} 
+   className={`absolute inset-y-0 right-0 w-fib-55 bg-gradient-to-l from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} 
   />
   <div 
-   className={`absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} 
+   className={`absolute inset-y-0 left-0 w-fib-55 bg-gradient-to-r from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} 
   />
 
   <div 
@@ -108,15 +141,15 @@ export default function Projects() {
   </div>
   </div>
 
-  {/* Tools Section */}
-  <div className="w-full mt-0 mb-0 relative z-10 -mx-1 md:-mx-2">
+  {/* Tools Section - Increased margin-top and updated gap */}
+  <div className="w-full mt-24 mb-0 relative z-10">
   <div className="flex items-center gap-6 mb-12 opacity-50 px-1 md:px-2">
    <div className="h-[1px] bg-border flex-1" />
    <h4 className="text-muted-foreground font-display text-xs md:text-sm uppercase font-bold">ابزارها</h4>
    <div className="h-[1px] bg-border flex-1" />
   </div>
   
-  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
    {TOOLS_DATA.map(tool => (
    <div 
     key={tool.id} 

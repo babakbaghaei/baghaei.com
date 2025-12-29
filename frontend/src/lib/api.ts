@@ -6,16 +6,18 @@ const getAuthHeader = (): Record<string, string> => {
  return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
+const BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '') + '/api/v1';
+
 export const api = {
  async get(endpoint: string) {
-  const res = await fetch(`http://127.0.0.1:8000${endpoint}`, {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
    headers: { ...getAuthHeader() },
   });
-  return res.json();
+  return res.json() as Promise<any>;
  },
 
- async post(endpoint: string, data: any) {
-  const res = await fetch(`http://127.0.0.1:8000${endpoint}`, {
+ async post<T>(endpoint: string, data: T) {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
    method: 'POST',
    headers: {
     'Content-Type': 'application/json',
@@ -23,11 +25,11 @@ export const api = {
    },
    body: JSON.stringify(data),
   });
-  return res.json();
+  return res.json() as Promise<any>;
  },
 
- async put(endpoint: string, data: any) {
-  const res = await fetch(`http://127.0.0.1:8000${endpoint}`, {
+ async put<T>(endpoint: string, data: T) {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
    method: 'PUT',
    headers: {
     'Content-Type': 'application/json',
@@ -35,14 +37,14 @@ export const api = {
    },
    body: JSON.stringify(data),
   });
-  return res.json();
+  return res.json() as Promise<any>;
  },
 
  async delete(endpoint: string) {
-  const res = await fetch(`http://127.0.0.1:8000${endpoint}`, {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
    method: 'DELETE',
    headers: { ...getAuthHeader() },
   });
-  return res.json();
+  return res.json() as Promise<any>;
  },
 };

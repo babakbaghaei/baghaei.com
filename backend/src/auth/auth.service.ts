@@ -31,7 +31,7 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     if (user && (await bcrypt.compare(pass, user.password))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
@@ -72,7 +72,7 @@ export class AuthService {
     });
   }
 
-  async logout(refreshToken: string): Promise<void> {
+  async logout(): Promise<void> {
     this.logger.log('User logged out');
   }
 }

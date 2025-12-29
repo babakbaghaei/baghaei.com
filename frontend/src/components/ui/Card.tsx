@@ -10,10 +10,17 @@ interface CardContextType {
 
 const CardContext = createContext<CardContextType | null>(null);
 
+/**
+ * Hook to access card tilt values.
+ * Returns zeros if used outside of a Card component.
+ */
 export const useCardTilt = () => {
- const context = useContext(CardContext);
- if (!context) return { tiltX: useMotionValue(0), tiltY: useMotionValue(0) };
- return context;
+  const context = useContext(CardContext);
+  const fallbackX = useMotionValue(0);
+  const fallbackY = useMotionValue(0);
+  
+  if (!context) return { tiltX: fallbackX, tiltY: fallbackY };
+  return context;
 };
 
 interface CardProps {
@@ -62,13 +69,12 @@ export const Card: React.FC<CardProps> = ({
   return Math.min(d * 2.5, 1);
  });
 
- const colorA = glowColor;
  const colorB = useTransform(contrastFactor, [0, 1], [glowColor, 'rgba(255,255,255,0.2)']);
 
  const innerBackground = useMotionTemplate`linear-gradient(
   ${sheenAngle}deg, 
-  ${colorA} 0%, 
-  ${colorA} 50%,
+  ${glowColor} 0%, 
+  ${glowColor} 50%,
   ${colorB} 100%
  )`;
 
@@ -116,7 +122,7 @@ export const Card: React.FC<CardProps> = ({
 
   window.addEventListener('mousemove', onMouseMove, { passive: true });
   return () => window.removeEventListener('mousemove', onMouseMove);
- }, [isTouchDevice, isHoverable]);
+ }, [isTouchDevice, isHoverable, innerGlowOpacity, borderOpacity, scale, tiltX, tiltY, mouseX, mouseY]);
 
  return (
   <CardContext.Provider value={{ tiltX, tiltY }}>

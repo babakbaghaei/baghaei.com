@@ -1,3 +1,7 @@
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+dotenv.config({ path: path.join(__dirname, '../../../.env') });
+
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -52,4 +56,4 @@ async function bootstrap() {
     console.log(`Swagger documentation: http://localhost:${port}/api/docs`);
   }
 }
-bootstrap();
+void bootstrap();

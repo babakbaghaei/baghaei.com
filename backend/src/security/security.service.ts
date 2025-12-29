@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
-import mongoSanitize from 'express-mongo-sanitize';
 import hpp from 'hpp';
 import validator from 'validator';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -57,9 +56,9 @@ export class SecurityService {
     );
 
     /*
-    // Sanitize data to prevent mongo injection
+    // Sanitize data to prevent mongo injection - REMOVED (Not needed for Postgres and causes query property error)
+    // app.use(mongoSanitize());
     */
-    app.use(mongoSanitize());
 
     /*
     // Prevent parameter pollution
@@ -119,8 +118,9 @@ export class SecurityService {
       const sanitizedObject = Array.isArray(input) ? [] : {};
       for (const key in input) {
         if (Object.prototype.hasOwnProperty.call(input, key)) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (sanitizedObject as any)[key] = this.sanitizeInput((input as any)[key]);
+          (sanitizedObject as any)[key] = this.sanitizeInput(
+            (input as any)[key],
+          );
         }
       }
       return sanitizedObject as T;

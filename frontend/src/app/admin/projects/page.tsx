@@ -2,97 +2,125 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Edit3, Trash2, ExternalLink, ArrowRight } from 'lucide-react';
-import { api } from '@/lib/api';
+import Image from 'next/image';
+import { Plus, Search, Filter, Edit, Trash2, ExternalLink } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Project } from '@/components/ui/ProjectCard';
+import { api } from '@/lib/api';
 
-export default function AdminProjects() {
- const [projects, setProjects] = useState<Project[]>([]);
- const [loading, setLoading] = useState(true);
+interface Project {
+  id: string | number;
+  title: string;
+  slug: string;
+  category: string;
+  role: string;
+  imageUrl?: string;
+  isLocked: boolean;
+}
 
- useEffect(() => {
-  fetchProjects();
- }, []);
+export default function AdminProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
- const fetchProjects = async () => {
-  try {
-   const res = await api.get('/projects');
-   setProjects(res.data || []);
-  } catch (error) {
-   console.error('Failed to fetch projects');
-  } finally {
-   setLoading(false);
-  }
- };
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const res = await api.get('/projects') as { data: Project[] };
+        setProjects(res.data);
+      } catch (error) {
+        console.error('Failed to fetch projects', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    void fetchProjects();
+  }, []);
 
- const handleDelete = async (id: number) => {
-  if (!confirm('آیا از حذف این پروژه مطمئن هستید؟')) return;
-  try {
-   await api.delete(`/projects/${id}`);
-   setProjects(projects.filter(p => p.id !== id));
-  } catch (error) {
-   alert('خطا در حذف پروژه');
-  }
- };
+  const filteredProjects = projects.filter(p => 
+    p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
- return (
-  <div className="min-h-screen bg-black text-white p-8 md:p-20">
-   <div className="max-w-7xl mx-auto space-y-12">
-    <header className="flex justify-between items-center border-b border-white/10 pb-8">
-     <div className="flex items-center gap-4">
-      <Link href="/admin" className="text-zinc-500 hover:text-white transition-colors">
-       <ArrowRight className="w-6 h-6" />
-      </Link>
-      <h1 className="text-3xl font-black font-display uppercase">مدیریت پروژه‌ها</h1>
-     </div>
-     <Link href="/admin/projects/new">
-      <Button leftIcon={<Plus className="w-4 h-4" />}>پروژه جدید</Button>
-     </Link>
-    </header>
+  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center font-display text-white text-lg">در حال دریافت پروژه‌ها...</div>;
 
-    {loading ? (
-     <div className="text-center py-20 text-zinc-500 font-display">در حال بارگذاری...</div>
-    ) : (
-     <div className="grid grid-cols-1 gap-6">
-      {projects.map((project) => (
-       <Card key={project.id} className="group !p-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-         <div className="flex items-center gap-6 text-right w-full">
-          <div 
-           className="w-16 h-16 rounded-2xl shrink-0"
-           style={{ backgroundColor: project.color }}
-          />
-          <div className="space-y-1">
-           <h3 className="text-xl font-bold font-display">{project.title}</h3>
-           <p className="text-zinc-500 text-xs font-display">{project.category}</p>
+  return (
+    <div className="min-h-screen bg-background text-foreground p-8 md:p-20">
+      <div className="max-w-5xl mx-auto space-y-12">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-black font-display uppercase tracking-tight">پروژه‌ها</h1>
+            <p className="text-muted-foreground font-display">مدیریت و ویرایش نمونه کارهای گروه فناوری بقایی</p>
           </div>
-         </div>
-         
-         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-          <Link href={`/admin/projects/${project.id}`}>
-           <button className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all">
-            <Edit3 className="w-4 h-4" />
-           </button>
+          <Link href="/admin/projects/new">
+            <Button className="rounded-full px-8 py-6 gap-2">
+              <Plus className="w-5 h-5" />
+              پروژه جدید
+            </Button>
           </Link>
-          <button 
-           onClick={() => handleDelete(project.id)}
-           className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-red-600 transition-all text-red-500 hover:text-white"
-          >
-           <Trash2 className="w-4 h-4" />
-          </button>
-          <div className="w-px h-8 bg-white/10 mx-2" />
-          <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider ${project.isLocked ? 'bg-zinc-800 text-zinc-500' : 'bg-green-900/30 text-green-500'}`}>
-           {project.isLocked ? 'Locked' : 'Published'}
-          </span>
-         </div>
+        </header>
+
+        <div className="flex gap-4 items-center bg-secondary/30 p-2 rounded-2xl border border-border">
+          <div className="relative flex-1 group">
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
+            <input 
+              type="text" 
+              placeholder="جستجو در نام پروژه یا دسته‌بندی..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-transparent py-3 pr-12 pl-4 outline-none font-display text-sm"
+            />
+          </div>
+          <Button variant="ghost" size="sm" className="rounded-xl px-4">
+            <Filter className="w-4 h-4 mr-2" />
+            فیلتر
+          </Button>
         </div>
-       </Card>
-      ))}
-     </div>
-    )}
-   </div>
-  </div>
- );
+
+        <div className="grid grid-cols-1 gap-6">
+          {filteredProjects.map((project) => (
+            <Card key={project.id} className="group overflow-hidden">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="w-full md:w-48 h-32 rounded-2xl bg-secondary/50 flex items-center justify-center relative overflow-hidden border border-border/50 text-right">
+                  {project.imageUrl ? (
+                    <Image 
+                      src={project.imageUrl} 
+                      alt={project.title} 
+                      fill 
+                      className="object-cover" 
+                    />
+                  ) : (
+                    <ExternalLink className="w-8 h-8 text-muted-foreground/30" />
+                  )}
+                </div>
+                
+                <div className="flex-1 space-y-2 text-right">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-xl font-bold font-display">{project.title}</h3>
+                    <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider ${project.isLocked ? 'bg-zinc-800 text-zinc-500' : 'bg-zinc-100 text-black'}`}>
+                      {project.isLocked ? 'Draft' : 'Published'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground font-display">{project.category} — {project.role}</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <Link href={`/admin/projects/${project.id}`}>
+                    <Button variant="outline" size="sm" className="rounded-xl px-4 py-5 border-border/50 hover:bg-white hover:text-black transition-all">
+                      <Edit className="w-4 h-4 mr-2" />
+                      ویرایش
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="sm" className="rounded-xl px-4 py-5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    حذف
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }

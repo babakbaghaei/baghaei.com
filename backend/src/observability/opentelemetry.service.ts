@@ -40,7 +40,7 @@ export class OpenTelemetryService implements OnModuleInit, OnModuleDestroy {
     });
 
     try {
-      await this.sdk.start();
+      this.sdk.start();
       this.logger.log('OpenTelemetry SDK started successfully');
     } catch (error) {
       this.logger.error(`Failed to start OpenTelemetry SDK: ${error.message}`);
