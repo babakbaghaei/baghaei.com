@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
+import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from 'framer-motion';
 
 const PHILOSOPHY_LAYERS = [
   {
@@ -29,7 +29,7 @@ export default function Philosophy() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 100);
+    const timer = setTimeout(() => setIsMounted(true), 0);
     return () => clearTimeout(timer);
   }, []);
 
@@ -39,7 +39,7 @@ export default function Philosophy() {
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 30,
+    stiffness: 35,
     damping: 20
   });
 
@@ -51,7 +51,7 @@ export default function Philosophy() {
     >
       <div className="sticky top-0 h-screen w-full flex items-center overflow-hidden">
         
-        {/* Background Grid - System Style */}
+        {/* Background Grid */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
           <div className="absolute inset-0" style={{ 
             backgroundImage: 'linear-gradient(#3b82f6 1px, transparent 1px), linear-gradient(90deg, #3b82f6 1px, transparent 1px)',
@@ -61,14 +61,14 @@ export default function Philosophy() {
 
         <div className="relative z-10 w-full max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-12 h-full items-center px-6 md:px-20">
           
-          {/* LEFT: VISUALIZER */}
+          {/* LEFT: VISUALIZER (Data Dashboard) */}
           <div className="hidden lg:flex lg:col-span-7 h-[75vh] relative items-center justify-center bg-white/[0.01] rounded-3xl border border-white/5 overflow-hidden">
              {isMounted && <TechnicalVisualizer progress={smoothProgress} />}
              <div className="absolute top-4 left-4 w-8 h-8 border-t border-l border-primary/30" />
              <div className="absolute bottom-4 right-4 w-8 h-8 border-b border-r border-primary/30" />
           </div>
 
-          {/* RIGHT: TEXT (RTL) */}
+          {/* RIGHT: TEXT CONTENT (Consistent Right-to-Left Animation) */}
           <div className="lg:col-span-5 h-full flex flex-col justify-center items-end text-right relative" dir="rtl">
             {PHILOSOPHY_LAYERS.map((layer, index) => (
               <LayerContent 
@@ -86,16 +86,7 @@ export default function Philosophy() {
         <div className="absolute bottom-10 left-10 md:left-20 z-50 flex items-center gap-4 font-mono text-[9px] text-white/20 uppercase tracking-[0.3em]">
           <div className="flex gap-1">
             {[0, 1, 2].map((i) => (
-              <motion.div 
-                key={i}
-                className="h-1 w-8 rounded-full bg-white/10"
-                style={{ 
-                  backgroundColor: useTransform(smoothProgress, 
-                    [i * 0.33, (i + 0.33) * 1], 
-                    ["rgba(255,255,255,0.1)", "rgba(59,130,246,1)"]
-                  )
-                }}
-              />
+              <ProgressIndicator key={i} index={i} progress={smoothProgress} />
             ))}
           </div>
           <span>Kernel_Sync_Verified</span>
@@ -105,34 +96,56 @@ export default function Philosophy() {
   );
 }
 
+function ProgressIndicator({ index, progress }: { index: number, progress: any }) {
+  const bgColor = useTransform(
+    progress,
+    [index * 0.33, (index + 1) * 0.33],
+    ["rgba(255,255,255,0.1)", "rgba(59,130,246,1)"]
+  );
+  return <motion.div style={{ backgroundColor: bgColor }} className="h-1 w-8 rounded-full" />;
+}
+
 function LayerContent({ layer, index, progress }: { layer: typeof PHILOSOPHY_LAYERS[0], index: number, progress: any }) {
-  // STRICT SEQUENCING:
-  // Layer 0: 0.0 -> 0.33 (Peak at 0.16)
-  // Layer 1: 0.33 -> 0.66 (Peak at 0.50)
-  // Layer 2: 0.66 -> 1.0 (Peak at 0.83)
   const start = index * 0.33;
   const end = (index + 1) * 0.33;
-  const peak = (start + end) / 2;
+  const middle = (start + end) / 2;
 
-  const opacity = useTransform(progress, [start, start + 0.08, end - 0.08, end], [0, 1, 1, 0]);
-  const y = useTransform(progress, [start, peak, end], [40, 0, -40]);
-  const blur = useTransform(progress, [start, start + 0.08, end - 0.08, end], ["10px", "0px", "0px", "10px"]);
+  // DIRECTION: All enter from RIGHT (100%) and exit to LEFT (-100%)
+  const x = useTransform(
+    progress, 
+    [start, start + 0.1, end - 0.1, end], 
+    [200, 0, 0, -200]
+  );
+  
+  const opacity = useTransform(
+    progress, 
+    [start, start + 0.08, end - 0.08, end], 
+    [0, 1, 1, 0]
+  );
+
+  const blur = useTransform(
+    progress, 
+    [start, start + 0.08, end - 0.08, end], 
+    ["10px", "0px", "0px", "10px"]
+  );
+
+  const display = useTransform(progress, (v) => (v >= start - 0.05 && v <= end + 0.05 ? 'block' : 'none'));
 
   return (
     <motion.div
       style={{ 
         opacity, 
-        y, 
+        x, 
         filter: `blur(${blur})`,
-        position: 'absolute',
-        display: useTransform(progress, (v) => (v >= start - 0.05 && v <= end + 0.05 ? 'block' : 'none')) as any
+        display,
+        position: 'absolute'
       }}
       className="space-y-8 max-w-xl"
     >
       <div className="space-y-4">
-        <motion.span className="text-primary font-mono text-sm tracking-[0.4em] bg-primary/10 px-4 py-1 rounded-full inline-block">
+        <span className="text-primary font-mono text-sm tracking-[0.4em] bg-primary/10 px-4 py-1 rounded-full inline-block">
           MODULE_0{index + 1}
-        </motion.span>
+        </span>
         <h2 className="text-7xl md:text-9xl font-display font-black tracking-tighter text-white leading-[0.85]">
           {layer.title}
         </h2>
@@ -155,6 +168,12 @@ function LayerContent({ layer, index, progress }: { layer: typeof PHILOSOPHY_LAY
 }
 
 function TechnicalVisualizer({ progress }: { progress: any }) {
+  const [coords, setCoords] = useState("0.0000");
+  
+  useMotionValueEvent(progress, "change", (latest) => {
+    setCoords((latest * 100).toFixed(4));
+  });
+
   const hexLines = useMemo(() => 
     [...Array(20)].map(() => "0x" + Math.random().toString(16).toUpperCase().substring(2, 24)),
   []);
@@ -167,16 +186,14 @@ function TechnicalVisualizer({ progress }: { progress: any }) {
           <span>LATENCY: 12ms</span>
           <span>UPTIME: 99.99%</span>
         </div>
-        <motion.div>
-          COORDS: {useTransform(progress, (v: number) => (v * 100).toFixed(4))}%
-        </motion.div>
+        <div>COORDS: {coords}%</div>
       </div>
 
-      {/* Central Visual Stage */}
+      {/* Main Screen */}
       <div className="flex-1 relative bg-black/20 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden">
         <LayerVisual progress={progress} />
         
-        {/* Dynamic Data Stream */}
+        {/* Scrolling Hex Data */}
         <div className="absolute right-6 top-0 bottom-0 w-48 overflow-hidden opacity-10 pointer-events-none">
           <motion.div 
             animate={{ y: [0, -400] }}
@@ -188,9 +205,9 @@ function TechnicalVisualizer({ progress }: { progress: any }) {
         </div>
       </div>
 
-      {/* Grid Metrics */}
+      {/* Metrics */}
       <div className="grid grid-cols-4 gap-4 h-20">
-        {[...Array(4)].map((_, i) => (
+        {[0, 1, 2, 3].map((i) => (
           <div key={i} className="bg-white/[0.02] border border-white/5 rounded-xl p-4 flex flex-col justify-between">
             <div className="h-0.5 w-full bg-white/5 overflow-hidden">
               <motion.div 
@@ -208,61 +225,55 @@ function TechnicalVisualizer({ progress }: { progress: any }) {
 }
 
 function LayerVisual({ progress }: { progress: any }) {
-  // Visual assembly logic based on scroll segment
-  const activeLayer = useTransform(progress, [0, 0.33, 0.66, 1], [0, 1, 2, 2]);
-  
   return (
-    <div className="relative w-[400px] h-[400px]">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key="unified-visual"
-          className="absolute inset-0 flex items-center justify-center"
-        >
-          <svg viewBox="0 0 400 400" className="w-full h-full overflow-visible">
-            {/* Core Shell */}
-            <motion.circle 
-              cx="200" cy="200" r="50"
-              stroke="var(--primary)" strokeWidth="2" fill="none"
-              animate={{ r: [50, 55, 50], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            />
+    <div className="relative w-[400px] h-[400px] flex items-center justify-center">
+      <svg viewBox="0 0 400 400" className="w-full h-full overflow-visible">
+        <motion.circle 
+          cx="200" cy="200" r="50"
+          stroke="var(--primary)" strokeWidth="2" fill="none"
+          animate={{ r: [50, 55, 50], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        />
 
-            {/* Segmented Rings - Reaction to scroll */}
-            {[...Array(3)].map((_, i) => (
-              <motion.circle
-                key={i}
-                cx="200" cy="200" r={80 + i * 40}
-                stroke="white" strokeWidth="0.5" strokeDasharray="4 8" fill="none"
-                style={{ 
-                  opacity: useTransform(progress, [(i*0.3), (i+1)*0.3], [0.05, 0.3]),
-                  scale: useTransform(progress, [0, 1], [0.8 + (i*0.1), 1.2])
-                }}
-                animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              />
-            ))}
+        {[0, 1, 2].map((i) => (
+          <OrbitRing key={i} index={i} progress={progress} />
+        ))}
 
-            {/* Assembly Components */}
-            {[...Array(12)].map((_, i) => {
-              const angle = (i * 30) * Math.PI / 180;
-              const x2 = Number((200 + Math.cos(angle) * 160).toFixed(4));
-              const y2 = Number((200 + Math.sin(angle) * 160).toFixed(4));
-              
-              return (
-                <motion.line
-                  key={i}
-                  x1="200" y1="200" x2={x2} y2={y2}
-                  stroke="var(--primary)" strokeWidth="1"
-                  style={{ 
-                    pathLength: useTransform(progress, [0, 1], [0, 1]),
-                    opacity: useTransform(progress, [0, 0.5], [0, 0.2])
-                  }}
-                />
-              );
-            })}
-          </svg>
-        </motion.div>
-      </AnimatePresence>
+        {[...Array(12)].map((_, i) => (
+          <AssemblyLine key={i} index={i} progress={progress} />
+        ))}
+      </svg>
     </div>
+  );
+}
+
+function OrbitRing({ index, progress }: { index: number, progress: any }) {
+  const opacity = useTransform(progress, [(index * 0.3), (index + 1) * 0.3], [0.05, 0.3]);
+  const scale = useTransform(progress, [0, 1], [0.8 + (index * 0.1), 1.2]);
+
+  return (
+    <motion.circle
+      cx="200" cy="200" r={80 + index * 40}
+      stroke="white" strokeWidth="0.5" strokeDasharray="4 8" fill="none"
+      style={{ opacity, scale }}
+      animate={{ rotate: index % 2 === 0 ? 360 : -360 }}
+      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+    />
+  );
+}
+
+function AssemblyLine({ index, progress }: { index: number, progress: any }) {
+  const angle = (index * 30) * Math.PI / 180;
+  const x2 = Number((200 + Math.cos(angle) * 160).toFixed(4));
+  const y2 = Number((200 + Math.sin(angle) * 160).toFixed(4));
+  const pathLength = useTransform(progress, [0, 1], [0, 1]);
+  const opacity = useTransform(progress, [0, 0.5], [0, 0.2]);
+
+  return (
+    <motion.line
+      x1="200" y1="200" x2={x2} y2={y2}
+      stroke="var(--primary)" strokeWidth="1"
+      style={{ pathLength, opacity }}
+    />
   );
 }
