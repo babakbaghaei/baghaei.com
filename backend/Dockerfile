@@ -25,4 +25,6 @@ RUN chmod +x entrypoint.sh
 
 EXPOSE 8000
 
+ENV NODE_ENV=production
+
 CMD ["./entrypoint.sh"]
