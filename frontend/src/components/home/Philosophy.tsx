@@ -39,7 +39,7 @@ export default function Philosophy() {
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 35,
+    stiffness: 30,
     damping: 20
   });
 
@@ -61,14 +61,14 @@ export default function Philosophy() {
 
         <div className="relative z-10 w-full max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-12 h-full items-center px-6 md:px-20">
           
-          {/* LEFT: VISUALIZER (Data Dashboard) */}
+          {/* LEFT: VISUALIZER */}
           <div className="hidden lg:flex lg:col-span-7 h-[75vh] relative items-center justify-center bg-white/[0.01] rounded-3xl border border-white/5 overflow-hidden">
              {isMounted && <TechnicalVisualizer progress={smoothProgress} />}
              <div className="absolute top-4 left-4 w-8 h-8 border-t border-l border-primary/30" />
              <div className="absolute bottom-4 right-4 w-8 h-8 border-b border-r border-primary/30" />
           </div>
 
-          {/* RIGHT: TEXT CONTENT (Consistent Right-to-Left Animation) */}
+          {/* RIGHT: TEXT CONTENT (Strict Right-to-Left Sequence) */}
           <div className="lg:col-span-5 h-full flex flex-col justify-center items-end text-right relative" dir="rtl">
             {PHILOSOPHY_LAYERS.map((layer, index) => (
               <LayerContent 
@@ -106,30 +106,30 @@ function ProgressIndicator({ index, progress }: { index: number, progress: any }
 }
 
 function LayerContent({ layer, index, progress }: { layer: typeof PHILOSOPHY_LAYERS[0], index: number, progress: any }) {
+  // Sequence ranges with "Safe Gaps" to prevent overlapping
+  // Layer 0: 0.00 -> 0.30
+  // Layer 1: 0.35 -> 0.65
+  // Layer 2: 0.70 -> 1.00
   const start = index * 0.33;
   const end = (index + 1) * 0.33;
-  const middle = (start + end) / 2;
-
-  // DIRECTION: All enter from RIGHT (100%) and exit to LEFT (-100%)
-  const x = useTransform(
-    progress, 
+  
+  // DIRECTION: All enter from RIGHT (300px) and exit to LEFT (-300px)
+  const x = useTransform(progress, 
     [start, start + 0.1, end - 0.1, end], 
-    [200, 0, 0, -200]
+    [300, 0, 0, -300]
   );
   
-  const opacity = useTransform(
-    progress, 
+  const opacity = useTransform(progress, 
     [start, start + 0.08, end - 0.08, end], 
     [0, 1, 1, 0]
   );
 
-  const blur = useTransform(
-    progress, 
+  const blur = useTransform(progress, 
     [start, start + 0.08, end - 0.08, end], 
     ["10px", "0px", "0px", "10px"]
   );
 
-  const display = useTransform(progress, (v) => (v >= start - 0.05 && v <= end + 0.05 ? 'block' : 'none'));
+  const display = useTransform(progress, (v) => (v >= start - 0.02 && v <= end + 0.02 ? 'block' : 'none'));
 
   return (
     <motion.div
@@ -180,7 +180,6 @@ function TechnicalVisualizer({ progress }: { progress: any }) {
 
   return (
     <div className="w-full h-full p-16 flex flex-col gap-10">
-      {/* HUD Header */}
       <div className="flex justify-between font-mono text-[10px] text-primary/40 tracking-widest">
         <div className="flex gap-6">
           <span>LATENCY: 12ms</span>
@@ -189,11 +188,9 @@ function TechnicalVisualizer({ progress }: { progress: any }) {
         <div>COORDS: {coords}%</div>
       </div>
 
-      {/* Main Screen */}
       <div className="flex-1 relative bg-black/20 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden">
         <LayerVisual progress={progress} />
         
-        {/* Scrolling Hex Data */}
         <div className="absolute right-6 top-0 bottom-0 w-48 overflow-hidden opacity-10 pointer-events-none">
           <motion.div 
             animate={{ y: [0, -400] }}
@@ -205,7 +202,6 @@ function TechnicalVisualizer({ progress }: { progress: any }) {
         </div>
       </div>
 
-      {/* Metrics */}
       <div className="grid grid-cols-4 gap-4 h-20">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="bg-white/[0.02] border border-white/5 rounded-xl p-4 flex flex-col justify-between">
