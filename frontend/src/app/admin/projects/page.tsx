@@ -42,7 +42,7 @@ export default function AdminProjectsPage() {
     p.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center font-display text-white text-lg">در حال دریافت پروژه‌ها...</div>;
+  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center font-display text-foreground text-lg">در حال دریافت پروژه‌ها...</div>;
 
   return (
     <div className="min-h-screen bg-background text-foreground p-8 md:p-20">
@@ -97,7 +97,7 @@ export default function AdminProjectsPage() {
                 <div className="flex-1 space-y-2 text-right">
                   <div className="flex items-center gap-3">
                     <h3 className="text-xl font-bold font-display">{project.title}</h3>
-                    <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider ${project.isLocked ? 'bg-zinc-800 text-zinc-500' : 'bg-zinc-100 text-black'}`}>
+                    <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider ${project.isLocked ? 'bg-secondary text-muted-foreground' : 'bg-primary text-primary-foreground'}`}>
                       {project.isLocked ? 'Draft' : 'Published'}
                     </span>
                   </div>
@@ -106,12 +106,12 @@ export default function AdminProjectsPage() {
 
                 <div className="flex gap-3">
                   <Link href={`/admin/projects/${project.id}`}>
-                    <Button variant="outline" size="sm" className="rounded-xl px-4 py-5 border-border/50 hover:bg-white hover:text-black transition-all">
+                    <Button variant="outline" size="sm" className="rounded-xl px-4 py-5 border-border/50 hover:bg-foreground hover:text-background transition-all">
                       <Edit className="w-4 h-4 mr-2" />
                       ویرایش
                     </Button>
                   </Link>
-                  <Button variant="ghost" size="sm" className="rounded-xl px-4 py-5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all">
+                  <Button variant="ghost" size="sm" className="rounded-xl px-4 py-5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all">
                     <Trash2 className="w-4 h-4 mr-2" />
                     حذف
                   </Button>

@@ -40,13 +40,13 @@ function ServiceItem({ service, index }: { service: Service, index: number }) {
       style={{ transformStyle: "preserve-3d" }}
     >
       <div className="flex items-center gap-3 group-hover:text-primary transition-colors duration-500" style={{ transform: "translateZ(40px)" }}>
-        <Icon className="w-5 h-5 text-zinc-500 group-hover:text-primary transition-transform duration-500 group-hover:scale-110" strokeWidth={1.2} />
-        <h3 className="text-base md:text-lg font-bold font-display text-zinc-200 group-hover:text-white">
+        <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-transform duration-500 group-hover:scale-110" strokeWidth={1.2} />
+        <h3 className="text-base md:text-lg font-bold font-display text-foreground group-hover:text-primary">
           {service.title}
         </h3>
       </div>
 
-      <p className="text-zinc-500 text-xs md:text-sm font-display leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity duration-500 line-clamp-3 text-right" dir="rtl" style={{ transform: "translateZ(20px)" }}>
+      <p className="text-muted-foreground text-xs md:text-sm font-display leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity duration-500 line-clamp-3 text-right" dir="rtl" style={{ transform: "translateZ(20px)" }}>
         {service.description}
       </p>
     </motion.div>

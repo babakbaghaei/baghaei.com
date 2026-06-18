@@ -45,7 +45,7 @@ export class ServicesService {
     const sanitizedData = this.securityService.sanitizeInput(createServiceDto);
     await this.cacheManager.del('services');
     return this.prisma.service.create({
-      data: sanitizedData as any,
+      data: sanitizedData,
     });
   }
 
@@ -54,7 +54,7 @@ export class ServicesService {
     await this.cacheManager.del('services');
     return this.prisma.service.update({
       where: { id },
-      data: sanitizedData as any,
+      data: sanitizedData,
     });
   }
 

@@ -33,7 +33,7 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
       {posts.map((post) => (
         <motion.div key={post.slug} variants={item}>
           <Link href={`/blog/${post.slug}`}>
-            <SpotlightCard className="h-full flex flex-col p-6 bg-zinc-900/40 border-white/10 group hover:border-primary/50 transition-colors">
+            <SpotlightCard className="h-full flex flex-col p-6 bg-card/40 border-border group hover:border-primary/50 transition-colors">
               <div className="mb-4">
                 <div className="flex gap-2 flex-wrap mb-4">
                   {post.tags.map(tag => (
@@ -45,17 +45,17 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
                 <h2 className="text-2xl font-bold font-display mb-3 group-hover:text-primary transition-colors">
                   {post.title}
                 </h2>
-                <p className="text-zinc-400 text-sm leading-relaxed mb-6 line-clamp-3">
+                <p className="text-muted-foreground text-sm leading-relaxed mb-6 line-clamp-3">
                   {post.excerpt}
                 </p>
               </div>
-              
-              <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-                 <div className="flex items-center gap-4 text-xs text-zinc-500 font-mono">
+
+              <div className="mt-auto flex items-center justify-between pt-4 border-t border-border">
+                 <div className="flex items-center gap-4 text-xs text-muted-foreground font-mono">
                     <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {post.date}</span>
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {post.readingTime}</span>
                  </div>
-                 <ArrowLeft className="w-4 h-4 text-zinc-400 group-hover:-translate-x-1 transition-transform" />
+                 <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:-translate-x-1 transition-transform" />
               </div>
             </SpotlightCard>
           </Link>

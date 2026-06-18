@@ -22,6 +22,7 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    await app.listen(0, '127.0.0.1');
   });
 
   afterAll(async () => {

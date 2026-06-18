@@ -18,7 +18,7 @@ export class ContactService {
 
     // 1. Save to DB (Synchronous - Critical)
     const message = await this.prisma.contactMessage.create({
-      data: sanitizedData as any,
+      data: sanitizedData,
     });
 
     // 2. Offload Notification to Queue (Asynchronous - Non-blocking)

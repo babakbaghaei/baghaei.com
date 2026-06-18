@@ -56,8 +56,8 @@ const ProjectContent = ({ project, horizontal }: { project: Project, horizontal:
           >
             {project.title}
           </h3>
-          <p 
-            className="text-muted-foreground/40 font-sans text-xs md:text-sm leading-relaxed line-clamp-1" 
+          <p
+            className="text-muted-foreground/70 font-sans text-xs md:text-sm leading-relaxed line-clamp-2"
             style={{ transform: "translateZ(30px)" }}
           >
             {project.desc}
@@ -106,13 +106,14 @@ const ProjectContent = ({ project, horizontal }: { project: Project, horizontal:
   );
 };
 
-export const ProjectCard: React.FC<{ project: Project, onClick: () => void, horizontal?: boolean }> = ({ project, onClick, horizontal = false }) => {
+export const ProjectCard: React.FC<{ project: Project, onClick: () => void, horizontal?: boolean, isActive?: boolean }> = ({ project, onClick, horizontal = false, isActive = false }) => {
   return (
-    <Card 
-      glowColor={project.color}
+    <Card
+      glowColor={isActive ? project.borderColor : project.color}
       roundedClass="rounded-[3rem]"
-      className={horizontal ? "p-0" : "p-2 md:p-4"}
+      className={`${horizontal ? "p-0" : "p-2 md:p-4"} ${isActive ? "ring-1 ring-white/10" : ""}`}
       isHoverable={true}
+      colorOnHoverOnly={!isActive}
     >
       <div onClick={onClick} className="h-full w-full cursor-pointer overflow-visible" style={{ transformStyle: "preserve-3d" }}>
         <ProjectContent project={project} horizontal={horizontal} />

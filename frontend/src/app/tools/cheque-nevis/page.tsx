@@ -366,7 +366,7 @@ export default function ChequeNevis() {
 
    <div className="mt-24 text-center pb-20">
 
-              <Link href="/" className="inline-flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-sm font-display mb-8">
+              <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-display mb-8">
 
                 <ArrowRight className="w-4 h-4" /> بازگشت به خانه
 

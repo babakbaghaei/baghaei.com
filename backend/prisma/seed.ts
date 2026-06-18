@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import * as bcrypt from 'bcrypt';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -9,13 +10,20 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log('Starting seeding...');
 
-  // Create Admin User
+  // Create Admin User (password is hashed; required via ADMIN_PASSWORD)
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword) {
+    throw new Error(
+      'ADMIN_PASSWORD environment variable is required to seed the admin account.',
+    );
+  }
+  const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
   await prisma.user.upsert({
     where: { email: 'admin@baghaei.com' },
-    update: {},
+    update: { password: hashedAdminPassword },
     create: {
       email: 'admin@baghaei.com',
-      password: 'admin-password-123', 
+      password: hashedAdminPassword,
       name: 'Babak Baghaei',
       role: 'ADMIN',
     },

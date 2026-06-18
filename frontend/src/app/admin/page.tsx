@@ -49,7 +49,7 @@ export default function AdminDashboard() {
   }, []);
 
   if (loading) {
-    return <div className="min-h-screen bg-background flex items-center justify-center font-display text-white text-lg">در حال اتصال به زیرساخت...</div>;
+    return <div className="min-h-screen bg-background flex items-center justify-center font-display text-foreground text-lg">در حال اتصال به زیرساخت...</div>;
   }
 
   const adminStats = [

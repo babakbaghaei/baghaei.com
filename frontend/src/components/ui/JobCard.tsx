@@ -22,18 +22,18 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
   <div onClick={onClick} className="cursor-pointer h-full">
    <Card 
     className="group space-y-8 h-full flex flex-col"
-    glowColor="rgba(255,255,255,0.03)"
+    glowColor="var(--glass-fill)"
    >
-    <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest font-display">
+    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-display">
      {job.type}
     </div>
-    <h3 className="text-3xl font-bold font-display text-white">
+    <h3 className="text-3xl font-bold font-display text-foreground">
      {job.title}
     </h3>
-    <p className="text-zinc-400 font-sans leading-relaxed">
+    <p className="text-muted-foreground font-sans leading-relaxed">
      {job.desc}
     </p>
-    <div className="pt-8 mt-auto flex items-center gap-4 text-xs font-black uppercase text-white border-t border-white/5 font-display">
+    <div className="pt-8 mt-auto flex items-center gap-4 text-xs font-black uppercase text-foreground border-t border-border font-display">
      <span>ارسال درخواست</span>
      <ArrowLeft className="w-4 h-4 transition-transform group-hover:translate-x-[-4px]" />
     </div>

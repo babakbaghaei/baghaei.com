@@ -25,7 +25,7 @@ export const Button: React.FC<ButtonProps> = ({
  ...props
 }) => {
  const { play } = useSound();
- const baseStyles = "relative flex items-center justify-center gap-3 rounded-full font-display transition-all duration-300 active:scale-95 disabled:opacity-70 overflow-hidden group";
+ const baseStyles = "relative flex items-center justify-center gap-3 rounded-full font-display transition-[transform,background-color,border-color,color,box-shadow] duration-300 active:scale-95 disabled:opacity-70 overflow-hidden group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background";
  
  const sizeStyles = {
   default: "px-8 py-3 text-sm",

@@ -15,9 +15,15 @@ export default function CookieConsent() {
  });
 
  useEffect(() => {
-  // Robust client-side check
+  // Robust client-side check. localStorage can throw in private mode or when
+  // storage is disabled, so guard the read.
   if (typeof window !== 'undefined') {
-   const consent = localStorage.getItem('cookie-consent-v10');
+   let consent: string | null = null;
+   try {
+    consent = localStorage.getItem('cookie-consent-v10');
+   } catch {
+    consent = null;
+   }
    if (!consent) {
     const timer = setTimeout(() => setIsVisible(true), 5000); // 5 second delay
     return () => clearTimeout(timer);
@@ -25,13 +31,21 @@ export default function CookieConsent() {
   }
  }, []);
 
+ const persistConsent = (value: object) => {
+  try {
+   localStorage.setItem('cookie-consent-v10', JSON.stringify(value));
+  } catch {
+   // Ignore storage failures (private mode / disabled storage).
+  }
+ };
+
  const handleAcceptAll = () => {
-  localStorage.setItem('cookie-consent-v10', JSON.stringify({ all: true, ...preferences }));
+  persistConsent({ all: true, ...preferences });
   setIsVisible(false);
  };
 
  const handleSavePreferences = () => {
-  localStorage.setItem('cookie-consent-v10', JSON.stringify(preferences));
+  persistConsent(preferences);
   setIsVisible(false);
  };
 
@@ -43,45 +57,45 @@ export default function CookieConsent() {
      animate={{ y: 0, opacity: 1 }}
      exit={{ y: 100, opacity: 0 }}
      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-     className="fixed bottom-4 left-4 right-4 md:left-12 md:right-auto md:max-w-md z-[9999]"
+     className="fixed bottom-4 left-4 right-4 md:left-6 md:right-auto md:max-w-sm z-[9999]"
     >
-     <div className="bg-zinc-950 border border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden group">
+     <div className="bg-popover border border-border rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden group">
       <div className="relative z-10 space-y-6">
        <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-         <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white">
+         <div className="w-10 h-10 rounded-xl bg-secondary border border-border flex items-center justify-center text-foreground">
           <ShieldCheck className="w-5 h-5" />
          </div>
-         <h3 className="text-base font-bold font-display text-white">تنظیمات داده‌ها</h3>
+         <h3 className="text-base font-bold font-display text-foreground">تنظیمات داده‌ها</h3>
         </div>
-        <button onClick={() => setIsVisible(false)} className="text-zinc-600 hover:text-white transition-colors">
+        <button onClick={() => setIsVisible(false)} className="text-muted-foreground hover:text-foreground transition-colors">
          <X className="w-4 h-4" />
         </button>
        </div>
 
-       <p className="text-zinc-400 text-xs leading-relaxed font-sans text-justify">
-        ما برای بهینه‌سازی تجربه مهندسی شما از داده‌ها استفاده می‌کنیم. می‌توانید انتخاب کنید کدام دسته از کوکی‌ها فعال باشند. اطلاعات بیشتر در <Link href="/privacy" className="text-white underline decoration-white/20">سند حریم خصوصی</Link>.
+       <p className="text-muted-foreground text-xs leading-relaxed font-sans text-justify">
+        ما برای بهینه‌سازی تجربه مهندسی شما از داده‌ها استفاده می‌کنیم. می‌توانید انتخاب کنید کدام دسته از کوکی‌ها فعال باشند. اطلاعات بیشتر در <Link href="/privacy" className="text-foreground underline decoration-border">سند حریم خصوصی</Link>.
        </p>
 
        {isExpanded && (
-        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="space-y-3 pt-2 border-t border-white/5">
-         <div className="flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5">
-          <div className="text-[10px] font-bold text-zinc-300 font-display">کوکی‌های ضروری (غیرقابل تغییر)</div>
-          <div className="w-4 h-4 rounded-full bg-zinc-700" />
+        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="space-y-3 pt-2 border-t border-border">
+         <div className="flex items-center justify-between p-3 bg-secondary rounded-2xl border border-border">
+          <div className="text-[10px] font-bold text-foreground font-display">کوکی‌های ضروری (غیرقابل تغییر)</div>
+          <div className="w-4 h-4 rounded-full bg-muted-foreground" />
          </div>
-         <button 
+         <button
           onClick={() => setPreferences(p => ({ ...p, analytical: !p.analytical }))}
-          className="w-full flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors"
+          className="w-full flex items-center justify-between p-3 bg-secondary rounded-2xl border border-border hover:bg-muted transition-colors"
          >
-          <div className="text-[10px] font-bold text-zinc-300 font-display">تحلیل ترافیک و رفتار</div>
-          <div className={`w-4 h-4 rounded-full transition-colors ${preferences.analytical ? 'bg-white' : 'bg-zinc-800'}`} />
+          <div className="text-[10px] font-bold text-foreground font-display">تحلیل ترافیک و رفتار</div>
+          <div className={`w-4 h-4 rounded-full transition-colors ${preferences.analytical ? 'bg-primary' : 'bg-muted'}`} />
          </button>
-         <button 
+         <button
           onClick={() => setPreferences(p => ({ ...p, functional: !p.functional }))}
-          className="w-full flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors"
+          className="w-full flex items-center justify-between p-3 bg-secondary rounded-2xl border border-border hover:bg-muted transition-colors"
          >
-          <div className="text-[10px] font-bold text-zinc-300 font-display">شخصی‌سازی و عملکرد</div>
-          <div className={`w-4 h-4 rounded-full transition-colors ${preferences.functional ? 'bg-white' : 'bg-zinc-800'}`} />
+          <div className="text-[10px] font-bold text-foreground font-display">شخصی‌سازی و عملکرد</div>
+          <div className={`w-4 h-4 rounded-full transition-colors ${preferences.functional ? 'bg-primary' : 'bg-muted'}`} />
          </button>
         </motion.div>
        )}
@@ -89,13 +103,13 @@ export default function CookieConsent() {
        <div className="flex flex-col gap-3 pt-2">
         <button
          onClick={isExpanded ? handleSavePreferences : handleAcceptAll}
-         className="w-full bg-white !text-black py-3.5 rounded-full !font-black font-display text-xs uppercase hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+         className="w-full bg-primary !text-primary-foreground py-3.5 rounded-full !font-black font-display text-xs uppercase hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(120,120,120,0.1)]"
         >
          {isExpanded ? 'ذخیره تنظیمات' : 'تایید و قبول همه'}
         </button>
         <button
          onClick={() => setIsExpanded(!isExpanded)}
-         className="w-full py-3 text-zinc-500 font-bold font-display text-[10px] flex items-center justify-center gap-2 hover:text-white transition-colors"
+         className="w-full py-3 text-muted-foreground font-bold font-display text-[10px] flex items-center justify-center gap-2 hover:text-foreground transition-colors"
         >
          {isExpanded ? 'بستن تنظیمات' : 'شخصی‌سازی گزینه‌ها'}
          {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}

@@ -28,7 +28,10 @@ export class DashboardController {
   }
 
   @Get('force-seed')
-  @ApiOperation({ summary: 'Seed database via API' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Seed database via API (admin only)' })
   forceSeed() {
     return this.dashboardService.forceSeed();
   }

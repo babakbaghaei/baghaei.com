@@ -20,10 +20,10 @@ export default async function BlogPage() {
       
       <section className="pt-32 pb-20 px-6 max-w-5xl mx-auto w-full z-10 flex-grow">
         <div className="mb-16">
-          <h1 className="text-5xl md:text-7xl font-black font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
+          <h1 className="text-5xl md:text-7xl font-black font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/50">
             وبلاگ تخصصی
           </h1>
-          <p className="text-xl text-zinc-400 max-w-2xl font-display">
+          <p className="text-xl text-muted-foreground max-w-2xl font-display">
             تجربیات، تحلیل‌ها و دانش فنی ما در مسیر خلق سیستم‌های پیشرفته.
           </p>
         </div>

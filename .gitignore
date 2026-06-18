@@ -46,6 +46,8 @@ docker-compose.override.yml
 # Prisma
 *.sqlite
 *.sqlite-journal
+*.db
+*.db-journal
 
 # Husky (optional, usually we commit this but ignore _ contents sometimes)
 #.husky/_

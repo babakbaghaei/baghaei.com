@@ -15,19 +15,22 @@ const ReactiveQuote = () => {
   const filter = useMotionTemplate`drop-shadow(${hX}px ${hY}px 2px rgba(255,255,255,0.1)) drop-shadow(${sX}px ${sY}px 8px rgba(0,0,0,0.8))`;
 
   return (
-    <motion.div className="absolute top-4 right-4 pointer-events-none" style={{ filter }}>
-      <Quote className="w-12 h-12 text-white opacity-[0.2]" />
+    <motion.div aria-hidden="true" className="absolute top-4 right-4 pointer-events-none" style={{ filter }}>
+      <Quote className="w-12 h-12 text-foreground opacity-[0.2]" />
     </motion.div>
   );
 };
 
+// iMessage signature blue (#007AFF) — reassuring, trustworthy bubble tone.
+const IMESSAGE_BLUE = 'rgba(0, 122, 255, 0.18)';
+
 const testimonials = [
-  { id: 1, content: "طراحی سیستم یکپارچه نمایش اطلاعات پرواز فرودگاه کیش، با دقت مهندسی فوق‌العاده و پایداری کامل در شرایط عملیاتی سخت.", author: "سیستم FIDS", company: "Airport Infrastructure", color: '#007AFF' },
-  { id: 2, content: "توسعه پلتفرم باگ‌بانتی ملی برای شناسایی شکاف‌های امنیتی توسط هکرهای کلاه سفید، با امنیتی فراتر از استانداردهای معمول.", author: "پلتفرم راورو", company: "Cyber Security", color: '#007AFF' },
-  { id: 3, content: "طراحی و توسعه بازی موبایل پیکسلی با تمرکز بر تجربه کاربری رقابتی و صداسازی منحصر به فرد که مخاطبان زیادی را جذب کرد.", author: "پیکسل بال", company: "Game Dev", color: '#007AFF' },
-  { id: 4, content: "اولین بازار آنلاین محصولات تازه دریایی با هدف حذف واسطه‌ها و اتصال مستقیم صیاد به مشتری با رابط کاربری مدرن.", author: "پلتفرم مالاتا", company: "E-commerce", color: '#007AFF' },
-  { id: 5, content: "سرویس پوش‌نوتیفیکیشن هوشمند برای وب‌سایت‌ها و اپلیکیشن‌ها با هدف افزایش نرخ بازگشت کاربران در مقیاس میلیونی.", author: "پوشیو", company: "SaaS Platform", color: '#007AFF' },
-  { id: 6, content: "طراحی هویت دیجیتال و پلتفرم مدیریت مشتریان برای یکی از لوکس‌ترین مجموعه‌های ورزشی کشور با رویکرد مینیمالیستی.", author: "باشگاه رویال اقدسیه", company: "Luxury Fitness", color: '#007AFF' }
+  { id: 1, content: "طراحی سیستم یکپارچه نمایش اطلاعات پرواز فرودگاه کیش، با دقت مهندسی فوق‌العاده و پایداری کامل در شرایط عملیاتی سخت.", author: "سیستم FIDS", company: "Airport Infrastructure", color: IMESSAGE_BLUE },
+  { id: 2, content: "توسعه پلتفرم باگ‌بانتی ملی برای شناسایی شکاف‌های امنیتی توسط هکرهای کلاه سفید، با امنیتی فراتر از استانداردهای معمول.", author: "پلتفرم راورو", company: "Cyber Security", color: IMESSAGE_BLUE },
+  { id: 3, content: "طراحی و توسعه بازی موبایل پیکسلی با تمرکز بر تجربه کاربری رقابتی و صداسازی منحصر به فرد که مخاطبان زیادی را جذب کرد.", author: "پیکسل بال", company: "Game Dev", color: IMESSAGE_BLUE },
+  { id: 4, content: "اولین بازار آنلاین محصولات تازه دریایی با هدف حذف واسطه‌ها و اتصال مستقیم صیاد به مشتری با رابط کاربری مدرن.", author: "پلتفرم مالاتا", company: "E-commerce", color: IMESSAGE_BLUE },
+  { id: 5, content: "سرویس پوش‌نوتیفیکیشن هوشمند برای وب‌سایت‌ها و اپلیکیشن‌ها با هدف افزایش نرخ بازگشت کاربران در مقیاس میلیونی.", author: "پوشیو", company: "SaaS Platform", color: IMESSAGE_BLUE },
+  { id: 6, content: "طراحی هویت دیجیتال و پلتفرم مدیریت مشتریان برای یکی از لوکس‌ترین مجموعه‌های ورزشی کشور با رویکرد مینیمالیستی.", author: "باشگاه رویال اقدسیه", company: "Luxury Fitness", color: IMESSAGE_BLUE }
 ];
 
 export default function Testimonials() {
@@ -37,7 +40,7 @@ export default function Testimonials() {
 
   return (
     <Section sectionRef={sectionRef} id="testimonials" className="border-t border-border bg-transparent">
-      <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+      <motion.div aria-hidden="true" style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
         <MessageSquare className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
       </motion.div>
 
@@ -53,19 +56,20 @@ export default function Testimonials() {
             transition={{ type: 'spring', stiffness: 200, damping: 22, delay: index * 0.1 }}
             className="flex flex-col h-full"
           >
-            <Card 
+            <Card
               glowColor={t.color}
               roundedClass="rounded-[2.5rem] rounded-bl-lg"
               className="flex-1"
               maskedContent={<ReactiveQuote />}
+              colorOnHoverOnly
             >
-              <p style={{ transform: "translateZ(30px)" }} className="text-sm md:text-base font-medium font-sans leading-relaxed text-white text-right relative z-10">
+              <p style={{ transform: "translateZ(30px)" }} className="text-sm md:text-base font-medium font-sans leading-relaxed text-foreground text-right relative z-10">
                 «{t.content}»
               </p>
             </Card>
 
             <div className="mt-6 flex flex-row-reverse items-center justify-start gap-3 px-4 w-full">
-              <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-white shrink-0 shadow-lg bg-zinc-800">
+              <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-secondary-foreground shrink-0 shadow-lg bg-secondary">
                 <User className="w-5 h-5" />
               </div>
               <div className="text-right">

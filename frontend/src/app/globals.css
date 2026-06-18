@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 240 20% 98%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -29,10 +29,16 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    /* Glassmorphism effect tokens (light) */
+    --glass-fill: rgba(0, 0, 0, 0.035);
+    --glass-edge: rgba(30, 30, 50, 0.4);
+    --glass-sheen: rgba(255, 255, 255, 0.5);
+    --glass-border: rgba(0, 0, 0, 0.08);
   }
 
   .dark {
-    --background: 20 14.3% 4.1%;
+    --background: 0 0% 0%;
     --foreground: 0 0% 95%;
     --card: 24 9.8% 10%;
     --card-foreground: 0 0% 95%;
@@ -51,6 +57,12 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 0 0% 98%;
+
+    /* Glassmorphism effect tokens (dark) */
+    --glass-fill: rgba(255, 255, 255, 0.08);
+    --glass-edge: rgba(255, 255, 255, 0.8);
+    --glass-sheen: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -97,7 +109,7 @@
 html {
   font-size: clamp(14px, 1.1vw, 18px);
   scroll-behavior: auto !important;
-  background-color: #000000 !important;
+  background-color: hsl(var(--background));
 }
 
 ::selection {
@@ -105,11 +117,26 @@ html {
   color: hsl(var(--primary-foreground));
 }
 
+/* Global keyboard focus ring: keyboard users always get a visible focus
+   indicator, while mouse/touch users are unaffected (:focus-visible). */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
 /* Ultimate Glassmorphism Utility */
 .glass-panel {
   backdrop-filter: blur(12px) saturate(150%);
   -webkit-backdrop-filter: blur(12px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
 }
 
@@ -128,4 +155,18 @@ html {
 .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Accessibility: honor the user's reduced-motion preference.
+   Near-instant durations keep transitionend events firing while
+   removing the heavy motion (sun pulse, tilt, preloader, etc.). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -15,6 +15,20 @@ export class SecurityService {
    * Apply security middleware to the application
    */
   applySecurityMiddleware(app: NestExpressApplication) {
+    // Swagger UI (dev only) relies on inline scripts. In production the API
+    // serves JSON only, so we drop 'unsafe-inline' from scriptSrc to keep the
+    // CSP effective against script injection.
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+    const scriptSrc = [
+      "'self'",
+      'https://www.googletagmanager.com',
+      'https://www.google-analytics.com',
+    ];
+    if (!isProduction) {
+      scriptSrc.push("'unsafe-inline'");
+    }
+
     // Use Helmet to secure HTTP headers
     app.use(
       helmet({
@@ -29,12 +43,7 @@ export class SecurityService {
             ],
             fontSrc: ["'self'", 'fonts.gstatic.com', 'data:'],
             imgSrc: ["'self'", 'data:', 'https:'],
-            scriptSrc: [
-              "'self'",
-              "'unsafe-inline'",
-              'https://www.googletagmanager.com',
-              'https://www.google-analytics.com',
-            ],
+            scriptSrc,
             connectSrc: [
               "'self'",
               'https://api.segment.io',

@@ -24,10 +24,10 @@ export default function Careers() {
  const [selectedJob, setSelectedJob] = useState<any | null>(null);
 
  return (
-  <Section id="careers" className="border-t border-zinc-900">
+  <Section id="careers" className="border-t border-border">
    <Heading subtitle="رشد">فرصت‌های</Heading>
-   
-   <p className="text-zinc-400 max-w-2xl font-sans text-lg md:text-xl leading-relaxed mb-24 text-right ml-auto">
+
+   <p className="text-muted-foreground max-w-2xl font-sans text-lg md:text-xl leading-relaxed mb-24 text-right ml-auto">
     ما همیشه به دنبال استعدادهای درخشان هستیم که مرزهای تکنولوژی را با ما جابجا کنند.
    </p>
 

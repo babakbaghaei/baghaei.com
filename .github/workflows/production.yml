@@ -16,15 +16,19 @@ jobs:
       with:
         node-version: '22'
         cache: 'npm'
+        cache-dependency-path: |
+          package-lock.json
+          backend/package-lock.json
+          frontend/package-lock.json
     
     - name: Install Root Dependencies
-      run: npm install
+      run: npm ci
       
     - name: Backend Lint
-      run: cd backend && npm install --legacy-peer-deps && npm run lint
+      run: cd backend && npm ci --legacy-peer-deps && npm run lint
       
     - name: Frontend Lint
-      run: cd frontend && npm install && npm run lint
+      run: cd frontend && npm ci && npm run lint
 
   backend-testing:
     name: Backend Tests
@@ -38,7 +42,7 @@ jobs:
         cache-dependency-path: backend/package-lock.json
         
     - name: Install Dependencies
-      run: cd backend && npm install --legacy-peer-deps
+      run: cd backend && npm ci --legacy-peer-deps
       
     - name: Generate Prisma Client
       run: cd backend && npx prisma generate
@@ -51,9 +55,31 @@ jobs:
         DATABASE_URL: "file:./test.db"
         JWT_SECRET: "ci-test-secret-key-at-least-32-characters"
 
+  frontend-testing:
+    name: Frontend E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install Dependencies
+      run: cd frontend && npm ci
+
+    - name: Install Playwright Browsers
+      run: cd frontend && npx playwright install --with-deps
+
+    - name: Run E2E Tests
+      run: cd frontend && npm test
+      env:
+        NEXT_PUBLIC_API_URL: "http://localhost:8000"
+
   docker-verification:
     name: Container Build Verify
-    needs: [quality-assurance, backend-testing]
+    needs: [quality-assurance, backend-testing, frontend-testing]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:

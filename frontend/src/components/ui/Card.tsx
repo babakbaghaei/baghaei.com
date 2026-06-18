@@ -26,16 +26,18 @@ interface CardProps {
   isHoverable?: boolean;
   roundedClass?: string;
   bgClassName?: string;
+  colorOnHoverOnly?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
   maskedContent,
   className = "",
-  glowColor = "rgba(255,255,255,0.1)",
+  glowColor = "var(--glass-fill)",
   isHoverable = true,
   roundedClass = "rounded-[3rem]",
-  bgClassName = ""
+  bgClassName = "",
+  colorOnHoverOnly = false
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -50,6 +52,7 @@ export const Card: React.FC<CardProps> = ({
   const scale = useSpring(1, springConfig);
   const innerGlowOpacity = useSpring(0, { stiffness: 200, damping: 35 });
   const borderOpacity = useSpring(0.2, { stiffness: 200, damping: 35 });
+  const colorOpacity = useSpring(colorOnHoverOnly ? 0 : 1, { stiffness: 200, damping: 35 });
 
   // PUSH EFFECT
   const rotateX = useTransform(tiltY, [-0.5, 0.5], [12, -12]);
@@ -60,8 +63,8 @@ export const Card: React.FC<CardProps> = ({
     return (angleRad * 180) / Math.PI;
   });
 
-  const borderBackground = useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.8), ${glowColor} 40%, transparent 100%)`;
-  const innerBackground = useMotionTemplate`linear-gradient(${sheenAngle}deg, rgba(255,255,255,0.05) 0%, transparent 60%)`;
+  const borderBackground = useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, var(--glass-edge), ${glowColor} 40%, transparent 100%)`;
+  const innerBackground = useMotionTemplate`linear-gradient(${sheenAngle}deg, var(--glass-sheen) 0%, transparent 60%)`;
 
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -84,24 +87,33 @@ export const Card: React.FC<CardProps> = ({
       setIsHovered(isMouseOver);
       
       if (isMouseOver) {
-        mouseX.set(rect.width - x); 
+        mouseX.set(rect.width - x);
         mouseY.set(rect.height - y);
         tiltX.set(x / rect.width - 0.5);
         tiltY.set(y / rect.height - 0.5);
         innerGlowOpacity.set(1);
+        if (colorOnHoverOnly) colorOpacity.set(1);
       } else {
         mouseX.set(x);
         mouseY.set(y);
         tiltX.set(0);
         tiltY.set(0);
         innerGlowOpacity.set(0);
+        if (colorOnHoverOnly) colorOpacity.set(0);
       }
       borderOpacity.set(dist < 800 ? (isMouseOver ? 1 : 0.4) : 0.2);
     };
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', onMouseMove);
-  }, [isTouchDevice, isHoverable, innerGlowOpacity, borderOpacity, scale, tiltX, tiltY, mouseX, mouseY]);
+  }, [isTouchDevice, isHoverable, innerGlowOpacity, borderOpacity, scale, tiltX, tiltY, mouseX, mouseY, colorOnHoverOnly, colorOpacity]);
+
+  // Touch devices / non-hoverable cards can't hover, so keep them colored.
+  useEffect(() => {
+    if (colorOnHoverOnly && (isTouchDevice || !isHoverable)) {
+      colorOpacity.set(1);
+    }
+  }, [colorOnHoverOnly, isTouchDevice, isHoverable, colorOpacity]);
 
   return (
     <CardContext.Provider value={{ tiltX, tiltY }}>
@@ -120,16 +132,29 @@ export const Card: React.FC<CardProps> = ({
           }}
           className={`relative w-full h-full ${roundedClass} shadow-2xl`}
         >
-          {/* 1. GLASS BACKGROUND */}
-          <div 
+          {/* 1. GLASS BACKGROUND (neutral by default when colorOnHoverOnly) */}
+          <div
             className={`absolute inset-0 ${roundedClass} ${bgClassName}`}
-            style={{ 
-              background: bgClassName ? undefined : glowColor,
+            style={{
+              background: bgClassName ? undefined : (colorOnHoverOnly ? "var(--glass-fill)" : glowColor),
               backdropFilter: "blur(12px) saturate(150%)",
               WebkitBackdropFilter: "blur(12px) saturate(150%)",
               transform: "translateZ(0px)"
             }}
           />
+
+          {/* 1b. COLOR TINT — fades in on hover (grayscale → color) */}
+          {colorOnHoverOnly && !bgClassName && (
+            <motion.div
+              className={`absolute inset-0 ${roundedClass}`}
+              style={{
+                opacity: colorOpacity,
+                background: glowColor,
+                transform: "translateZ(0px)",
+                pointerEvents: "none"
+              }}
+            />
+          )}
 
           {/* 2. LIGHTING EFFECTS */}
           <div className={`absolute inset-0 ${roundedClass} overflow-hidden pointer-events-none`} style={{ transform: "translateZ(1px)" }}>

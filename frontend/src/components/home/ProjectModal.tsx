@@ -151,7 +151,7 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent z-0" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-[10px] font-mono text-white/5 uppercase tracking-widest">Screenshot_{i + 1}</span>
+                    <span className="text-[10px] font-mono text-foreground/10 uppercase tracking-widest">Screenshot_{i + 1}</span>
                   </div>
                   <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-500" />
                 </motion.div>

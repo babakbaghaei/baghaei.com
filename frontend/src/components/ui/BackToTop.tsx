@@ -44,7 +44,7 @@ export default function BackToTop() {
         >
           <button
             onClick={scrollToTop}
-            className="relative p-4 rounded-full bg-zinc-900/80 backdrop-blur-xl border border-white/10 text-white shadow-2xl hover:scale-110 active:scale-95 transition-all group"
+            className="relative p-4 rounded-full bg-card/80 backdrop-blur-xl border border-border text-foreground shadow-2xl hover:scale-110 active:scale-95 transition-all group"
           >
             {/* Circular Progress Path */}
             <svg className="absolute inset-0 w-full h-full -rotate-90">

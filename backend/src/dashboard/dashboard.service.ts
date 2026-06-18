@@ -16,10 +16,16 @@ export class DashboardService {
       await this.prisma.project.deleteMany({});
 
       // 2. Create Admin if not exists
-      const hashedAdminPassword = await bcrypt.hash('admin123', 10);
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      if (!adminPassword) {
+        throw new Error(
+          'ADMIN_PASSWORD environment variable is required to seed the admin account.',
+        );
+      }
+      const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
       await this.prisma.user.upsert({
         where: { email: 'admin@baghaei.com' },
-        update: {},
+        update: { password: hashedAdminPassword },
         create: {
           email: 'admin@baghaei.com',
           name: 'Babak Baghaei',

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import Script from "next/script";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import BackgroundGrid from "@/components/effects/BackgroundGrid";
 import CookieConsent from "@/components/layout/CookieConsent";
 import { RootMobileMenu } from "@/components/layout/RootMobileMenu";
@@ -103,9 +104,9 @@ export const viewport: Viewport = {
  ],
  width: 'device-width',
  initialScale: 1,
- maximumScale: 1,
- minimumScale: 1,
- userScalable: false,
+ // Do not block zoom: maximumScale/userScalable:false break pinch-to-zoom and
+ // fail WCAG 1.4.4 (Resize Text). Users must be able to magnify the page.
+ colorScheme: 'dark',
 };
 
 export default function RootLayout({
@@ -116,24 +117,18 @@ export default function RootLayout({
  return (
   <html lang="fa" dir="rtl" suppressHydrationWarning className={`${iransans.variable} ${yekanbakh.variable} bg-background`}>
    <body className="antialiased text-foreground selection:bg-primary selection:text-primary-foreground font-sans bg-transparent">
+    <a
+     href="#main-content"
+     className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:right-4 focus:z-[10001] focus:rounded-full focus:bg-white focus:px-5 focus:py-2.5 focus:text-xs focus:font-bold focus:text-black"
+    >
+     رفتن به محتوای اصلی
+    </a>
     <ThemeProvider
      attribute="class"
      defaultTheme="dark"
-     enableSystem
+     enableSystem={false}
      disableTransitionOnChange
     >
-     <Script
-      src="https://www.googletagmanager.com/gtag/js?id=G-YSHJT31R0K"
-      strategy="afterInteractive"
-     />
-     <Script id="google-analytics" strategy="afterInteractive">
-      {`
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-YSHJT31R0K');
-      `}
-     </Script>
      <Script id="json-ld" type="application/ld+json" strategy="afterInteractive">
       {`
        {
@@ -186,14 +181,17 @@ export default function RootLayout({
      <Suspense fallback={null}>
        <ProgressBar />
      </Suspense>
-     <PageTransition>
-       {children}
-     </PageTransition>
+     <div id="main-content">
+       <PageTransition>
+         {children}
+       </PageTransition>
+     </div>
      <BackToTop />
      <CommandMenu />
      <CookieConsent />
      <RootMobileMenu />
     </ThemeProvider>
+    <GoogleAnalytics gaId="G-YSHJT31R0K" />
    </body>
   </html>
  );

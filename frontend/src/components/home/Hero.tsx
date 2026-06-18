@@ -79,13 +79,13 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
   };
 
   return (
-      <section id="hero" className="relative h-screen flex flex-col items-center justify-center bg-transparent overflow-hidden">
+      <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center bg-transparent overflow-hidden pt-32 pb-20 lg:pt-28">
       <div className="max-w-7xl mx-auto px-6 lg:px-16 w-full flex flex-col relative z-10">        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 mb-8">
           <div className="order-1 space-y-6 flex flex-col items-start text-right">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="inline-flex items-center gap-3 px-4 py-1.5 bg-secondary/50 border border-border rounded-full">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/20 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/30 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
               <span className="text-muted-foreground text-xs uppercase tracking-wider font-display" style={{ fontWeight: 500 }}>
                 پیشرو در معماری سیستم‌های سازمانی
@@ -146,7 +146,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
           </div>
         </div>
 
-        <div className="w-full h-px bg-white/5 my-8" />
+        <div className="w-full h-px bg-border my-8" />
         {children}
       </div>
 

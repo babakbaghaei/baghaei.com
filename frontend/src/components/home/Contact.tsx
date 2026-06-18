@@ -45,7 +45,7 @@ export default function Contact() {
  return (
  <Section id="contact" className="border-t border-border bg-transparent">
   {/* Background Icon */}
-  <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+  <motion.div aria-hidden="true" style={{ y: bgY }} className="absolute top-0 right-0 -mr-20 -mt-20 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
   <Mail className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
   </motion.div>
 
@@ -55,29 +55,37 @@ export default function Contact() {
   <form onSubmit={handleSubmit} className="relative max-w-6xl w-full">
    <div className="text-xl md:text-4xl font-medium font-display leading-[2.2] md:leading-[1.8] text-foreground text-right">
    <span className="inline">سلام، من </span>
-   <input 
-    type="text" name="name" required 
+   <label htmlFor="contact-name" className="sr-only">نام و نام خانوادگی</label>
+   <input
+    id="contact-name"
+    type="text" name="name" required
+    autoComplete="name"
     placeholder="نام و نام خانوادگی"
     onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً نام خود را وارد کنید')}
     onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
+    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus-visible:border-foreground focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
    />
    <span className="inline"> هستم. می‌خواهم در مورد </span>
-   <input 
-    type="text" name="message" required 
+   <label htmlFor="contact-message" className="sr-only">موضوع یا شرح پروژه</label>
+   <input
+    id="contact-message"
+    type="text" name="message" required
     placeholder="موضوع یا شرح پروژه"
     onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً موضوع یا متن پیام را بنویسید')}
     onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
+    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus-visible:border-foreground focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
    />
    <span className="inline"> با شما همکاری کنم. </span>
    <span className="inline">می‌توانید به من در </span>
-   <input 
-    type="text" name="phone" required 
+   <label htmlFor="contact-phone" className="sr-only">شماره تماس یا ایمیل</label>
+   <input
+    id="contact-phone"
+    type="text" name="phone" required
+    autoComplete="tel"
     placeholder="شماره تماس یا ایمیل"
     onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً شماره تماس یا ایمیل خود را وارد کنید')}
     onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
+    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus-visible:border-foreground focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
     dir="ltr"
    />
    <span className="inline"> پیام دهید.</span>
@@ -92,7 +100,7 @@ export default function Contact() {
     className="px-12 py-6 text-lg"
     rightIcon={
      status === 'success' ? (
-     <Check className="w-5 h-5 text-black" strokeWidth={3} />
+     <Check className="w-5 h-5 text-primary-foreground" strokeWidth={3} />
      ) : (
      <Send className="w-5 h-5" />
      )
@@ -102,15 +110,16 @@ export default function Contact() {
     </Button>
    </Magnetic>
 
+   <div aria-live="polite" role="status">
    <AnimatePresence>
     {status === 'success' && (
-     <motion.div 
+     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
-      className="flex items-center gap-3 text-zinc-400 font-medium"
+      className="flex items-center gap-3 text-muted-foreground font-medium"
      >
-      <div className="w-2 h-2 rounded-full bg-current animate-pulse" />
+      <div aria-hidden="true" className="w-2 h-2 rounded-full bg-current animate-pulse" />
       <p>پیام شما با موفقیت دریافت شد. به زودی با شما تماس خواهیم گرفت.</p>
      </motion.div>
     )}
@@ -121,6 +130,7 @@ export default function Contact() {
     خطا در ارسال. مجدداً تلاش کنید.
     </motion.p>
    )}
+   </div>
    </div>
   </form>
   </div>

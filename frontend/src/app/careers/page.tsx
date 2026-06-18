@@ -53,7 +53,7 @@ export default function CareersPage() {
  const [selectedJob, setSelectedJob] = useState<any | null>(null);
 
  return (
-  <main className="min-h-screen bg-black">
+  <main className="min-h-screen bg-background">
    <Navbar />
    
    <Section className="pt-48 pb-40">
@@ -64,7 +64,7 @@ export default function CareersPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="text-zinc-400 max-w-2xl font-sans text-xl md:text-2xl leading-relaxed mb-24 text-right"
+      className="text-muted-foreground max-w-2xl font-sans text-xl md:text-2xl leading-relaxed mb-24 text-right"
      >
       ما به دنبال مهندسانی هستیم که کدنویسی را فراتر از یک ابزار، و آن را به عنوان یک هنر و دانش معماری می‌بینند. در گروه بقایی، چالش‌های بزرگ منتظر راه‌حل‌های هوشمندانه شماست.
      </motion.p>
@@ -90,13 +90,13 @@ export default function CareersPage() {
      initial={{ opacity: 0 }}
      animate={{ opacity: 1 }}
      transition={{ delay: 0.6 }}
-     className="mt-32 p-12 rounded-[3rem] border border-white/5 bg-white/[0.02] text-center"
+     className="mt-32 p-12 rounded-[3rem] border border-border bg-foreground/[0.02] text-center"
     >
-     <h3 className="text-2xl font-bold text-white mb-4 font-display">موقعیتی که دنبالش هستید را نمی‌بینید؟</h3>
-     <p className="text-zinc-500 max-w-xl mx-auto mb-8 font-sans">
+     <h3 className="text-2xl font-bold text-foreground mb-4 font-display">موقعیتی که دنبالش هستید را نمی‌بینید؟</h3>
+     <p className="text-muted-foreground max-w-xl mx-auto mb-8 font-sans">
       اگر فکر می‌کنید تخصص شما می‌تواند به گروه ما کمک کند، رزومه خود را برای ما بفرستید. ما همیشه برای استعدادهای واقعی جا داریم.
      </p>
-     <a href="mailto:hr@baghaei.com" className="text-white border-b border-white/20 pb-1 hover:border-white transition-colors font-display">
+     <a href="mailto:hr@baghaei.com" className="text-foreground border-b border-border pb-1 hover:border-foreground transition-colors font-display">
       hr@baghaei.com
      </a>
     </motion.div>
