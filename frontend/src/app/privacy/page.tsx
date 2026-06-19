@@ -4,13 +4,13 @@ import Footer from '@/components/layout/Footer';
 
 export default function PrivacyPage() {
  return (
-  <main className="min-h-screen bg-background text-foreground pt-48 pb-20 px-6 relative overflow-hidden">
+  <main className="min-h-screen bg-background text-foreground pt-48 pb-20 relative overflow-hidden">
    {/* Background Noise/Grid */}
    <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
-   
+
    <Navbar />
-   
-   <div className="max-w-4xl mx-auto space-y-16 relative z-10">
+
+   <div className="max-w-4xl mx-auto px-6 lg:px-16 space-y-16 relative z-10">
     <header className="space-y-6 border-b border-border pb-12">
      <h1 className="text-5xl md:text-7xl font-bold font-display uppercase tracking-tighter leading-none">
       حریم <span className="text-muted-foreground">خصوصی.</span>

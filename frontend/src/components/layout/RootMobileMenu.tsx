@@ -6,11 +6,10 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const navLinks = [
  { id: 'hero', label: 'خانه' },
- { id: 'philosophy', label: 'فلسفه ما' },
- { id: 'projects', label: 'پروژه‌ها' },
+ { id: 'projects', label: 'محصولات' },
+ { id: 'tools', label: 'ابزارها' },
  { id: 'services', label: 'خدمات' },
- { id: 'testimonials', label: 'اعتماد مشتریان' },
- { id: 'contact', label: 'ارتباط' },
+ { id: 'about', label: 'درباره ما' },
 ];
 
 export function RootMobileMenu() {
@@ -26,6 +25,14 @@ export function RootMobileMenu() {
 
  const scrollTo = (id: string) => {
   setIsOpen(false);
+  if (id === 'tools') {
+   router.push('/tools');
+   return;
+  }
+  if (id === 'about') {
+   router.push('/about');
+   return;
+  }
   if (pathname !== '/') {
    router.push(`/#${id}`);
    return;

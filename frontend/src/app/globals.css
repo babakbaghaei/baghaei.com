@@ -60,7 +60,7 @@
 
     /* Glassmorphism effect tokens (dark) */
     --glass-fill: rgba(255, 255, 255, 0.08);
-    --glass-edge: rgba(255, 255, 255, 0.8);
+    --glass-edge: rgba(255, 255, 255, 0.4);
     --glass-sheen: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
   }

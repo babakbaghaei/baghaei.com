@@ -67,7 +67,7 @@ const AUTO_INSERT_SET = new Set(['\u200C', '،', '.', '!', '؟', '؛', ':', '(',
 const HUD = memo(({ wpm, accuracy }: { wpm: number, accuracy: number }) => (
   <div className="flex justify-between items-end mb-16 px-4" dir="rtl">
     <div className="flex flex-col gap-2 text-right">
-      <h1 className="text-4xl font-black font-display text-foreground text-right">تایپِ جنگی</h1>
+      <h1 className="text-4xl font-black font-display text-foreground text-right">سرعت‌سنج تایپ</h1>
       <div className="text-[10px] font-bold text-muted-foreground uppercase text-right">تست سرعت و دقت تایپ فارسی</div>
     </div>
     <div className="flex gap-10">
@@ -237,7 +237,7 @@ export default function TypeJangi() {
   }, [stats, isGameOver]);
 
   return (
-    <main className={`min-h-screen transition-colors duration-200 flex flex-col items-center justify-center p-6 font-sans select-none overflow-hidden ${isWrong ? 'bg-primary/5' : 'bg-background'}`}>
+    <main className={`min-h-screen transition-colors duration-200 flex flex-col items-center justify-center px-6 pt-32 pb-16 font-sans select-none overflow-hidden ${isWrong ? 'bg-primary/5' : 'bg-background'}`}>
       <div className="w-full max-w-5xl relative z-10">
         
         {/* Settings Bar */}

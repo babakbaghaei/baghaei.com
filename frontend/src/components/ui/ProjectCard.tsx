@@ -20,6 +20,7 @@ export interface Project {
   borderColor: string;
   tech?: string[];
   href?: string;
+  images?: string[];
   isLocked: boolean;
 }
 
@@ -106,7 +107,7 @@ const ProjectContent = ({ project, horizontal }: { project: Project, horizontal:
   );
 };
 
-export const ProjectCard: React.FC<{ project: Project, onClick: () => void, horizontal?: boolean, isActive?: boolean }> = ({ project, onClick, horizontal = false, isActive = false }) => {
+export const ProjectCard: React.FC<{ project: Project, onClick: (e: React.MouseEvent<HTMLDivElement>) => void, horizontal?: boolean, isActive?: boolean }> = ({ project, onClick, horizontal = false, isActive = false }) => {
   return (
     <Card
       glowColor={isActive ? project.borderColor : project.color}

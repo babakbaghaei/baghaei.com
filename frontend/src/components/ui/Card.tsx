@@ -27,6 +27,7 @@ interface CardProps {
   roundedClass?: string;
   bgClassName?: string;
   colorOnHoverOnly?: boolean;
+  contentClassName?: string;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -37,7 +38,8 @@ export const Card: React.FC<CardProps> = ({
   isHoverable = true,
   roundedClass = "rounded-[3rem]",
   bgClassName = "",
-  colorOnHoverOnly = false
+  colorOnHoverOnly = false,
+  contentClassName = "p-10"
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -117,16 +119,16 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <CardContext.Provider value={{ tiltX, tiltY }}>
-      <div 
+      <div
         ref={containerRef}
         className={`relative group ${className} ${roundedClass} select-none h-full`}
         style={{ perspective: "2000px" }}
       >
         <motion.div
-          style={{ 
-            rotateX, 
-            rotateY, 
-            scale, 
+          style={{
+            rotateX,
+            rotateY,
+            scale,
             transformStyle: "preserve-3d",
             willChange: "transform"
           }}
@@ -179,7 +181,7 @@ export const Card: React.FC<CardProps> = ({
           </div>
 
           {/* 3. CONTENT LAYER */}
-          <div className={`relative z-10 p-10 h-full`} style={{ transformStyle: "preserve-3d" }}>
+          <div className={`relative z-10 ${contentClassName} h-full`} style={{ transformStyle: "preserve-3d" }}>
             {children}
           </div>
         </motion.div>

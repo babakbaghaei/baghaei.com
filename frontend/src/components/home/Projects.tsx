@@ -2,11 +2,13 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import Link from 'next/link';
 import ProjectModal from './ProjectModal';
 import { Project, ProjectCard } from '../ui/ProjectCard';
+import { Card } from '../ui/Card';
 import { Section, Heading } from '../ui/Layout';
-import { ArrowLeft, Box, PenTool, Keyboard, RotateCw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { Box, ArrowUpLeft } from 'lucide-react';
+import { TOOLS, type Tool } from '@/lib/data/tools';
 
 // Selected High-Impact Projects for the Top Slider
 const SELECTED_PROJECTS: Project[] = [
@@ -60,113 +62,77 @@ const SELECTED_PROJECTS: Project[] = [
   }
 ];
 
-// Tools & Apps for the Grid
-const TOOLS_DATA: Project[] = [
-  { 
-    id: 10, 
-    title: 'پلتفرم کولک', 
-    category: 'زیرساخت / SaaS', 
-    role: 'معمار ارشد سیستم', 
-    desc: 'توسعه زیرساخت‌های مقیاس‌پذیر و راهکارهای نوین ابری برای کسب‌وکارهای در حال رشد.', 
-    metrics: [], 
-    color: 'rgba(34, 197, 94, 0.2)', 
-    borderColor: 'rgba(34, 197, 94, 0.8)', 
-    isLocked: false,
-    tech: ['Next.js', 'Go', 'Docker']
-  },
-  { 
-    id: 11, 
-    title: 'بازی تخت نرد', 
-    category: 'سرگرمی / Game', 
-    role: 'توسعه‌دهنده بازی', 
-    desc: 'طراحی و پیاده‌سازی بازی کلاسیک تخت نرد با فیزیک واقعی و قابلیت بازی آنلاین بلادرنگ.', 
-    metrics: [], 
-    color: 'rgba(120, 67, 40, 0.2)', 
-    borderColor: 'rgba(120, 67, 40, 0.8)', 
-    isLocked: false,
-    tech: ['Unity', 'C#', 'WebSockets']
-  },
-  { 
-    id: 12, 
-    title: 'اسپات لایت', 
-    category: 'گردشگری / هوشمند', 
-    role: 'معمار نرم‌افزار', 
-    desc: 'پلتفرم مدیریت هوشمند تورهای گردشگری با قابلیت ردیابی لحظه‌ای لیدرها.', 
-    metrics: [], 
-    color: 'rgba(20, 83, 45, 0.2)', 
-    borderColor: 'rgba(20, 83, 45, 0.8)', 
-    isLocked: false,
-    tech: ['Node.js', 'Redis', 'GPS-API']
-  },
-  { 
-    id: 14, 
-    title: 'لایف کوچ اوج', 
-    category: 'سلامت / مربیگری', 
-    role: 'توسعه‌دهنده ارشد', 
-    desc: 'پلتفرم اختصاصی اتصال مربیان حرفه‌ای به مراجعین با ابزارهای مدیریت جلسات.', 
-    metrics: [], 
-    color: 'rgba(254, 243, 199, 0.15)', 
-    borderColor: 'rgba(254, 243, 199, 0.8)', 
-    isLocked: false,
-    tech: ['Next.js', 'FastAPI', 'WebRTC']
-  },
-  { 
-    id: 13, 
-    title: 'پروژه رشد', 
-    category: 'توسعه فردی', 
-    role: 'مدیر فنی', 
-    desc: 'سیستم جامع مدیریت یادگیری و رهگیری شاخص‌های رشد فردی و سازمانی.', 
-    metrics: [], 
-    color: 'rgba(139, 92, 246, 0.2)', 
-    borderColor: 'rgba(139, 92, 246, 0.8)', 
-    isLocked: false,
-    tech: ['React', 'PostgreSQL', 'Prisma']
-  },
-  {
-    id: 101,
-    title: 'دستیار چک‌نویس',
-    category: 'ابزار مالی',
-    role: 'تبدیل عدد به حروف',
-    desc: 'مبدل هوشمند و دقیق عدد به حروف فارسی جهت نوشتن آسان چک‌های صیادی.',
-    metrics: [],
-    color: 'rgba(99, 102, 241, 0.2)',
-    borderColor: 'rgba(99, 102, 241, 0.8)',
-    isLocked: false,
-    href: '/tools/cheque-nevis',
-    tech: ['React']
-  },
-  {
-    id: 102,
-    title: 'تایپِ جنگی',
-    category: 'سرگرمی',
-    role: 'تست سرعت تایپ',
-    desc: 'سنجش سرعت و دقت تایپ فارسی با چالش‌های هیجان‌انگیز.',
-    metrics: [],
-    color: 'rgba(239, 68, 68, 0.2)',
-    borderColor: 'rgba(239, 68, 68, 0.8)',
-    isLocked: false,
-    href: '/tools/type-jangi',
-    tech: ['React']
-  },
-  {
-    id: 103,
-    title: 'چرخونه تصمیم',
-    category: 'ابزار کمکی',
-    role: 'تصمیم‌گیری شانس',
-    desc: 'ابزاری مدرن برای حل تردیدها و تصمیم‌گیری‌های سخت با چرخونه شانس.',
-    metrics: [],
-    color: 'rgba(139, 92, 246, 0.2)',
-    borderColor: 'rgba(139, 92, 246, 0.8)',
-    isLocked: false,
-    href: '/tools/spin-win',
-    tech: ['Framer Motion']
-  }
-];
+// Most-used tools — shown as square Card-based tiles continuing the projects scroll.
+const FEATURED_TOOLS = TOOLS.filter((t) => t.featured && t.status !== 'soon');
+
+// Pack the featured tools into columns of two so a pair of square tiles fits the
+// exact height of a single project card, keeping the horizontal rhythm intact.
+const TOOL_COLUMNS: Tool[][] = [];
+for (let i = 0; i < FEATURED_TOOLS.length; i += 2) {
+  TOOL_COLUMNS.push(FEATURED_TOOLS.slice(i, i + 2));
+}
+
+// Square tool tile built on the shared Card so it inherits the exact 3D tilt,
+// glass and corner-lighting physics of the project cards.
+function SquareToolCard({ tool }: { tool: Tool }) {
+  const Icon = tool.icon;
+  const accent = tool.accent;
+  return (
+    <Link
+      href={`/tools/${tool.slug}`}
+      aria-label={tool.title}
+      className="block h-full w-full rounded-[1.75rem] outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+    >
+      <Card
+        glowColor={`rgba(${accent}, 0.22)`}
+        roundedClass="rounded-[1.75rem]"
+        className="p-2 md:p-3"
+        contentClassName="p-4 md:p-5"
+        isHoverable
+        colorOnHoverOnly
+      >
+        <div className="flex h-full w-full flex-col text-right" dir="rtl" style={{ transformStyle: 'preserve-3d' }}>
+          <div className="flex items-start justify-between" style={{ transform: 'translateZ(40px)' }}>
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-2xl"
+              style={{ background: `rgba(${accent}, 0.12)`, color: `rgb(${accent})` }}
+            >
+              <Icon className="h-5 w-5" strokeWidth={1.75} />
+            </div>
+            <ArrowUpLeft
+              className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+              style={{ color: `rgb(${accent})` }}
+              aria-hidden
+            />
+          </div>
+          <div className="mt-auto" style={{ transform: 'translateZ(30px)' }}>
+            <h3 className="font-display text-sm md:text-base font-black leading-snug text-foreground">
+              {tool.title}
+            </h3>
+            <p className="mt-1 line-clamp-2 font-sans text-[11px] md:text-xs leading-relaxed text-muted-foreground">
+              {tool.desc}
+            </p>
+          </div>
+        </div>
+      </Card>
+    </Link>
+  );
+}
 
 export default function Projects() {
- const router = useRouter();
  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+ const [originRect, setOriginRect] = useState<DOMRect | null>(null);
  const [activeId, setActiveId] = useState<number | null>(null);
+
+ const openProject = (p: Project, e: React.MouseEvent<HTMLDivElement>) => {
+  // Measure the clean, untransformed card frame (not the inner padded div,
+  // which is skewed by the Card's live 3D tilt) so the grow animation starts
+  // from the card's true on-screen rectangle.
+  const frame = (e.currentTarget as HTMLElement).closest('[data-project-frame]') as HTMLElement | null;
+  setOriginRect((frame ?? e.currentTarget).getBoundingClientRect());
+  setSelectedProject(p);
+  setActiveId(p.id);
+ };
  const scrollContainerRef = useRef<HTMLDivElement>(null);
  const sectionRef = useRef<HTMLDivElement>(null);
  
@@ -201,44 +167,35 @@ export default function Projects() {
   <div className={`absolute inset-y-0 right-0 w-fib-55 bg-gradient-to-l from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
   <div className={`absolute inset-y-0 left-0 w-fib-55 bg-gradient-to-r from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
 
-  <div ref={scrollContainerRef} onScroll={handleScroll} className="flex overflow-x-auto pb-20 no-scrollbar relative z-10 gap-0">
+  <div ref={scrollContainerRef} onScroll={handleScroll} className="flex items-center overflow-x-auto pb-20 no-scrollbar relative z-10 gap-0">
    {SELECTED_PROJECTS.map((p) => (
-   <div key={p.id} className="w-[280px] md:w-[320px] h-[420px] md:h-[480px] shrink-0 relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
-    <ProjectCard project={p} onClick={() => { setSelectedProject(p); setActiveId(p.id); }} isActive={selectedProject?.id === p.id} />
+   <div key={p.id} data-project-frame className="w-[280px] md:w-[320px] h-[420px] md:h-[480px] shrink-0 relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
+    <ProjectCard project={p} onClick={(e) => openProject(p, e)} />
+   </div>
+   ))}
+
+   {/* Divider between flagship projects and the most-used tools */}
+   <div className="shrink-0 self-stretch flex flex-col items-center justify-center gap-4 px-fib-5 md:px-fib-8">
+    <div className="w-px flex-1 bg-gradient-to-b from-transparent via-border to-transparent" />
+    <span className="text-[10px] font-display font-bold uppercase tracking-widest text-muted-foreground/60 [writing-mode:vertical-rl] rotate-180">ابزارها</span>
+    <div className="w-px flex-1 bg-gradient-to-b from-transparent via-border to-transparent" />
+   </div>
+
+   {/* Most-used tools continuing the same horizontal scroll — two square tiles
+       per column so a pair fits the exact height of one project card. */}
+   {TOOL_COLUMNS.map((col, ci) => (
+   <div key={ci} className="w-[210px] md:w-[240px] h-[420px] md:h-[480px] shrink-0 flex flex-col">
+    {col.map((tool) => (
+    <div key={tool.slug} className="flex-1 min-h-0">
+     <SquareToolCard tool={tool} />
+    </div>
+    ))}
    </div>
    ))}
   </div>
   </div>
 
-  <div className="w-full mt-24 mb-0 relative z-10">
-  <div className="flex items-center gap-6 mb-12 opacity-50 px-1 md:px-2">
-   <div className="h-[1px] bg-border flex-1" />
-   <h4 className="text-muted-foreground font-display text-xs md:text-sm uppercase font-bold">ابزارها و اپلیکیشن‌ها</h4>
-   <div className="h-[1px] bg-border flex-1" />
-  </div>
-  
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-   {TOOLS_DATA.map(tool => (
-   <div key={tool.id} className="h-32 relative" style={{ zIndex: activeId === tool.id ? 50 : 1 }}>
-    <ProjectCard 
-    project={tool} 
-    onClick={() => {
-      if (tool.href) {
-        router.push(tool.href);
-      } else {
-        setSelectedProject(tool);
-        setActiveId(tool.id);
-      }
-    }}
-    isActive={selectedProject?.id === tool.id}
-    horizontal
-    />
-   </div>
-   ))}
-  </div>
-  </div>
-
-  <ProjectModal project={selectedProject} isOpen={!!selectedProject} onClose={() => setSelectedProject(null)} />
+  <ProjectModal project={selectedProject} originRect={originRect} isOpen={!!selectedProject} onClose={() => { setSelectedProject(null); setActiveId(null); }} />
  </Section>
  );
 }

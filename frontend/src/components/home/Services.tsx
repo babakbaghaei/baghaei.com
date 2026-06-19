@@ -31,5 +31,9 @@ export default function Services() {
     fetchServices();
   }, []);
 
-  return <ServicesList services={services} />;
+  return (
+    <div id="services" className="scroll-mt-28">
+      <ServicesList services={services} />
+    </div>
+  );
 }
