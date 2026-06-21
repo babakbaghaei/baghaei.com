@@ -14,9 +14,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY package*.json ./
 RUN npm install --no-audit --no-fund
 
-# Copy source and build
+# Copy source and build.
+# Raise V8's heap ceiling so `next build` succeeds on small-RAM hosts (it would
+# otherwise hit "Reached heap limit"); excess spills to swap.
 COPY . .
-RUN npm run build
+RUN NODE_OPTIONS=--max-old-space-size=2048 npm run build
 
 # Stage 2: Production (standalone output)
 FROM node:22-alpine AS runner
