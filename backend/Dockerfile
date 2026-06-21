@@ -21,6 +21,9 @@ COPY --from=builder --chown=node:node /app/package*.json ./
 COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/dist ./dist
 COPY --from=builder --chown=node:node /app/prisma ./prisma
+# prisma.config.ts holds the datasource URL for the CLI (migrate/seed). Without
+# it in the runner image, `prisma migrate deploy` can't find the connection URL.
+COPY --from=builder --chown=node:node /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder --chown=node:node /app/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x ./entrypoint.sh

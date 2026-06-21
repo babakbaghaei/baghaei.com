@@ -7,9 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // Required by the Prisma CLI (migrate/seed). At runtime PrismaService uses the
-  // @prisma/adapter-pg driver adapter, which takes precedence over this URL.
-  url      = env("DATABASE_URL")
 }
 
 model User {
