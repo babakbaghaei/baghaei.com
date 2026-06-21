@@ -7,9 +7,12 @@ ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install dependencies separately for better caching
+# Install dependencies separately for better caching.
+# Use `npm install` (not `npm ci`) so platform-specific transitive deps (e.g.
+# @swc/helpers for linux) resolve correctly even when the committed lock was
+# generated on a different OS.
 COPY package*.json ./
-RUN npm ci
+RUN npm install --no-audit --no-fund
 
 # Copy source and build
 COPY . .
