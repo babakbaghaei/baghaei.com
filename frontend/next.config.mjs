@@ -18,8 +18,10 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.baghaei.com' },
     ],
   },
-  // Fix for monorepo structure with multiple lockfiles
-  outputFileTracingRoot: path.join(process.cwd(), '../'),
+  // Root the standalone output at the app dir so `.next/standalone/server.js`
+  // is NOT nested under a subpath — the Docker runner runs `node server.js`
+  // from /app. (Pointing this at the parent nests it under /app/app/server.js.)
+  outputFileTracingRoot: process.cwd(),
   // Add empty turbopack config to satisfy Next.js 16 and silence root warning
   turbopack: {
     root: path.join(process.cwd(), '../'),

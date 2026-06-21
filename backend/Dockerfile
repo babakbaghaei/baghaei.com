@@ -25,6 +25,10 @@ COPY --from=builder --chown=node:node /app/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x ./entrypoint.sh
 
+# Pino writes ./logs/app.log in production; create it writable for the non-root
+# user so logging doesn't crash the process with EACCES.
+RUN mkdir -p /app/logs && chown -R node:node /app/logs
+
 USER node
 
 EXPOSE 8000
