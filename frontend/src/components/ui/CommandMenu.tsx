@@ -62,10 +62,10 @@ export function CommandMenu() {
       <div className="relative w-full max-w-2xl overflow-hidden rounded-xl border border-border bg-popover/90 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
         <Command className="w-full">
           <div className="flex items-center border-b border-border px-4" cmdk-input-wrapper="">
-            <Search className="mr-2 h-5 w-5 shrink-0 text-muted-foreground" />
+            <Search className="me-2 h-5 w-5 shrink-0 text-muted-foreground" />
             <Command.Input
               placeholder="جستجو در بخش‌ها (برای انتخاب Enter بزنید)..."
-              className="flex h-14 w-full rounded-md bg-transparent py-3 text-lg outline-none placeholder:text-muted-foreground text-foreground font-display text-right pr-4"
+              className="flex h-14 w-full rounded-md bg-transparent py-3 text-lg outline-none placeholder:text-muted-foreground text-foreground font-display text-right ps-4"
               dir="rtl"
             />
           </div>

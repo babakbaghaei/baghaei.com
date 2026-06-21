@@ -37,6 +37,10 @@ export default function CookieConsent() {
   } catch {
    // Ignore storage failures (private mode / disabled storage).
   }
+  // Notify the AnalyticsGate so GA activates/deactivates without a reload.
+  if (typeof window !== 'undefined') {
+   window.dispatchEvent(new CustomEvent('cookie-consent-updated'));
+  }
  };
 
  const handleAcceptAll = () => {
@@ -57,7 +61,7 @@ export default function CookieConsent() {
      animate={{ y: 0, opacity: 1 }}
      exit={{ y: 100, opacity: 0 }}
      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-     className="fixed bottom-4 left-4 right-4 md:left-6 md:right-auto md:max-w-sm z-[9999]"
+     className="fixed bottom-4 start-4 end-4 md:end-6 md:start-auto md:max-w-sm z-[9999]"
     >
      <div className="bg-popover border border-border rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden group">
       <div className="relative z-10 space-y-6">
@@ -68,8 +72,8 @@ export default function CookieConsent() {
          </div>
          <h3 className="text-base font-bold font-display text-foreground">تنظیمات داده‌ها</h3>
         </div>
-        <button onClick={() => setIsVisible(false)} className="text-muted-foreground hover:text-foreground transition-colors">
-         <X className="w-4 h-4" />
+        <button onClick={() => setIsVisible(false)} aria-label="بستن" className="text-muted-foreground hover:text-foreground transition-colors">
+         <X aria-hidden="true" className="w-4 h-4" />
         </button>
        </div>
 
@@ -84,18 +88,24 @@ export default function CookieConsent() {
           <div className="w-4 h-4 rounded-full bg-muted-foreground" />
          </div>
          <button
+          type="button"
+          role="switch"
+          aria-checked={preferences.analytical}
           onClick={() => setPreferences(p => ({ ...p, analytical: !p.analytical }))}
           className="w-full flex items-center justify-between p-3 bg-secondary rounded-2xl border border-border hover:bg-muted transition-colors"
          >
           <div className="text-[10px] font-bold text-foreground font-display">تحلیل ترافیک و رفتار</div>
-          <div className={`w-4 h-4 rounded-full transition-colors ${preferences.analytical ? 'bg-primary' : 'bg-muted'}`} />
+          <div aria-hidden="true" className={`w-4 h-4 rounded-full transition-colors ${preferences.analytical ? 'bg-primary' : 'bg-muted'}`} />
          </button>
          <button
+          type="button"
+          role="switch"
+          aria-checked={preferences.functional}
           onClick={() => setPreferences(p => ({ ...p, functional: !p.functional }))}
           className="w-full flex items-center justify-between p-3 bg-secondary rounded-2xl border border-border hover:bg-muted transition-colors"
          >
           <div className="text-[10px] font-bold text-foreground font-display">شخصی‌سازی و عملکرد</div>
-          <div className={`w-4 h-4 rounded-full transition-colors ${preferences.functional ? 'bg-primary' : 'bg-muted'}`} />
+          <div aria-hidden="true" className={`w-4 h-4 rounded-full transition-colors ${preferences.functional ? 'bg-primary' : 'bg-muted'}`} />
          </button>
         </motion.div>
        )}

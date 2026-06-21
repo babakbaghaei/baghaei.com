@@ -88,7 +88,21 @@ export const api = {
   });
  },
 
+ patch<T = any, B = unknown>(endpoint: string, data: B) {
+  return request<T>(endpoint, {
+   method: 'PATCH',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify(data),
+  });
+ },
+
  delete<T = any>(endpoint: string) {
   return request<T>(endpoint, { method: 'DELETE' });
+ },
+
+ // Multipart upload — do NOT set Content-Type; the browser adds the multipart
+ // boundary automatically. Auth header is still attached by request().
+ upload<T = any>(endpoint: string, formData: FormData) {
+  return request<T>(endpoint, { method: 'POST', body: formData });
  },
 };

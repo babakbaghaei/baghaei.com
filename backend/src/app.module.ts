@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { SentryModule } from '@sentry/nestjs/setup';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -19,6 +20,7 @@ import { SecurityModule } from './security/security.module';
 import { HealthModule } from './health/health.module';
 import { ServicesModule } from './services/services.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -74,8 +76,10 @@ import { DashboardModule } from './dashboard/dashboard.module';
     }),
     PrometheusModule.register(),
     PrismaModule,
+    SentryModule.forRoot(),
     ProjectsModule,
     ContactModule,
+    UploadModule,
     AuthModule,
     OpenTelemetryModule,
     SecurityModule,

@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save, X, Plus, Trash } from 'lucide-react';
+import Image from 'next/image';
+import { Save, Plus, Trash, Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -15,16 +16,36 @@ interface ProjectFormProps {
 export const ProjectForm: React.FC<ProjectFormProps> = ({ initialData, isEditing }) => {
  const router = useRouter();
  const [loading, setLoading] = useState(false);
+ const [uploading, setUploading] = useState(false);
+ const fileInputRef = useRef<HTMLInputElement>(null);
  const [formData, setFormData] = useState({
   title: initialData?.title || '',
   category: initialData?.category || '',
   role: initialData?.role || '',
   desc: initialData?.desc || '',
+  imageUrl: initialData?.imageUrl || '',
   color: initialData?.color || 'rgba(255,255,255,0.1)',
   borderColor: initialData?.borderColor || 'rgba(255,255,255,0.2)',
   isLocked: initialData?.isLocked ?? true,
   metrics: initialData?.metrics || [{ label: '', value: '' }]
  });
+
+ const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  setUploading(true);
+  try {
+   const fd = new FormData();
+   fd.append('file', file);
+   const res = (await api.upload('/upload/image', fd)) as { data: { url: string } };
+   setFormData((prev) => ({ ...prev, imageUrl: res.data.url }));
+  } catch {
+   alert('خطا در آپلود تصویر');
+  } finally {
+   setUploading(false);
+   if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+ };
 
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -131,6 +152,46 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ initialData, isEditing
         className="w-5 h-5 accent-primary"
        />
        <span className="text-sm font-display">پروژه قفل باشد (در حال توسعه)</span>
+      </div>
+     </Card>
+
+     <Card className="space-y-6">
+      <h3 className="text-xl font-bold font-display">تصویر پروژه</h3>
+      <div className="flex items-center gap-5">
+       <div className="relative w-28 h-20 rounded-xl overflow-hidden border border-border bg-foreground/5 flex items-center justify-center shrink-0">
+        {formData.imageUrl ? (
+         <Image src={formData.imageUrl} alt="پیش‌نمایش تصویر پروژه" fill sizes="112px" className="object-cover" />
+        ) : (
+         <ImageIcon className="w-7 h-7 text-muted-foreground/40" />
+        )}
+       </div>
+       <div className="flex-1 space-y-3">
+        <input
+         ref={fileInputRef}
+         type="file"
+         accept="image/*"
+         onChange={handleUpload}
+         className="hidden"
+         id="project-image-upload"
+        />
+        <button
+         type="button"
+         onClick={() => fileInputRef.current?.click()}
+         disabled={uploading}
+         className="inline-flex items-center gap-2 rounded-xl bg-foreground/5 border border-border px-4 py-2.5 text-sm font-display hover:bg-foreground/10 transition-colors disabled:opacity-50"
+        >
+         {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+         {uploading ? 'در حال آپلود...' : 'آپلود تصویر'}
+        </button>
+        <input
+         type="text"
+         value={formData.imageUrl}
+         onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+         placeholder="یا آدرس تصویر را وارد کنید"
+         dir="ltr"
+         className="w-full bg-foreground/5 border border-border rounded-xl p-3 text-xs text-foreground outline-none"
+        />
+       </div>
       </div>
      </Card>
 

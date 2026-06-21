@@ -11,6 +11,7 @@ export interface Metric {
 
 export interface Project {
   id: number;
+  slug?: string;
   title: string;
   category: string;
   role: string;
@@ -96,7 +97,7 @@ const ProjectContent = ({ project, horizontal }: { project: Project, horizontal:
           style={{ transform: "translateZ(50px)" }}
         >
           {project.tech.slice(0, 4).map((t, i) => (
-            <span key={i} className="rounded-full bg-white/5 border border-white/5 font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 text-[9px]">
+            <span key={i} className="rounded-full bg-white/5 border border-white/5 font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 pe-1.5 ps-2.5 py-1 text-[9px]">
               <TechIcon name={t} />
               {t}
             </span>
@@ -116,7 +117,20 @@ export const ProjectCard: React.FC<{ project: Project, onClick: (e: React.MouseE
       isHoverable={true}
       colorOnHoverOnly={!isActive}
     >
-      <div onClick={onClick} className="h-full w-full cursor-pointer overflow-visible" style={{ transformStyle: "preserve-3d" }}>
+      <div
+        onClick={onClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick(e as unknown as React.MouseEvent<HTMLDivElement>);
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={`${project.title} — نمایش جزئیات پروژه`}
+        className="h-full w-full cursor-pointer overflow-visible rounded-[3rem] outline-none focus-visible:ring-2 focus-visible:ring-foreground/60"
+        style={{ transformStyle: "preserve-3d" }}
+      >
         <ProjectContent project={project} horizontal={horizontal} />
       </div>
     </Card>

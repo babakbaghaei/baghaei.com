@@ -15,6 +15,8 @@ export default function Contact() {
  const [isPending, startTransition] = useTransition();
  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
  const { play } = useSound();
+ // Timestamp of first render — used to reject instantaneous (bot) submissions.
+ const formRenderedAt = useRef<number>(Date.now());
 
  // Use GLOBAL scroll to avoid hydration issues with refs
  const { scrollYProgress } = useScroll();
@@ -23,8 +25,18 @@ export default function Contact() {
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
  e.preventDefault();
  const form = e.currentTarget;
+
+ // Anti-bot min-time: a human cannot fill three required fields in under half
+ // a second. Drop instantaneous (scripted) submissions, mimicking success so
+ // the bot gets no signal. Real users are never this fast.
+ if (Date.now() - formRenderedAt.current < 500) {
+  setStatus('success');
+  form.reset();
+  return;
+ }
+
  const formData = new FormData(form);
- 
+
  startTransition(async () => {
   const result = await submitContactForm(formData);
   if (result.success) {
@@ -53,6 +65,11 @@ export default function Contact() {
   <Heading align="right" subtitle="گفتگو">شروع یک</Heading>
 
   <form onSubmit={handleSubmit} className="relative max-w-6xl w-full">
+   {/* Honeypot — hidden from real users, auto-filled by bots. Do not remove. */}
+   <div aria-hidden="true" className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden" style={{ opacity: 0 }}>
+    <label htmlFor="contact-company">Company</label>
+    <input id="contact-company" type="text" name="company" tabIndex={-1} autoComplete="off" />
+   </div>
    <div className="text-xl md:text-4xl font-medium font-display leading-[2.2] md:leading-[1.8] text-foreground text-right">
    <span className="inline">سلام، من </span>
    <label htmlFor="contact-name" className="sr-only">نام و نام خانوادگی</label>

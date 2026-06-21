@@ -51,3 +51,6 @@ docker-compose.override.yml
 
 # Husky (optional, usually we commit this but ignore _ contents sometimes)
 #.husky/_
+
+# Local design source assets (sketch/zip/fonts) — not deployable
+BlueTech/

@@ -24,6 +24,23 @@ export class ProjectsService {
     });
   }
 
+  // Case-insensitive search across title + description. Uncached on purpose so
+  // it never collides with the cached findAll() ('all_projects') key.
+  async search(query: string) {
+    const q = (query || '').trim();
+    if (!q) return [];
+    return this.prisma.project.findMany({
+      where: {
+        OR: [
+          { title: { contains: q, mode: 'insensitive' } },
+          { description: { contains: q, mode: 'insensitive' } },
+        ],
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+  }
+
   async findOne(id: number) {
     const project = await this.prisma.project.findUnique({
       where: { id },

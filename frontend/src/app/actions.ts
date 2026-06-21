@@ -7,6 +7,7 @@ export async function submitContactForm(formData: FormData) {
  const email = formData.get('email') // This might be null if only phone is provided
  const phone = formData.get('phone')
  const message = formData.get('message')
+ const company = formData.get('company') // Honeypot — real users never fill this
 
  // Use the internal server URL for backend communication
  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
@@ -17,10 +18,11 @@ export async function submitContactForm(formData: FormData) {
    method: 'POST',
    headers: { 'Content-Type': 'application/json' },
    body: JSON.stringify({
-    name, 
-    email: email || undefined, 
+    name,
+    email: email || undefined,
     phone,
-    message 
+    message,
+    company: company || undefined,
    }),
   });
 

@@ -91,7 +91,12 @@ export default function Navbar() {
 
  return (
   <nav
-   className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isSolid ? 'py-4' : 'py-8'} ${
+   onBlur={(e) => {
+    // Close the mega-menu once focus leaves the whole nav (keyboard users).
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpenMenu(null);
+   }}
+   onKeyDown={(e) => { if (e.key === 'Escape') setOpenMenu(null); }}
+   className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isSolid ? 'py-4' : 'py-8'} ${
     openMenu
      ? 'bg-background border-b border-border shadow-sm'
      : isSolid
@@ -125,6 +130,7 @@ export default function Navbar() {
        <div
         key={link.id}
         onMouseEnter={() => setOpenMenu(link.hasDropdown ? link.id : null)}
+        onFocus={() => setOpenMenu(link.hasDropdown ? link.id : null)}
         className="relative"
        >
         <NavItem
@@ -138,7 +144,7 @@ export default function Navbar() {
          className={`flex items-center gap-1 ${link.hasDropdown && link.id !== 'tools' ? 'cursor-default' : ''}`}
         />
         {link.hasDropdown && (
-         <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${openMenu === link.id ? 'rotate-180' : ''} absolute left-[-14px] top-1/2 -translate-y-1/2`} />
+         <ChevronDown aria-hidden="true" className={`w-3 h-3 transition-transform duration-300 ${openMenu === link.id ? 'rotate-180' : ''} absolute end-[-14px] top-1/2 -translate-y-1/2`} />
         )}
        </div>
       ))}
@@ -165,13 +171,15 @@ export default function Navbar() {
 
     <div className="md:hidden flex items-center gap-4 relative z-[210]">
      <ThemeToggle />
-     <button 
+     <button
       onClick={() => {
        window.dispatchEvent(new CustomEvent('toggle-mobile-menu'));
-      }} 
+      }}
+      aria-label="باز کردن منو"
+      aria-haspopup="menu"
       className="p-3 bg-primary text-primary-foreground rounded-full active:scale-90 transition-transform shadow-xl"
      >
-      <Menu className="w-5 h-5" />
+      <Menu aria-hidden="true" className="w-5 h-5" />
      </button>
     </div>
 
@@ -184,14 +192,14 @@ export default function Navbar() {
        exit={{ opacity: 0, y: -10 }}
        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as any }}
        onMouseLeave={() => setOpenMenu(null)}
-       className="absolute top-full left-0 w-full bg-background border-b border-border shadow-2xl z-0"
+       className="absolute top-full start-0 w-full bg-background border-b border-border shadow-2xl z-0"
       >
        <div className="max-w-7xl mx-auto px-6 lg:px-16 py-12" dir="rtl">
          {openMenu === 'products' ? (
            /* Products / Projects */
            <div className="grid grid-cols-1 md:grid-cols-[0.85fr_2fr] gap-10 lg:gap-16">
              {/* intro */}
-             <div className="flex flex-col justify-between gap-6 md:border-l md:border-border/50 md:pl-10">
+             <div className="flex flex-col justify-between gap-6 md:border-e md:border-border/50 md:pe-10">
                <div className="space-y-3">
                  <div className="flex items-center gap-2.5">
                    <Layout className="w-4 h-4 text-primary" />
@@ -206,7 +214,7 @@ export default function Navbar() {
                  className="inline-flex items-center gap-2 text-xs font-black font-display text-primary transition-all hover:gap-3 self-start"
                >
                  مشاهده همهٔ پروژه‌ها
-                 <ArrowLeft className="w-4 h-4" />
+                 <ArrowLeft aria-hidden="true" className="w-4 h-4" />
                </button>
              </div>
              {/* projects grid */}
@@ -232,7 +240,7 @@ export default function Navbar() {
            /* Tools — full toolbox by category */
            <div className="grid grid-cols-1 md:grid-cols-[0.85fr_2fr] gap-10 lg:gap-16">
              {/* intro */}
-             <div className="flex flex-col justify-between gap-6 md:border-l md:border-border/50 md:pl-10">
+             <div className="flex flex-col justify-between gap-6 md:border-e md:border-border/50 md:pe-10">
                <div className="space-y-3">
                  <div className="flex items-center gap-2.5">
                    <Sparkles className="w-4 h-4 text-primary" />
@@ -248,7 +256,7 @@ export default function Navbar() {
                  className="inline-flex items-center gap-2 text-xs font-black font-display text-primary transition-all hover:gap-3 self-start"
                >
                  مشاهده جعبه ابزار
-                 <ArrowLeft className="w-4 h-4" />
+                 <ArrowLeft aria-hidden="true" className="w-4 h-4" />
                </Link>
              </div>
              {/* categories grid */}
@@ -269,7 +277,7 @@ export default function Navbar() {
                        </span>
                        <h5 className="text-[12px] font-black font-display text-foreground">{cat}</h5>
                      </div>
-                     <ul className="space-y-1.5 pr-1">
+                     <ul className="space-y-1.5 ps-1">
                        {items.map((t) => (
                          <li key={t.slug}>
                            <Link
@@ -291,7 +299,7 @@ export default function Navbar() {
            /* Services — what our team builds */
            <div className="grid grid-cols-1 md:grid-cols-[0.85fr_2fr] gap-10 lg:gap-16">
              {/* intro */}
-             <div className="flex flex-col justify-between gap-6 md:border-l md:border-border/50 md:pl-10">
+             <div className="flex flex-col justify-between gap-6 md:border-e md:border-border/50 md:pe-10">
                <div className="space-y-3">
                  <div className="flex items-center gap-2.5">
                    <Cpu className="w-4 h-4 text-primary" />
@@ -306,7 +314,7 @@ export default function Navbar() {
                  className="inline-flex items-center gap-2 text-xs font-black font-display text-primary transition-all hover:gap-3 self-start"
                >
                  مشاهده همهٔ خدمات
-                 <ArrowLeft className="w-4 h-4" />
+                 <ArrowLeft aria-hidden="true" className="w-4 h-4" />
                </button>
              </div>
              {/* services grid */}

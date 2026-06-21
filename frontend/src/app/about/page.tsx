@@ -135,7 +135,7 @@ export default function AboutPage() {
               transition={{ delay: i * 0.06 }}
               className="flex flex-col items-center justify-center gap-2 py-12 border-border first:border-r-0 md:[&:not(:first-child)]:border-r"
             >
-              <span className="text-3xl md:text-5xl font-black font-display text-foreground">
+              <span className="text-3xl md:text-5xl font-black font-display text-foreground tabular-nums">
                 {s.value}
               </span>
               <span className="text-xs md:text-sm text-muted-foreground font-display">

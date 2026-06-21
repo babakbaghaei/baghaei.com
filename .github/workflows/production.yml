@@ -77,6 +77,26 @@ jobs:
       env:
         NEXT_PUBLIC_API_URL: "http://localhost:8000"
 
+  lighthouse:
+    name: Lighthouse & A11y Audit (report-only)
+    runs-on: ubuntu-latest
+    # Report-only: never blocks the pipeline or deploy. Lighthouse's accessibility
+    # category runs axe-core rules, so this covers perf + a11y + SEO + best-practices.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install Dependencies
+        run: cd frontend && npm ci
+      - name: Build
+        run: cd frontend && npm run build
+      - name: Run Lighthouse CI
+        run: cd frontend && npx --yes @lhci/cli@0.14.x autorun || true
+
   docker-verification:
     name: Container Build Verify
     needs: [quality-assurance, backend-testing, frontend-testing]
@@ -107,7 +127,10 @@ jobs:
     name: Deploy to Server
     needs: [docker-verification]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    # Disabled: deployment is handled by a server-side systemd timer that polls
+    # git every minute and rebuilds on change (see /var/www/baghaei.com/auto-deploy.sh).
+    # This avoids coupling deploys to CI test outcomes and works without GH secrets.
+    if: false
     steps:
       - name: SSH and Deploy
         uses: appleboy/ssh-action@v1.0.3

@@ -32,4 +32,13 @@ export class CreateContactDto {
   @IsNotEmpty()
   @MaxLength(5000)
   message: string;
+
+  // Honeypot: hidden from real users via CSS/aria. Bots tend to auto-fill any
+  // field named like this, so a non-empty value flags a spam submission.
+  // Declared here (not stripped by the whitelist ValidationPipe) so the service
+  // can detect and silently drop it without signalling the bot.
+  @IsString()
+  @IsOptional()
+  @MaxLength(200)
+  company?: string;
 }

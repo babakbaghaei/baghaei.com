@@ -2,10 +2,15 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Logger } from '@nestjs/common';
 import axios from 'axios';
+import { EmailService } from './email.service';
 
 @Processor('notifications')
 export class NotificationsProcessor extends WorkerHost {
   private readonly logger = new Logger(NotificationsProcessor.name);
+
+  constructor(private readonly emailService: EmailService) {
+    super();
+  }
 
   async process(job: Job<any, any, string>): Promise<any> {
     switch (job.name) {
@@ -44,6 +49,14 @@ export class NotificationsProcessor extends WorkerHost {
       this.logger.warn(
         'Telegram credentials not found, skipping notification.',
       );
+    }
+
+    // Email channel (env-gated). Non-fatal: a failure here must not discard the
+    // message — Telegram already delivered/queued — so we log and continue.
+    try {
+      await this.emailService.sendContactNotification(data);
+    } catch (error) {
+      this.logger.error('Failed to send email notification', error);
     }
 
     return { sent: true };

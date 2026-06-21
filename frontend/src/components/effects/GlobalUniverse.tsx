@@ -166,11 +166,18 @@ export const GalaxyBackground = ({ scrollProgress }: { scrollProgress: number })
   scrollRef.current = scrollProgress;
 
   if (!starsRef.current) {
-    starsRef.current = [...Array(1500)].map(() => ({
+    // Responsive density: thin the field on small screens so it never becomes
+    // textured noise behind Persian copy. Falls back to a mid count during SSR
+    // (the server render paints no canvas, so the value is only a placeholder).
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const starCount = vw < 768 ? 450 : vw < 1280 ? 800 : 1100;
+    starsRef.current = [...Array(starCount)].map(() => ({
       x: Math.random() * 5000,
       y: Math.random() * 5000,
       size: 0.2 + Math.random() * 1.8,
-      opacity: 0.15 + Math.random() * 0.5,
+      // Lower opacity ceiling (~0.4 vs 0.65) keeps foreground text readable
+      // while the twinkle below still gives the field life.
+      opacity: 0.08 + Math.random() * 0.32,
       parallax: 0.02 + Math.random() * 0.2,
       twinkle: 1 + Math.random() * 4
     }));

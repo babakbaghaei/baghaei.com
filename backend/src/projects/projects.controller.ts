@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Param,
+  Query,
   Put,
   Delete,
   UseGuards,
@@ -30,6 +31,12 @@ export class ProjectsController {
   @CacheTTL(60000) // Override default TTL if needed
   findAll() {
     return this.projectsService.findAll();
+  }
+
+  // Declared before ':id' so "search" isn't captured as an id param.
+  @Get('search')
+  search(@Query('q') q: string) {
+    return this.projectsService.search(q || '');
   }
 
   @Get(':id')

@@ -12,53 +12,59 @@ import { TOOLS, type Tool } from '@/lib/data/tools';
 
 // Selected High-Impact Projects for the Top Slider
 const SELECTED_PROJECTS: Project[] = [
-  { 
-    id: 2, 
-    title: 'پلتفرم راورو', 
-    category: 'امنیت سایبری', 
-    role: 'طراح ارشد رابط کاربری', 
-    desc: 'توسعه پلتفرم باگ‌بانتی با هدف شناسایی شکاف‌های امنیتی توسط هکرهای کلاه سفید در مقیاس ملی.', 
-    metrics: [{ label: 'باگ کشف شده', value: '۱K+' }, { label: 'شرکت فعال', value: '۵۰+' }], 
-    color: 'rgba(245, 158, 11, 0.2)', 
-    borderColor: 'rgba(245, 158, 11, 0.8)', 
+  {
+    id: 2,
+    slug: 'ravro-platform',
+    title: 'پلتفرم راورو',
+    category: 'امنیت سایبری',
+    role: 'طراح ارشد رابط کاربری',
+    desc: 'توسعه پلتفرم باگ‌بانتی با هدف شناسایی شکاف‌های امنیتی توسط هکرهای کلاه سفید در مقیاس ملی.',
+    metrics: [{ label: 'باگ کشف شده', value: '۱K+' }, { label: 'شرکت فعال', value: '۵۰+' }],
+    color: 'rgba(245, 158, 11, 0.2)',
+    borderColor: 'rgba(245, 158, 11, 0.8)',
     isLocked: false,
+    images: ['/assets/projects/ravro-dashboard.jpg', '/assets/projects/ravro-target.jpg'],
     tech: ['React', 'Node.js', 'PostgreSQL', 'Docker']
   },
-  { 
-    id: 5, 
-    title: 'پلتفرم مالاتا', 
-    category: 'تجارت الکترونیک', 
-    role: 'بنیان‌گذار فنی و معمار نرم‌افزار', 
-    desc: 'اولین بازار آنلاین محصولات تازه دریایی با هدف حذف واسطه‌ها و اتصال مستقیم صیاد به مشتری.', 
-    metrics: [{ label: 'فروشنده فعال', value: '۵۰۰+' }, { label: 'رضایت مشتری', value: '۹۵٪' }], 
-    color: 'rgba(14, 165, 233, 0.2)', 
-    borderColor: 'rgba(14, 165, 233, 0.8)', 
+  {
+    id: 1,
+    slug: 'kish-airport-fids',
+    title: 'FIDS فرودگاه کیش',
+    category: 'زیرساخت فرودگاهی',
+    role: 'طراح ارشد رابط کاربری',
+    desc: 'طراحی سیستم‌های نمایش اطلاعات پرواز و رابط کاربری کانترهای فرودگاه بین‌المللی کیش.',
+    metrics: [{ label: 'دقت نمایش', value: '۹۹.۹٪' }, { label: 'ترافیک روزانه', value: '۲۰K+' }],
+    color: 'rgba(30, 64, 175, 0.2)',
+    borderColor: 'rgba(30, 64, 175, 0.8)',
     isLocked: false,
-    tech: ['Next.js', 'Go', 'Redis', 'Kubernetes']
-  },
-  { 
-    id: 1, 
-    title: 'FIDS فرودگاه کیش', 
-    category: 'زیرساخت فرودگاهی', 
-    role: 'طراح ارشد رابط کاربری', 
-    desc: 'طراحی سیستم‌های نمایش اطلاعات پرواز و رابط کاربری کانترهای فرودگاه بین‌المللی کیش.', 
-    metrics: [{ label: 'دقت نمایش', value: '۹۹.۹٪' }, { label: 'ترافیک روزانه', value: '۲۰K+' }], 
-    color: 'rgba(30, 64, 175, 0.2)', 
-    borderColor: 'rgba(30, 64, 175, 0.8)', 
-    isLocked: false,
+    images: ['/assets/projects/fids-kish-gate.jpg', '/assets/projects/fids-kish-system.jpg'],
     tech: ['C++', 'Qt', 'WebSockets', 'Linux']
   },
-  { 
-    id: 9, 
-    title: 'تیونینگ کیوانی', 
-    category: 'خودرو / لوکس', 
-    role: 'معمار نرم‌افزار', 
-    desc: 'طراحی پلتفرم اختصاصی و سیستم پیکربندی خودروهای فوق‌لوکس برای برند جهانی Kevany.', 
-    metrics: [{ label: 'خودرو اختصاصی', value: '۱۰۰+' }, { label: 'بازدید جهانی', value: '۱M+' }], 
-    color: 'rgba(153, 27, 27, 0.3)', 
-    borderColor: 'rgba(153, 27, 27, 0.8)', 
+  {
+    id: 9,
+    slug: 'kevany-tuning',
+    title: 'تیونینگ کیوانی',
+    category: 'خودرو / لوکس',
+    role: 'طراح رابط کاربری',
+    desc: 'طراحی پلتفرم اختصاصی و سیستم پیکربندی خودروهای فوق‌لوکس برای برند جهانی Kevany.',
+    metrics: [{ label: 'خودرو اختصاصی', value: '۱۰۰+' }, { label: 'بازدید جهانی', value: '۱M+' }],
+    color: 'rgba(153, 27, 27, 0.3)',
+    borderColor: 'rgba(153, 27, 27, 0.8)',
     isLocked: false,
+    images: ['/assets/projects/keyvani-configurator.jpg'],
     tech: ['WebGL', 'Three.js', 'React', 'Next.js']
+  },
+  {
+    id: 5,
+    title: 'پلتفرم مالاتا',
+    category: 'تجارت الکترونیک',
+    role: 'بنیان‌گذار فنی و معمار نرم‌افزار',
+    desc: 'اولین بازار آنلاین محصولات تازه دریایی با هدف حذف واسطه‌ها و اتصال مستقیم صیاد به مشتری.',
+    metrics: [{ label: 'فروشنده فعال', value: '۵۰۰+' }, { label: 'رضایت مشتری', value: '۹۵٪' }],
+    color: 'rgba(14, 165, 233, 0.2)',
+    borderColor: 'rgba(14, 165, 233, 0.8)',
+    isLocked: false,
+    tech: ['Next.js', 'Go', 'Redis', 'Kubernetes']
   }
 ];
 
@@ -157,7 +163,7 @@ export default function Projects() {
 
  return (
  <Section id="projects" sectionRef={sectionRef} className="border-t border-border overflow-visible !pb-fib-55 bg-transparent">
-  <motion.div style={{ y: bgY }} className="absolute top-0 right-0 -mr-fib-34 -mt-fib-34 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
+  <motion.div aria-hidden="true" style={{ y: bgY }} className="absolute top-0 right-0 -mr-fib-34 -mt-fib-34 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
   <Box className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
   </motion.div>
 
@@ -167,7 +173,7 @@ export default function Projects() {
   <div className={`absolute inset-y-0 right-0 w-fib-55 bg-gradient-to-l from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
   <div className={`absolute inset-y-0 left-0 w-fib-55 bg-gradient-to-r from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
 
-  <div ref={scrollContainerRef} onScroll={handleScroll} className="flex items-center overflow-x-auto pb-20 no-scrollbar relative z-10 gap-0">
+  <div ref={scrollContainerRef} onScroll={handleScroll} className="flex items-center overflow-x-auto overscroll-x-contain pb-20 no-scrollbar relative z-10 gap-0">
    {SELECTED_PROJECTS.map((p) => (
    <div key={p.id} data-project-frame className="w-[280px] md:w-[320px] h-[420px] md:h-[480px] shrink-0 relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
     <ProjectCard project={p} onClick={(e) => openProject(p, e)} />

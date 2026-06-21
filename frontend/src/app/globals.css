@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     --background: 240 20% 98%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -38,6 +39,7 @@
   }
 
   .dark {
+    color-scheme: dark;
     --background: 0 0% 0%;
     --foreground: 0 0% 95%;
     --card: 24 9.8% 10%;
@@ -64,6 +66,16 @@
     --glass-sheen: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
   }
+}
+
+/* Native <select> option lists: force readable colors in both themes. Some
+   browsers render the option popup with OS defaults regardless of color-scheme,
+   which can make options invisible (e.g. light text on a light popup) — this
+   pins the popup to the active theme's background/foreground. */
+select option,
+select optgroup {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
 /* NProgress Styles */
@@ -117,6 +129,28 @@ html {
   color: hsl(var(--primary-foreground));
 }
 
+/* Interaction polish: remove the grey tap flash on mobile and keep taps
+   snappy (skips the 300ms double-tap delay) on every interactive element. */
+a,
+button,
+[role="button"],
+label,
+summary {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Typography: balance multi-line headings so wraps look intentional, and
+   keep body copy from leaving orphan words on the last line. */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+
 /* Global keyboard focus ring: keyboard users always get a visible focus
    indicator, while mouse/touch users are unaffected (:focus-visible). */
 a:focus-visible,
@@ -168,5 +202,27 @@ summary:focus-visible,
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Print: produce a clean PDF (e.g. of a tool result) by stripping site chrome,
+   decorative canvases and any element opted out via `.no-print`, and forcing
+   readable black-on-white. */
+@media print {
+  nav,
+  footer,
+  canvas,
+  .noise-bg,
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }

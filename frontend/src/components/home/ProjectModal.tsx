@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import { motion, useMotionValue, animate, useReducedMotion } from 'framer-motion';
 import {
@@ -278,7 +279,7 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
      />
 
      {/* Scrollable Content */}
-     <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10" dir="rtl">
+     <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar relative z-10" dir="rtl">
       {/* Sticky top bar — fully covers content scrolling beneath */}
       <div className="sticky top-0 z-50 flex justify-between items-center px-6 md:px-12 lg:px-16 py-4 bg-card/80 backdrop-blur-xl border-b border-border">
        <button
@@ -333,6 +334,15 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
         </div>
        </div>
 
+       {display.slug && (
+        <a
+         href={`/projects/${display.slug}`}
+         className="inline-flex items-center gap-2 mt-8 text-sm font-black font-display text-primary hover:opacity-80 transition-opacity"
+        >
+         مشاهدهٔ صفحهٔ کامل پروژه ↗
+        </a>
+       )}
+
        {/* MEDIA — clearly defined slot for project imagery */}
        <div className="mt-10 md:mt-12">
         {hasImages ? (
@@ -342,8 +352,13 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
             key={i}
             className="relative flex-none w-[85%] md:w-[62%] aspect-[16/9] rounded-2xl md:rounded-[1.75rem] overflow-hidden border border-border bg-secondary/30 snap-start"
            >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt={`${display.title} — ${i + 1}`} className="w-full h-full object-cover" />
+            <Image
+             src={src}
+             alt={`${display.title} — ${i + 1}`}
+             fill
+             sizes="(max-width: 768px) 85vw, 62vw"
+             className="object-cover"
+            />
            </div>
           ))}
          </div>

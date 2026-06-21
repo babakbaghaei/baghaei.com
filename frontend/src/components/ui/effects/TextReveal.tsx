@@ -18,7 +18,7 @@ export const TextReveal = ({ text, className = '' }: TextRevealProps) => {
   const words = text.split(' ');
 
   return (
-    <p ref={container} className={`flex flex-wrap ${className}`}>
+    <p ref={container} className={`relative flex flex-wrap ${className}`}>
       {words.map((word, i) => {
         const start = i / words.length;
         const end = start + 1 / words.length;

@@ -27,7 +27,7 @@ export default function Careers() {
   <Section id="careers" className="border-t border-border">
    <Heading subtitle="رشد">فرصت‌های</Heading>
 
-   <p className="text-muted-foreground max-w-2xl font-sans text-lg md:text-xl leading-relaxed mb-24 text-right ml-auto">
+   <p className="text-muted-foreground max-w-2xl font-sans text-lg md:text-xl leading-relaxed mb-24 text-right me-auto">
     ما همیشه به دنبال استعدادهای درخشان هستیم که مرزهای تکنولوژی را با ما جابجا کنند.
    </p>
 

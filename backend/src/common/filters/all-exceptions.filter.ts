@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
+import * as Sentry from '@sentry/nestjs';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -32,6 +33,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
       `Status: ${httpStatus} Error: ${typeof message === 'object' ? JSON.stringify(message) : message}`,
       exception instanceof Error ? exception.stack : '',
     );
+
+    // Report only genuine server errors to Sentry (no-op without SENTRY_DSN);
+    // 4xx client errors are expected and would be noise.
+    if (httpStatus >= 500) {
+      Sentry.captureException(exception);
+    }
 
     const responseBody = {
       statusCode: httpStatus,

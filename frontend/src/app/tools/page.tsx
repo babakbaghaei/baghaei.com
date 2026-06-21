@@ -50,7 +50,7 @@ export default function ToolsIndex() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 text-primary text-xs font-black font-display bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full mb-6"
           >
-            <Wrench className="w-3.5 h-3.5" />
+            <Wrench aria-hidden="true" className="w-3.5 h-3.5" />
             جعبه ابزار
           </motion.div>
           <motion.h1
@@ -78,13 +78,19 @@ export default function ToolsIndex() {
         <div className="flex flex-col lg:flex-row lg:items-center gap-5 mb-12">
           {/* search */}
           <div className="relative w-full lg:max-w-sm">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
+            <Search aria-hidden="true" className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              type="search"
+              name="tool-search"
+              inputMode="search"
+              autoComplete="off"
+              spellCheck={false}
+              enterKeyHint="search"
               placeholder="جستجوی ابزار…"
               aria-label="جستجوی ابزار"
-              className="w-full bg-card border border-border rounded-2xl py-3.5 pr-11 pl-4 text-sm font-sans focus:border-primary outline-none transition-colors placeholder:text-muted-foreground/50"
+              className="w-full bg-card border border-border rounded-2xl py-3.5 pr-11 pl-4 text-sm font-sans focus:border-primary outline-none focus-visible:border-primary transition-colors placeholder:text-muted-foreground/50"
             />
           </div>
 
@@ -129,7 +135,7 @@ export default function ToolsIndex() {
         {/* Grid */}
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-24 gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
+            <div aria-hidden="true" className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
               <SearchX className="w-7 h-7" />
             </div>
             <p className="text-muted-foreground font-display">ابزاری با این مشخصات پیدا نشد.</p>
@@ -187,7 +193,7 @@ export default function ToolsIndex() {
             />
             <div className="relative flex flex-col md:flex-row md:items-center gap-6 md:justify-between">
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl shrink-0 bg-rose-500/10 text-rose-500">
+                <div aria-hidden="true" className="flex h-12 w-12 items-center justify-center rounded-2xl shrink-0 bg-rose-500/10 text-rose-500">
                   <Bug className="h-6 w-6" strokeWidth={1.75} />
                 </div>
                 <div>
@@ -203,9 +209,9 @@ export default function ToolsIndex() {
                 href={`mailto:${REPORT_EMAIL}?subject=${encodeURIComponent('گزارش مشکل در جعبه ابزار')}`}
                 className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-foreground px-5 py-3.5 text-sm font-black font-display text-background transition-transform hover:scale-[1.02]"
               >
-                <Mail className="h-4 w-4" />
+                <Mail aria-hidden="true" className="h-4 w-4" />
                 گزارش مشکل
-                <ArrowUpLeft className="h-4 w-4 -translate-x-1 opacity-70 transition-transform group-hover:translate-x-0" />
+                <ArrowUpLeft aria-hidden="true" className="h-4 w-4 -translate-x-1 opacity-70 transition-transform group-hover:translate-x-0" />
               </a>
             </div>
           </div>

@@ -41,4 +41,30 @@ describe('ProjectsService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('returns [] for an empty search query without hitting the DB', async () => {
+    mockPrismaService.project.findMany.mockClear();
+    const result = await service.search('   ');
+    expect(result).toEqual([]);
+    expect(mockPrismaService.project.findMany).not.toHaveBeenCalled();
+  });
+
+  it('runs a case-insensitive OR search on title and description', async () => {
+    mockPrismaService.project.findMany.mockClear();
+    mockPrismaService.project.findMany.mockResolvedValue([
+      { id: 1, title: 'Ravro' },
+    ]);
+    const result = await service.search('ravro');
+    expect(mockPrismaService.project.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          OR: [
+            { title: { contains: 'ravro', mode: 'insensitive' } },
+            { description: { contains: 'ravro', mode: 'insensitive' } },
+          ],
+        },
+      }),
+    );
+    expect(result).toHaveLength(1);
+  });
 });

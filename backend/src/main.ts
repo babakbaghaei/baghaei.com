@@ -1,3 +1,4 @@
+import './instrument'; // Sentry — must be imported before anything else.
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -5,10 +6,14 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { SecurityService } from './security/security.service';
 import { Logger } from 'nestjs-pino';
+import { join } from 'path';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Serve uploaded files (image uploads) statically at /uploads.
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads/' });
 
   // Use pino-logger
   app.useLogger(app.get(Logger));

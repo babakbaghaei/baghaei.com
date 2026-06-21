@@ -1,0 +1,16 @@
+{
+  "common": {
+    "nav": {
+      "home": "خانه",
+      "products": "محصولات",
+      "tools": "ابزارها",
+      "services": "خدمات",
+      "about": "درباره ما"
+    },
+    "cta": {
+      "startCollaboration": "شروع همکاری",
+      "viewProjects": "مشاهده پروژه‌ها",
+      "backToTop": "بازگشت به بالای صفحه"
+    }
+  }
+}

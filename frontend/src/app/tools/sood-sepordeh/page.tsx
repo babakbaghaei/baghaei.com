@@ -16,6 +16,10 @@ import {
   Notice,
   ShareButton,
   useShareResult,
+  PrintButton,
+  useToolHistory,
+  HistoryPanel,
+  type ToolHistoryEntry,
   AnimatePresence,
   motion,
   faNum,
@@ -44,6 +48,16 @@ export default function SoodSepordeh() {
   const [unit, setUnit] = useState<Unit>('toman');
 
   const { share, copied } = useShareResult();
+  const { entries, add: addHistory, clear: clearHistory } = useToolHistory('sood-sepordeh');
+
+  const applyParams = (params?: Record<string, string>) => {
+    if (!params) return;
+    if (params.principal && /^\d+$/.test(params.principal)) setPrincipal(Number(params.principal).toLocaleString('en-US'));
+    if (params.rate && /^\d*\.?\d+$/.test(params.rate)) setRate(params.rate);
+    if (params.years && /^\d*\.?\d+$/.test(params.years)) setYears(params.years);
+    if (params.freq && FREQUENCIES.some((f) => f.value === params.freq)) setFreq(params.freq);
+    if (params.unit === 'rial' || params.unit === 'toman') setUnit(params.unit);
+  };
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
@@ -86,20 +100,31 @@ export default function SoodSepordeh() {
   const u = unitLabel(unit);
   const freqLabel = FREQUENCIES.find((f) => f.value === freq)?.label ?? '';
 
+  const buildParams = (): Record<string, string> => ({
+    principal: String(principalNum),
+    rate: String(annualRate),
+    years: String(t),
+    freq,
+    unit,
+  });
+
   const onShare = () => {
     if (!calc) return;
+    const params = buildParams();
     share({
       title: 'سود سپرده و سرمایه‌گذاری',
       text: `سپردهٔ ${fmtMoney(principalNum)} ${u} با نرخ ${faNum(String(annualRate))}٪ در ${faNum(String(t))} سال — ارزش نهایی (مرکب): ${fmtMoney(calc.compoundTotal)} ${u}`,
-      params: {
-        principal: String(principalNum),
-        rate: String(annualRate),
-        years: String(t),
-        freq,
-        unit,
-      },
+      params,
+    });
+    // Record this calculation so the user can revisit it later.
+    addHistory({
+      label: `${fmtMoney(principalNum)} ${u} · ${faNum(String(annualRate))}٪ · ${faNum(String(t))} سال`,
+      result: `${fmtMoney(calc.compoundTotal)} ${u}`,
+      params,
     });
   };
+
+  const onSelectHistory = (entry: ToolHistoryEntry) => applyParams(entry.params);
 
   return (
     <ToolShell
@@ -208,12 +233,17 @@ export default function SoodSepordeh() {
                 <Notice accent={ACCENT}>
                   تفاوت سود مرکب و ساده هرچه مدت طولانی‌تر باشد بیشتر می‌شود؛ این قدرت بهره‌مرکب است.
                 </Notice>
-                <ShareButton accent={ACCENT} copied={copied} onClick={onShare} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <ShareButton accent={ACCENT} copied={copied} onClick={onShare} />
+                  <PrintButton accent={ACCENT} />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </VerdictPanel>
       </TwoPane>
+
+      <HistoryPanel entries={entries} onClear={clearHistory} onSelect={onSelectHistory} />
     </ToolShell>
   );
 }

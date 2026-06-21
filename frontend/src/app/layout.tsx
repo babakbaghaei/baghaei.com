@@ -2,19 +2,19 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import Script from "next/script";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import AnalyticsGate from "@/components/providers/AnalyticsGate";
 import BackgroundGrid from "@/components/effects/BackgroundGrid";
 import CookieConsent from "@/components/layout/CookieConsent";
 import { RootMobileMenu } from "@/components/layout/RootMobileMenu";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import MotionProvider from "@/components/providers/MotionProvider";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { CommandMenu } from "@/components/ui/CommandMenu";
 import PageTransition from "@/components/effects/PageTransition";
 import CustomCursor from "@/components/effects/CustomCursor";
-import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
-import ProgressBar from "@/components/effects/ProgressBar";
 import Preloader from "@/components/effects/Preloader";
-import BackToTop from "@/components/ui/BackToTop";
-import { Suspense } from "react";
+import ChatWidget from "@/components/layout/ChatWidget";
 
 const iransans = localFont({
  src: [
@@ -41,7 +41,7 @@ const yekanbakh = localFont({
  variable: "--font-yekanbakh",
 });
 
-import GlobalUniverse from "@/components/effects/GlobalUniverse";
+import GlobalUniverse from "@/components/effects/GlobalUniverseLazy";
 
 export const metadata: Metadata = {
  title: {
@@ -50,6 +50,7 @@ export const metadata: Metadata = {
  },
  description: "پیشرو در معماری سیستم‌های سازمانی مقیاس‌پذیر و مهندسی نرم‌افزار دقیق. ارائه راهکارهای نوین در هوش مصنوعی، امنیت سایبری و زیرساخت‌های ابری.",
  applicationName: "Baghaei Tech Group",
+ manifest: "/manifest.json",
  authors: [{ name: "Babak Baghaei", url: "https://baghaei.com" }],
  generator: "Next.js",
  keywords: ["گروه فناوری بقایی", "بابک بقایی", "مهندسی نرم‌افزار", "معماری سیستم", "هوش مصنوعی", "امنیت سایبری", "طراحی وب", "توسعه دهنده ارشد", "ایران", "تکنولوژی لوکس"],
@@ -57,6 +58,14 @@ export const metadata: Metadata = {
  metadataBase: new URL('https://baghaei.com'),
  alternates: {
   canonical: '/',
+  // hreflang structure. 'en-US': '/en' should be added once English pages exist.
+  languages: {
+   'fa-IR': '/',
+   'x-default': '/',
+  },
+  types: {
+   'application/rss+xml': '/feed.xml',
+  },
  },
  icons: {
   icon: '/logo.svg',
@@ -106,16 +115,19 @@ export const viewport: Viewport = {
  initialScale: 1,
  // Do not block zoom: maximumScale/userScalable:false break pinch-to-zoom and
  // fail WCAG 1.4.4 (Resize Text). Users must be able to magnify the page.
- colorScheme: 'dark',
+ // color-scheme is driven per theme in globals.css (:root = light, .dark = dark)
+ // so native controls/scrollbars match the active theme, not a hardcoded one.
 };
 
-export default function RootLayout({
+export default async function RootLayout({
  children,
 }: Readonly<{
  children: React.ReactNode;
 }>) {
+ const locale = await getLocale();
+ const messages = await getMessages();
  return (
-  <html lang="fa" dir="rtl" suppressHydrationWarning className={`${iransans.variable} ${yekanbakh.variable} bg-background`}>
+  <html lang={locale} dir="rtl" suppressHydrationWarning className={`${iransans.variable} ${yekanbakh.variable} bg-background`}>
    <body className="antialiased text-foreground selection:bg-primary selection:text-primary-foreground font-sans bg-transparent">
     <a
      href="#main-content"
@@ -123,6 +135,7 @@ export default function RootLayout({
     >
      رفتن به محتوای اصلی
     </a>
+    <NextIntlClientProvider locale={locale} messages={messages}>
     <ThemeProvider
      attribute="class"
      defaultTheme="dark"
@@ -145,7 +158,7 @@ export default function RootLayout({
           ],
           "contactPoint": {
            "@type": "ContactPoint",
-           "telephone": "+98-912-000-0000",
+           "telephone": "+989115790013",
            "contactType": "sales",
            "areaServed": "IR",
            "availableLanguage": ["Persian", "English"]
@@ -170,28 +183,28 @@ export default function RootLayout({
        }
       `}
      </Script>
-     
-     <Preloader />
-     <div className="fixed inset-0 z-[-2] pointer-events-none">
-       <GlobalUniverse renderBackground />
-     </div>
-     <div className="noise-bg opacity-[0.03] pointer-events-none" />
-     <BackgroundGrid />
-     <CustomCursor />
-     <Suspense fallback={null}>
-       <ProgressBar />
-     </Suspense>
-     <div id="main-content">
-       <PageTransition>
-         {children}
-       </PageTransition>
-     </div>
-     <BackToTop />
-     <CommandMenu />
-     <CookieConsent />
-     <RootMobileMenu />
+
+     <MotionProvider>
+      <Preloader />
+      <div className="fixed inset-0 z-[-2] pointer-events-none print:hidden">
+        <GlobalUniverse renderBackground />
+      </div>
+      <div className="noise-bg opacity-[0.03] pointer-events-none" />
+      <BackgroundGrid />
+      <CustomCursor />
+      <div id="main-content">
+        <PageTransition>
+          {children}
+        </PageTransition>
+      </div>
+      <ChatWidget />
+      <CommandMenu />
+      <CookieConsent />
+      <RootMobileMenu />
+     </MotionProvider>
     </ThemeProvider>
-    <GoogleAnalytics gaId="G-YSHJT31R0K" />
+    <AnalyticsGate gaId="G-YSHJT31R0K" />
+    </NextIntlClientProvider>
    </body>
   </html>
  );

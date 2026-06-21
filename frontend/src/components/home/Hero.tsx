@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
+import { motion, useScroll } from 'framer-motion';
 import { Button } from '../ui/Button';
 import Magnetic from '@/components/effects/Magnetic';
 import GlobalUniverse from '@/components/effects/GlobalUniverse';
@@ -92,9 +91,9 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               </span>
             </motion.div>
             
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-display tracking-tight leading-[1.1] w-full">
+            <h1 className="text-[7vw] sm:text-6xl md:text-8xl lg:text-9xl font-display tracking-tight leading-[1.1] w-full">
               <div className="w-full flex flex-col items-start text-right gap-2">
-                <div className="h-[70px] md:h-[110px] lg:h-[150px] flex items-center justify-start whitespace-nowrap overflow-visible">
+                <div className="h-[52px] sm:h-[70px] md:h-[110px] lg:h-[150px] flex items-center justify-start whitespace-nowrap overflow-visible">
                   <span className="text-muted-foreground font-bold">{displayTextLine1}</span>
                   {phase === 'line1' && (
                     <motion.div 
@@ -104,7 +103,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                     />
                   )}
                 </div>
-                <div className="h-[70px] md:h-[110px] lg:h-[150px] flex items-center justify-start whitespace-nowrap overflow-visible">
+                <div className="h-[52px] sm:h-[70px] md:h-[110px] lg:h-[150px] flex items-center justify-start whitespace-nowrap overflow-visible">
                   <span className="text-foreground font-black">
                     {displayTextLine2.endsWith('.') ? (
                       <>{displayTextLine2.slice(0, -1)}<span className="text-muted-foreground font-bold">.</span></>
@@ -141,7 +140,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
             </motion.div>
           </div>
 
-          <div className="hidden lg:block order-2 h-[500px] w-full relative">
+          <div className="order-2 h-[280px] sm:h-[360px] lg:h-[500px] w-full relative">
             <GlobalUniverse />
           </div>
         </div>
@@ -149,14 +148,6 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
         <div className="w-full h-px bg-border my-8" />
         {children}
       </div>
-
-      <motion.div 
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-muted-foreground opacity-30 pointer-events-none"
-      >
-        <ArrowDown className="w-6 h-6" />
-      </motion.div>
     </section>
   );
 }

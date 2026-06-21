@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SecurityService } from '../security/security.service';
+import { TwoFactorService } from './two-factor.service';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
@@ -38,6 +39,7 @@ describe('AuthService', () => {
         { provide: JwtService, useValue: mockJwtService },
         { provide: ConfigService, useValue: mockConfigService },
         { provide: SecurityService, useValue: mockSecurityService },
+        TwoFactorService,
       ],
     }).compile();
 

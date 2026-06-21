@@ -2,13 +2,17 @@
 
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 
 export default function Magnetic({ children, disabled = false }: { children: React.ReactNode, disabled?: boolean }) {
     const ref = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
+    const shouldReduceMotion = usePrefersReducedMotion();
 
     const handleMouse = (e: React.MouseEvent) => {
-        if (disabled) return;
+        // Skip the magnetic pull for reduced-motion users — the wrapper still
+        // renders its children, just without the cursor-following displacement.
+        if (disabled || shouldReduceMotion) return;
         const { clientX, clientY } = e;
         const { height, width, left, top } = ref.current!.getBoundingClientRect();
         const middleX = clientX - (left + width / 2);

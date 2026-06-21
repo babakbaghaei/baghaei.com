@@ -6,7 +6,7 @@
  * جلوگیری از تکرار قالب در هر صفحه.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -18,6 +18,9 @@ import {
   AlertTriangle,
   Info,
   BookOpen,
+  Printer,
+  History as HistoryIcon,
+  Trash2,
   type LucideIcon,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils/format';
@@ -637,6 +640,150 @@ export function ShareButton({
         </>
       )}
     </button>
+  );
+}
+
+/* ───────────── print / PDF ───────────── */
+
+export function PrintButton({ accent }: { accent: string }) {
+  return (
+    <button
+      onClick={() => window.print()}
+      aria-label="چاپ یا ذخیره به‌صورت PDF"
+      className="no-print w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-black font-display transition-all"
+      style={{
+        background: `rgba(${accent}, 0.1)`,
+        color: `rgb(${accent})`,
+        border: `1px solid rgba(${accent}, 0.25)`,
+      }}
+    >
+      <Printer className="w-4 h-4" /> خروجی PDF / چاپ
+    </button>
+  );
+}
+
+/* ───────────── history (localStorage) ───────────── */
+
+export interface ToolHistoryEntry {
+  id: number;
+  at: number;
+  label: string; // human-readable input summary
+  result: string; // human-readable result
+  params?: Record<string, string>; // to rebuild the calculation via URL
+}
+
+// Module-level cache so useSyncExternalStore returns a STABLE reference per key
+// (re-parsing localStorage on every render would loop). Keyed by storage key.
+const EMPTY_HISTORY: ToolHistoryEntry[] = [];
+const historyCache: Record<string, { raw: string | null; parsed: ToolHistoryEntry[] }> = {};
+const historyListeners: Record<string, Set<() => void>> = {};
+
+function readHistory(key: string): ToolHistoryEntry[] {
+  let raw: string | null = null;
+  try {
+    raw = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+  } catch {
+    raw = null;
+  }
+  const cached = historyCache[key];
+  if (cached && cached.raw === raw) return cached.parsed;
+  let parsed: ToolHistoryEntry[] = [];
+  try {
+    parsed = raw ? JSON.parse(raw) : [];
+  } catch {
+    parsed = [];
+  }
+  historyCache[key] = { raw, parsed };
+  return parsed;
+}
+
+function writeHistory(key: string, entries: ToolHistoryEntry[]) {
+  const raw = JSON.stringify(entries);
+  try {
+    localStorage.setItem(key, raw);
+  } catch {
+    /* private mode / disabled storage */
+  }
+  historyCache[key] = { raw, parsed: entries }; // keep reference identity
+  historyListeners[key]?.forEach((l) => l());
+}
+
+export function useToolHistory(toolKey: string, limit = 5) {
+  const key = `tool-history:${toolKey}`;
+
+  const subscribe = useCallback(
+    (cb: () => void) => {
+      (historyListeners[key] ||= new Set()).add(cb);
+      const onStorage = (e: StorageEvent) => {
+        if (e.key === key) cb();
+      };
+      window.addEventListener('storage', onStorage);
+      return () => {
+        historyListeners[key]?.delete(cb);
+        window.removeEventListener('storage', onStorage);
+      };
+    },
+    [key],
+  );
+
+  const entries = useSyncExternalStore(
+    subscribe,
+    () => readHistory(key),
+    () => EMPTY_HISTORY,
+  );
+
+  const add = useCallback(
+    (entry: Omit<ToolHistoryEntry, 'id' | 'at'>) => {
+      const stamp = Date.now();
+      const next = [{ ...entry, id: stamp, at: stamp }, ...readHistory(key)].slice(0, limit);
+      writeHistory(key, next);
+    },
+    [key, limit],
+  );
+
+  const clear = useCallback(() => writeHistory(key, []), [key]);
+
+  return { entries, add, clear };
+}
+
+export function HistoryPanel({
+  entries,
+  onClear,
+  onSelect,
+}: {
+  entries: ToolHistoryEntry[];
+  onClear: () => void;
+  onSelect?: (entry: ToolHistoryEntry) => void;
+}) {
+  if (entries.length === 0) return null;
+  return (
+    <div className="no-print mt-8 rounded-[1.75rem] border border-border bg-card/40 p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="flex items-center gap-2 text-sm font-black font-display text-foreground">
+          <HistoryIcon className="w-4 h-4 text-primary" /> محاسبات اخیر
+        </h3>
+        <button
+          onClick={onClear}
+          aria-label="پاک‌کردن تاریخچه"
+          className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive transition-colors font-display"
+        >
+          <Trash2 className="w-3.5 h-3.5" /> پاک‌کردن
+        </button>
+      </div>
+      <ul className="space-y-2">
+        {entries.map((e) => (
+          <li key={e.id}>
+            <button
+              onClick={() => onSelect?.(e)}
+              className="w-full text-right flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-background/40 px-4 py-2.5 hover:border-primary/40 transition-colors"
+            >
+              <span className="text-xs text-muted-foreground font-display truncate">{e.label}</span>
+              <span className="text-xs font-bold font-display shrink-0">{e.result}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

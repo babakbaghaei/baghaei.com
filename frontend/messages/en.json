@@ -1,0 +1,16 @@
+{
+  "common": {
+    "nav": {
+      "home": "Home",
+      "products": "Products",
+      "tools": "Tools",
+      "services": "Services",
+      "about": "About"
+    },
+    "cta": {
+      "startCollaboration": "Start a Project",
+      "viewProjects": "View Projects",
+      "backToTop": "Back to top"
+    }
+  }
+}
