@@ -112,7 +112,6 @@ export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
     <Link
       href={`/tools/${tool.slug}`}
       className="block h-full rounded-3xl outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-      aria-label={tool.title}
     >
       {card}
     </Link>

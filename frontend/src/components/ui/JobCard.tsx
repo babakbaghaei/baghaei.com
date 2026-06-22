@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { Card } from './Card';
 
@@ -19,8 +18,20 @@ interface JobCardProps {
 
 export const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
  return (
-  <div onClick={onClick} className="cursor-pointer h-full">
-   <Card 
+  <div
+   onClick={onClick}
+   onKeyDown={(e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+     e.preventDefault();
+     onClick();
+    }
+   }}
+   role="button"
+   tabIndex={0}
+   aria-label={`ارسال درخواست برای موقعیت شغلی ${job.title}`}
+   className="cursor-pointer h-full rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+  >
+   <Card
     className="group space-y-8 h-full flex flex-col"
     glowColor="var(--glass-fill)"
    >

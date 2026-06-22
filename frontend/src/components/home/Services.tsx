@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import ServicesList, { Service } from './ServicesList';
+import { getServices } from '@/app/actions';
 
 const STATIC_SERVICES: Service[] = [
   { id: 1, title: 'تحلیل و مشاوره', description: 'بررسی دقیق نیازها و تدوین نقشه راه تکنولوژی برای پروژه‌های مقیاس‌پذیر.', iconName: 'SearchCode', order: 1 },
@@ -16,19 +17,20 @@ export default function Services() {
   const [services, setServices] = useState<Service[]>(STATIC_SERVICES);
 
   useEffect(() => {
-    async function fetchServices() {
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
-        const res = await fetch(`${apiUrl}/api/v1/services`);
-        if (res.ok) {
-          const data = await res.json();
-          setServices(data);
-        }
-      } catch (error) {
-        // Fallback is already set
-      }
-    }
-    fetchServices();
+    // Fetch via the server action: the request runs on the server (not the
+    // browser), so it is not blocked by CSP and reaches the backend over its
+    // real address. The action itself falls back to its own static list on error.
+    let active = true;
+    getServices()
+      .then((data) => {
+        if (active && Array.isArray(data) && data.length > 0) setServices(data);
+      })
+      .catch(() => {
+        // Static fallback is already set.
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (

@@ -1,13 +1,21 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { getAllPosts } from '@/lib/blog';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import BackgroundGrid from '@/components/ui/effects/BackgroundGrid';
 import BlogList from '@/components/blog/BlogList';
 
-export const metadata = {
-  title: 'وبلاگ | گروه فناوری بقایی',
-  description: 'تجربیات، تحلیل‌ها و دانش فنی ما در مسیر خلق سیستم‌های پیشرفته.',
+export const metadata: Metadata = {
+  title: 'وبلاگ',
+  description: 'مقالات تخصصی درباره معماری نرم‌افزار، هوش مصنوعی، امنیت سایبری و زیرساخت‌های ابری.',
+  alternates: { canonical: '/blog' },
+  openGraph: {
+    type: 'website',
+    title: 'وبلاگ گروه فناوری بقایی',
+    description: 'مقالات تخصصی درباره معماری نرم‌افزار، هوش مصنوعی، امنیت سایبری و زیرساخت‌های ابری.',
+    url: '/blog',
+  },
 };
 
 export default async function BlogPage() {

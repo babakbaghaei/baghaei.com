@@ -3,7 +3,6 @@ import type { NextRequest } from 'next/server';
 
 export function proxy(request: NextRequest) {
  const response = NextResponse.next();
- const url = request.nextUrl.clone();
  const hostname = request.headers.get('host') || '';
  const { pathname } = request.nextUrl;
 
@@ -15,7 +14,7 @@ export function proxy(request: NextRequest) {
  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()');
  headers.set('X-XSS-Protection', '1; mode=block');
  headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
- headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com;");
+ headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.googletagmanager.com http://127.0.0.1:8000 http://localhost:8000;");
 
  // 1. Subdomain Routing (tools.baghaei.com)
  if (hostname.startsWith('tools.')) {
@@ -25,24 +24,15 @@ export function proxy(request: NextRequest) {
   }
  }
 
- // 2. Admin Protection
- if (pathname.startsWith('/admin')) {
-  const allowedIps = ['46.249.99.158', '127.0.0.1'];
-  const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-           request.headers.get('x-real-ip') || 
-           'unknown';
-
-  // Allow localhost, specific static IP, OR Docker internal networks (172.x, 192.168.x) for local testing
-  const isLocalOrDocker = clientIp === '::1' || clientIp.startsWith('172.') || clientIp.startsWith('192.168.') || clientIp.startsWith('10.');
-  
-  // TEMPORARY: Allow all for debugging/testing purposes
-  const isAllowed = true; // allowedIps.includes(clientIp) || isLocalOrDocker || process.env.NODE_ENV === 'development';
-
-  if (!isAllowed) {
-   console.warn(`[SECURITY] BLOCKED Access to ${pathname} | IP: ${clientIp} | ENV: ${process.env.NODE_ENV}`);
-   return NextResponse.rewrite(new URL('/forbidden', request.url));
-  } else {
-    console.log(`[SECURITY] ALLOWED Access to ${pathname} | IP: ${clientIp}`);
+ // 2. Admin Protection — edge presence-guard: bounce unauthenticated direct
+ //    hits to the login page. The backend still validates the JWT (Bearer) on
+ //    every API call, so this is defense-in-depth, not the sole gate. The
+ //    `admin_token` cookie is set by the login page alongside localStorage so
+ //    the middleware can see it (localStorage is invisible to the edge).
+ if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
+  const hasToken = !!request.cookies.get('admin_token')?.value;
+  if (!hasToken) {
+   return NextResponse.redirect(new URL('/admin/login', request.url));
   }
  }
 

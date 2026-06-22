@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Globe, Layers, Smartphone, Gamepad2, Terminal, Workflow, Database, Box, Cpu, Shield, Palette, Radio, Braces } from 'lucide-react';
+import Image from 'next/image';
+import { Globe, Layers, Smartphone, Gamepad2, Terminal, Workflow, Database, Box, Cpu, Shield, Palette, Braces, Dumbbell } from 'lucide-react';
 import { Card } from './Card';
 
 export interface Metric {
@@ -21,49 +22,85 @@ export interface Project {
   borderColor: string;
   tech?: string[];
   href?: string;
+  logo?: string;
+  // Lucide icon name used as the corner mark when there is no brand-logo asset.
+  icon?: string;
   images?: string[];
+  // Heavily blur/lock the project's screenshots in the detail modal (NDA work).
+  imagesLocked?: boolean;
+  // Keep in data but hide from every public listing (re-enable later).
+  hidden?: boolean;
   isLocked: boolean;
 }
 
-const TechIcon = ({ name }: { name: string }) => {
+// Icon overrides for the corner mark fallback (when a project has no logo asset).
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Globe, Dumbbell, Gamepad2, Cpu, Shield, Smartphone, Palette,
+};
+
+const TechIcon = ({ name, className = "w-3 h-3" }: { name: string; className?: string }) => {
  const n = name.toLowerCase();
- if (n.includes('react') || n.includes('next')) return <Globe className="w-3 h-3" />;
- if (n.includes('webgl') || n.includes('three')) return <Layers className="w-3 h-3" />;
- if (n.includes('android') || n.includes('ios')) return <Smartphone className="w-3 h-3" />;
- if (n.includes('unity')) return <Gamepad2 className="w-3 h-3" />;
- if (n.includes('node') || n.includes('go') || n.includes('python')) return <Terminal className="w-3 h-3" />;
- if (n.includes('graphql') || n.includes('api')) return <Workflow className="w-3 h-3" />;
- if (n.includes('sql') || n.includes('redis')) return <Database className="w-3 h-3" />;
- if (n.includes('docker') || n.includes('k8s')) return <Box className="w-3 h-3" />;
- if (n.includes('ai') || n.includes('llm')) return <Cpu className="w-3 h-3" />;
- if (n.includes('security')) return <Shield className="w-3 h-3" />;
- if (n.includes('branding') || n.includes('ui')) return <Palette className="w-3 h-3" />;
- return <Braces className="w-3 h-3" />;
+ if (n.includes('react') || n.includes('next')) return <Globe className={className} />;
+ if (n.includes('webgl') || n.includes('three')) return <Layers className={className} />;
+ if (n.includes('android') || n.includes('ios')) return <Smartphone className={className} />;
+ if (n.includes('unity')) return <Gamepad2 className={className} />;
+ if (n.includes('node') || n.includes('go') || n.includes('python')) return <Terminal className={className} />;
+ if (n.includes('graphql') || n.includes('api')) return <Workflow className={className} />;
+ if (n.includes('sql') || n.includes('redis')) return <Database className={className} />;
+ if (n.includes('docker') || n.includes('k8s')) return <Box className={className} />;
+ if (n.includes('ai') || n.includes('llm')) return <Cpu className={className} />;
+ if (n.includes('security')) return <Shield className={className} />;
+ if (n.includes('branding') || n.includes('ui')) return <Palette className={className} />;
+ return <Braces className={className} />;
+};
+
+// Project brand logo rendered solid in the content flow — the same crisp treatment
+// as the open detail modal (NOT a faint background watermark). Falls back to the
+// project's category icon when no brand-logo asset exists.
+const ProjectLogo = ({ project, size }: { project: Project; size: string }) => {
+  const OverrideIcon = project.icon ? ICON_MAP[project.icon] : null;
+
+  if (project.logo) {
+    return (
+      <Image
+        src={project.logo}
+        alt=""
+        aria-hidden
+        width={40}
+        height={40}
+        className={`${size} object-contain shrink-0 drop-shadow-lg`}
+      />
+    );
+  }
+  return (
+    <div className="text-primary opacity-50 shrink-0 drop-shadow-lg">
+      {OverrideIcon ? <OverrideIcon className={size} /> : <TechIcon name={project.tech?.[0] || project.category} className={size} />}
+    </div>
+  );
 };
 
 const ProjectContent = ({ project, horizontal }: { project: Project, horizontal: boolean }) => {
   if (horizontal) {
     return (
       <div className="flex items-center h-full w-full text-right px-8 py-4" dir="rtl" style={{ transformStyle: "preserve-3d" }}>
-        <div 
-          className="ml-6 text-primary/80 shrink-0" 
+        <div
+          className="ml-6 shrink-0"
           style={{ transform: "translateZ(40px)" }}
         >
-          <TechIcon name={project.tech?.[0] || 'code'} />
+          <ProjectLogo project={project} size="w-9 h-9" />
         </div>
-        <div className="flex-1 space-y-0.5 overflow-visible" style={{ transformStyle: "preserve-3d" }}>
-          <h3 
-            className="font-display text-foreground leading-tight font-bold text-lg md:text-xl truncate" 
+        <div className="flex-1 min-w-0 space-y-0.5 overflow-visible" style={{ transformStyle: "preserve-3d" }}>
+          <h3
+            className="font-display text-foreground leading-tight font-bold text-lg md:text-xl truncate"
             style={{ transform: "translateZ(60px)" }}
           >
             {project.title}
           </h3>
-          <p
-            className="text-muted-foreground/70 font-sans text-xs md:text-sm leading-relaxed line-clamp-2"
-            style={{ transform: "translateZ(30px)" }}
-          >
-            {project.desc}
-          </p>
+          <div style={{ transform: "translateZ(30px)" }}>
+            <p className="text-muted-foreground/70 font-sans text-xs md:text-sm leading-relaxed line-clamp-2">
+              {project.desc}
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -71,29 +108,31 @@ const ProjectContent = ({ project, horizontal }: { project: Project, horizontal:
 
   return (
     <div className="flex flex-col h-full w-full text-right" dir="rtl" style={{ transformStyle: "preserve-3d" }}>
-      <div className="space-y-3 flex-1 overflow-visible" style={{ transformStyle: "preserve-3d" }}>
+      <div className="space-y-3 flex-1 min-h-0 overflow-visible" style={{ transformStyle: "preserve-3d" }}>
         <div className="flex items-center justify-start" style={{ transform: "translateZ(30px)" }}>
           <span className="text-[10px] font-normal uppercase font-display bg-white/5 px-3 py-1 rounded-full border border-white/5 text-muted-foreground">
             {project.role}
           </span>
         </div>
-        <h3 
-          className="font-display text-foreground leading-tight font-black text-2xl md:text-3xl" 
-          style={{ transform: "translateZ(80px)" }}
-        >
-          {project.title}
-        </h3>
-        <p 
-          className="text-muted-foreground font-sans text-sm leading-relaxed line-clamp-4" 
-          style={{ transform: "translateZ(40px)" }}
-        >
-          {project.desc}
-        </p>
+        <div className="flex items-center gap-3" style={{ transform: "translateZ(80px)" }}>
+          <ProjectLogo project={project} size="w-9 h-9 md:w-10 md:h-10" />
+          <h3 className="font-display text-foreground leading-tight font-black text-2xl md:text-3xl line-clamp-2">
+            {project.title}
+          </h3>
+        </div>
+        {/* translateZ lives on the WRAPPER, never on the clamped <p>: Safari drops
+            -webkit-line-clamp when the clamped element itself carries a transform,
+            which let the description spill over the tech tags. */}
+        <div style={{ transform: "translateZ(40px)" }}>
+          <p className="text-muted-foreground font-sans text-sm leading-relaxed line-clamp-3">
+            {project.desc}
+          </p>
+        </div>
       </div>
       {project.tech && project.tech.length > 0 && (
-        <div 
-          className="flex flex-wrap gap-1.5 md:gap-2 mt-6 justify-start" 
-          dir="ltr" 
+        <div
+          className="flex flex-wrap gap-1.5 md:gap-2 mt-4 justify-end"
+          dir="ltr"
           style={{ transform: "translateZ(50px)" }}
         >
           {project.tech.slice(0, 4).map((t, i) => (

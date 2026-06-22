@@ -24,7 +24,7 @@ export default function CodeBlock({ children, className }: any) {
           {copied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
         </button>
       </div>
-      <pre className="p-6 overflow-x-auto custom-scrollbar">
+      <pre dir="ltr" className="p-6 overflow-x-auto custom-scrollbar text-left">
         <code className="text-sm font-mono leading-relaxed text-zinc-300">
           {children}
         </code>

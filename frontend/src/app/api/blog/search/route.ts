@@ -11,7 +11,7 @@ export async function GET() {
       tags: post.tags
     }));
     return NextResponse.json(searchData);
-  } catch (error) {
+  } catch {
     return NextResponse.json([], { status: 500 });
   }
 }

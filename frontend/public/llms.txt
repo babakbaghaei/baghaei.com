@@ -1,0 +1,15 @@
+# گروه فناوری بقایی (Baghaei Tech Group)
+
+> Persian (RTL) software engineering studio specializing in scalable enterprise system architecture, AI, cybersecurity, and web & mobile development. Also publishes free, offline-capable Persian utility calculators.
+
+## Main pages
+- [خانه / Home](https://baghaei.com/): Company overview, services, and selected projects.
+- [پروژه‌ها / Projects](https://baghaei.com/projects): Portfolio of delivered platforms and products.
+- [وبلاگ / Blog](https://baghaei.com/blog): Engineering articles on architecture, microservices, security, and DevOps.
+- [ابزارها / Tools](https://baghaei.com/tools): Free Persian calculators (loans, inheritance, tax, BMI, unit conversion, and more).
+- [درباره ما / About](https://baghaei.com/about): Team, expertise, and values.
+- [تماس / Contact](https://baghaei.com/#contact): Start a collaboration.
+
+## Legal
+- [قوانین و مقررات / Terms](https://baghaei.com/terms)
+- [حریم خصوصی / Privacy](https://baghaei.com/privacy)

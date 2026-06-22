@@ -5,13 +5,11 @@ import { ProjectForm } from '@/components/admin/ProjectForm';
 
 export default function NewProjectPage() {
  return (
-  <div className="min-h-screen bg-background text-foreground p-8 md:p-20">
-   <div className="max-w-5xl mx-auto space-y-12">
-    <header className="border-b border-border pb-8">
-     <h1 className="text-3xl font-black font-display uppercase">ایجاد پروژه جدید</h1>
-    </header>
-    <ProjectForm />
-   </div>
+  <div className="space-y-12">
+   <header className="border-b border-border pb-8">
+    <h1 className="text-3xl font-black font-display uppercase">ایجاد پروژه جدید</h1>
+   </header>
+   <ProjectForm />
   </div>
  );
 }

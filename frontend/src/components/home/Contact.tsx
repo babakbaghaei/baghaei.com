@@ -1,22 +1,16 @@
 'use client';
 
-import React, { useState, useTransition, useRef, useEffect } from 'react';
+import React, { useState, useTransition } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { submitContactForm } from '@/app/actions';
-import { Mail, Send, Check, Loader2 } from 'lucide-react';
+import { Mail, Send, Check } from 'lucide-react';
 import { Section, Heading } from '../ui/Layout';
 import { Button } from '../ui/Button';
 import Magnetic from '@/components/effects/Magnetic';
-import { useSound } from '@/lib/utils/sounds';
-import { toPersianDigits } from '@/lib/utils/format';
-import confetti from 'canvas-confetti';
 
 export default function Contact() {
  const [isPending, startTransition] = useTransition();
  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
- const { play } = useSound();
- // Timestamp of first render — used to reject instantaneous (bot) submissions.
- const formRenderedAt = useRef<number>(Date.now());
 
  // Use GLOBAL scroll to avoid hydration issues with refs
  const { scrollYProgress } = useScroll();
@@ -25,23 +19,24 @@ export default function Contact() {
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
  e.preventDefault();
  const form = e.currentTarget;
+ const formData = new FormData(form);
 
- // Anti-bot min-time: a human cannot fill three required fields in under half
- // a second. Drop instantaneous (scripted) submissions, mimicking success so
- // the bot gets no signal. Real users are never this fast.
- if (Date.now() - formRenderedAt.current < 500) {
+ // Anti-bot: only the hidden honeypot ("company") flags a bot. We mimic success
+ // so the bot gets no signal — but a real user submitting fast (autofill+Enter)
+ // never trips this, so they never get a false "sent". No time-based gate.
+ if ((formData.get('company') as string)?.trim()) {
   setStatus('success');
   form.reset();
   return;
  }
-
- const formData = new FormData(form);
 
  startTransition(async () => {
   const result = await submitContactForm(formData);
   if (result.success) {
    setStatus('success');
    form.reset();
+   // Load confetti only on success — keeps it out of the initial bundle.
+   const confetti = (await import('canvas-confetti')).default;
    confetti({
     particleCount: 150,
     spread: 70,
@@ -53,6 +48,14 @@ export default function Contact() {
   }
  });
  };
+
+ const inputClass = "border-b-2 border-border bg-transparent px-2 focus:outline-none focus-visible:border-foreground focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto md:inline-block text-right md:mx-1 font-display text-[16px] md:text-xl lg:text-4xl";
+ // Persistent field label: a block caption on mobile (so the user always knows
+ // what each underlined field is), collapsed to sr-only inside the md+ sentence.
+ const labelClass = "block md:sr-only mb-2 md:mb-0 font-display text-xs font-bold uppercase tracking-wider text-muted-foreground";
+ // Connective sentence fragments — shown only on md+ where the mad-libs prose
+ // reads naturally; hidden on mobile where fields stack as a labeled form.
+ const connector = "hidden md:inline";
 
  return (
  <Section id="contact" className="border-t border-border bg-transparent">
@@ -70,42 +73,52 @@ export default function Contact() {
     <label htmlFor="contact-company">Company</label>
     <input id="contact-company" type="text" name="company" tabIndex={-1} autoComplete="off" />
    </div>
-   <div className="text-xl md:text-4xl font-medium font-display leading-[2.2] md:leading-[1.8] text-foreground text-right">
-   <span className="inline">سلام، من </span>
-   <label htmlFor="contact-name" className="sr-only">نام و نام خانوادگی</label>
-   <input
-    id="contact-name"
-    type="text" name="name" required
-    autoComplete="name"
-    placeholder="نام و نام خانوادگی"
-    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً نام خود را وارد کنید')}
-    onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus-visible:border-foreground focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
-   />
-   <span className="inline"> هستم. می‌خواهم در مورد </span>
-   <label htmlFor="contact-message" className="sr-only">موضوع یا شرح پروژه</label>
-   <input
-    id="contact-message"
-    type="text" name="message" required
-    placeholder="موضوع یا شرح پروژه"
-    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً موضوع یا متن پیام را بنویسید')}
-    onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus-visible:border-foreground focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
-   />
-   <span className="inline"> با شما همکاری کنم. </span>
-   <span className="inline">می‌توانید به من در </span>
-   <label htmlFor="contact-phone" className="sr-only">شماره تماس یا ایمیل</label>
-   <input
-    id="contact-phone"
-    type="text" name="phone" required
-    autoComplete="tel"
-    placeholder="شماره تماس یا ایمیل"
-    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً شماره تماس یا ایمیل خود را وارد کنید')}
-    onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-    className="border-b-2 border-border bg-transparent px-2 focus:outline-none focus-visible:border-foreground focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto inline-block text-right mx-1 font-display text-[16px] md:text-xl lg:text-4xl"
-    dir="ltr"
-   />
-   <span className="inline"> پیام دهید.</span>
+
+   {/* One field set, two readings: stacked labeled fields on mobile, the mad-libs
+       inline sentence on md+. Fields are blocks on mobile (gap from flex-col) and
+       inline within the prose on md+ — no duplicate inputs, so no validation or
+       FormData ambiguity. */}
+   <div className="flex flex-col gap-8 md:block text-xl md:text-4xl font-medium font-display leading-[2.2] md:leading-[1.8] text-foreground text-right">
+   <span className={connector}>سلام، من </span>
+   <span className="flex flex-col gap-2 md:inline">
+    <label htmlFor="contact-name" className={labelClass}>نام و نام خانوادگی</label>
+    <input
+     id="contact-name"
+     type="text" name="name" required
+     autoComplete="name"
+     placeholder="نام و نام خانوادگی"
+     onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً نام خود را وارد کنید')}
+     onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+     className={inputClass}
+    />
+   </span>
+   <span className={connector}> هستم. می‌خواهم در مورد </span>
+   <span className="flex flex-col gap-2 md:inline">
+    <label htmlFor="contact-message" className={labelClass}>موضوع یا شرح پروژه</label>
+    <input
+     id="contact-message"
+     type="text" name="message" required
+     placeholder="موضوع یا شرح پروژه"
+     onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً موضوع یا متن پیام را بنویسید')}
+     onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+     className={inputClass}
+    />
+   </span>
+   <span className={connector}> با شما همکاری کنم. می‌توانید به من در </span>
+   <span className="flex flex-col gap-2 md:inline">
+    <label htmlFor="contact-phone" className={labelClass}>شماره تماس یا ایمیل</label>
+    <input
+     id="contact-phone"
+     type="text" name="phone" required
+     autoComplete="tel"
+     placeholder="شماره تماس یا ایمیل"
+     onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('لطفاً شماره تماس یا ایمیل خود را وارد کنید')}
+     onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+     className={inputClass}
+     dir="ltr"
+    />
+   </span>
+   <span className={connector}> پیام دهید.</span>
    </div>
 
    <div className="mt-16 flex flex-col items-start gap-12">

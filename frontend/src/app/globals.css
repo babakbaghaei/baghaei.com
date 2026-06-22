@@ -51,7 +51,7 @@
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 15%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted-foreground: 240 5% 70%;
     --accent: 12 6.5% 15.1%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
@@ -122,6 +122,19 @@ html {
   font-size: clamp(14px, 1.1vw, 18px);
   scroll-behavior: auto !important;
   background-color: hsl(var(--background));
+  /* Stop Safari (esp. iOS) from auto-inflating text, which makes card content
+     render larger than Chrome and overlap/cramp the fixed-size cards. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Cross-browser text consistency: Safari renders type heavier than Chrome by
+   default. Force the same antialiased smoothing everywhere so weight/spacing
+   match across Safari, Chrome and Firefox. */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
@@ -156,14 +169,42 @@ p {
 a:focus-visible,
 button:focus-visible,
 [role="button"]:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible,
 summary:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
   border-radius: var(--radius);
+}
+
+/* Text fields get a softer, on-brand focus instead of the stark white outline:
+   no hard outline ring, just a gentle tinted glow + the field's own
+   border-color change. Keeps focus visible for accessibility without the harsh
+   look. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.14);
+}
+
+/* Film-grain overlay — a fixed, full-viewport SVG fractal-noise texture that
+   sits just above the universe background (z-[-2]) and below page content.
+   The grain is generated inline (no network asset, no 404) and kept subtle by
+   the element's own low opacity. Hidden when the user prefers reduced motion
+   is unnecessary (it's static), but it is dropped for print via the rule below. */
+.noise-texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 160px 160px;
+}
+.noise-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 160px 160px;
 }
 
 /* Ultimate Glassmorphism Utility */

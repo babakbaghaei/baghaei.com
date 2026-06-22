@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useRef, useMemo, useEffect, useState } from 'react';
-import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
-import { toPersianDigits } from '@/lib/utils/format';
+import React, { useRef, useEffect, useState } from 'react';
+import { motion, useScroll } from 'framer-motion';
 import { useTheme } from 'next-themes';
+import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 
 interface PlanetData {
   id: string;
@@ -150,12 +150,22 @@ const moonLongitude = (date: Date) => {
 // conventional "view from the north" star chart instead of a mirrored one.
 const longitudeToScreenAngle = (lon: number) => norm360(90 - lon);
 
+// Human-readable Persian names for the page sections each planet links to, used
+// to build descriptive aria-labels for the clickable planet controls.
+const SECTION_LABELS: Record<string, string> = {
+  hero: 'خانه',
+  philosophy: 'فلسفه',
+  projects: 'پروژه‌ها',
+  services: 'خدمات',
+  contact: 'تماس',
+};
+
 // Scrolling the page fast-forwards time so the orbits visibly advance, just
 // like before — but now anchored to the real "now". A full-page scroll spans
 // eight years of simulated motion.
 const SCROLL_TIME_SPAN_MS = 8 * 365.25 * 86400000;
 
-export const GalaxyBackground = ({ scrollProgress }: { scrollProgress: number }) => {
+export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: { scrollProgress: number, observeVisibility?: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { resolvedTheme } = useTheme();
   const starsRef = useRef<{ x: number, y: number, size: number, opacity: number, parallax: number, twinkle: number }[] | null>(null);
@@ -243,16 +253,52 @@ export const GalaxyBackground = ({ scrollProgress }: { scrollProgress: number })
     window.addEventListener('resize', resize);
 
     if (prefersReducedMotion) {
+      // Reduced motion: draw a single static frame, no rAF loop at all (and no
+      // need to observe visibility since nothing is animating).
       draw();
+      return () => {
+        window.removeEventListener('resize', resize);
+      };
+    }
+
+    // Pause the rAF loop while the canvas is scrolled off-screen so it stops
+    // burning the main thread on an invisible field. Only the sized/hero
+    // variant opts in via `observeVisibility` — the fixed full-screen
+    // background is effectively always visible and must never be frozen.
+    let observer: IntersectionObserver | null = null;
+    const start = () => {
+      if (!animationId) render();
+    };
+    const stop = () => {
+      cancelAnimationFrame(animationId);
+      animationId = 0;
+    };
+
+    if (observeVisibility && typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting) {
+            start();
+          } else {
+            stop();
+          }
+        },
+        { threshold: 0 }
+      );
+      observer.observe(canvas);
+      // Don't start here: the observer delivers an initial callback (next frame)
+      // with the current intersection state, which kicks off the loop if the
+      // canvas is visible — a one-frame delay that is imperceptible.
     } else {
-      render();
+      start();
     }
 
     return () => {
-      cancelAnimationFrame(animationId);
+      stop();
+      observer?.disconnect();
       window.removeEventListener('resize', resize);
     };
-  }, [resolvedTheme]);
+  }, [resolvedTheme, observeVisibility]);
 
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />;
 };
@@ -263,15 +309,32 @@ const PlanetBody = ({ planet, eclipseData, moonRotate = 0, moonEclipse }: { plan
  const pSize = (planet.diameter / earthDiameter) * earthSizeBase;
  const finalSize = planet.diameter > 50000 ? 10 + Math.log10(planet.diameter/10000) * 12 : pSize + 2;
 
+ const isClickable = !!planet.targetSection;
+ const goToSection = () => {
+   if (planet.targetSection) {
+     document.getElementById(planet.targetSection)?.scrollIntoView({ behavior: 'smooth' });
+   }
+ };
+ const sectionLabel = SECTION_LABELS[planet.targetSection] || planet.targetSection;
+
  return (
-  <motion.div 
-   onClick={() => {
-     if (planet.targetSection) {
-       document.getElementById(planet.targetSection)?.scrollIntoView({ behavior: 'smooth' });
-     }
-   }}
+  <motion.div
+   {...(isClickable
+     ? {
+         onClick: goToSection,
+         onKeyDown: (e: React.KeyboardEvent) => {
+           if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+             e.preventDefault();
+             goToSection();
+           }
+         },
+         role: 'button',
+         tabIndex: 0,
+         'aria-label': `${planet.name} — رفتن به بخش ${sectionLabel}`,
+       }
+     : { 'aria-hidden': true })}
    style={{ width: finalSize, height: finalSize, zIndex: 20 }}
-   className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer group/planet active:scale-95 transition-transform"
+   className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 group/planet active:scale-95 transition-transform rounded-full ${isClickable ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black' : ''}`}
   >
    <div className="w-full h-full rounded-full relative overflow-hidden shadow-2xl pointer-events-none" style={{ background: planet.texture }}>
     <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.3)_0%,transparent_60%)]" />
@@ -395,6 +458,7 @@ const Planet = ({ planet, date, allPlanets }: { planet: PlanetData, date: Date, 
 export default function GlobalUniverse({ renderBackground = false, scrollProgress: externalProgress }: { renderBackground?: boolean, scrollProgress?: number }) {
  const { scrollYProgress } = useScroll();
  const [progress, setProgress] = useState(0);
+ const prefersReducedMotion = usePrefersReducedMotion();
 
  useEffect(() => {
     return scrollYProgress.on('change', (v) => setProgress(v));
@@ -418,13 +482,23 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
  }, []);
 
  if (renderBackground) {
-    return <GalaxyBackground scrollProgress={activeProgress} />;
+    // Observe the canvas so the starfield rAF loop pauses whenever it is
+    // scrolled out of the viewport. The site mounts this inside a `fixed
+    // inset-0` wrapper, so it always intersects and is never wrongly frozen;
+    // the observer only ever pauses it in a non-fixed/scrollable host.
+    return <GalaxyBackground scrollProgress={activeProgress} observeVisibility />;
  }
 
  // Avoid a server/client hydration mismatch: render nothing until the
  // client-side clock is set. The base is the real "now" (live), and scrolling
  // fast-forwards time from there so the orbits animate just like before.
- const date = now ? new Date(now.getTime() + activeProgress * SCROLL_TIME_SPAN_MS) : null;
+ // Under reduced motion we anchor to the live "now" only — scrolling no longer
+ // advances simulated time, so the planets/moon hold a single static position
+ // (the declarative motion.div rotations are already neutralised by the root
+ // <MotionConfig reducedMotion="user">, this stops the value itself moving).
+ const date = now
+   ? new Date(now.getTime() + (prefersReducedMotion ? 0 : activeProgress * SCROLL_TIME_SPAN_MS))
+   : null;
 
  return (
   <div className="absolute inset-0 pointer-events-none z-[50]">
@@ -435,7 +509,7 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
       className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10" 
       style={{ width: 45, height: 45 }}
      >
-      <div className="absolute inset-[-60px] rounded-full bg-orange-500/10 blur-[40px] animate-pulse" />
+      <div className={`absolute inset-[-60px] rounded-full bg-orange-500/10 blur-[40px] ${prefersReducedMotion ? '' : 'animate-pulse'}`} />
       <div className="absolute inset-[-20px] rounded-full bg-yellow-500/20 blur-[20px]" />
       <div className="absolute inset-0 rounded-full bg-[#FFD700] shadow-[0_0_40px_rgba(255,165,0,0.6)]" />
       <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,#FFFFFF_0%,#FFD700_40%,#FF8C00_100%)]" />

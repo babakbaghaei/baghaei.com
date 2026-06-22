@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, FolderKanban, MessageSquare, Users, LogOut, Layers, Activity } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, MessageSquare, Layers, Activity } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { toPersianDigits } from '../../lib/utils/format';
 import { api } from '../../lib/api';
@@ -49,31 +49,25 @@ export default function AdminDashboard() {
   }, []);
 
   if (loading) {
-    return <div className="min-h-screen bg-background flex items-center justify-center font-display text-foreground text-lg">در حال اتصال به زیرساخت...</div>;
+    return <div className="flex items-center justify-center py-32 font-display text-foreground text-lg">در حال اتصال به زیرساخت...</div>;
   }
 
   const adminStats = [
     { label: 'پروژه‌ها', value: stats?.projects || 0, icon: FolderKanban, href: '/admin/projects' },
     { label: 'خدمات', value: stats?.services || 0, icon: Layers, href: '/admin/services' },
     { label: 'پیام‌ها', value: stats?.messages || 0, icon: MessageSquare, href: '/admin/messages' },
-    { label: 'استخدام', value: stats?.careers || 0, icon: Users, href: '/admin/careers' },
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-8 md:p-20">
-      <div className="max-w-5xl mx-auto space-y-16">
+    <div className="space-y-16">
         <header className="flex justify-between items-center border-b border-border pb-8">
           <div className="flex items-center gap-4">
             <LayoutDashboard className="w-8 h-8 text-primary" />
             <h1 className="text-3xl font-black font-display uppercase tracking-tight">پنل مدیریت</h1>
           </div>
-          <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-display">
-            <span>خروج</span>
-            <LogOut className="w-5 h-5" />
-          </button>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {adminStats.map((stat) => (
             <Link key={stat.label} href={stat.href}>
               <Card className="hover:scale-[1.02] transition-transform cursor-pointer group hover:border-primary/50">
@@ -138,7 +132,6 @@ export default function AdminDashboard() {
             </div>
           </Card>
         </div>
-      </div>
     </div>
   );
 }

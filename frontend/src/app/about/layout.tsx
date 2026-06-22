@@ -4,7 +4,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'درباره ما',
+  title: 'درباره گروه فناوری بقایی',
   description:
     'گروه فناوری بقایی؛ تیمی از مهندسان نرم‌افزار با تمرکز بر معماری سیستم‌های مقیاس‌پذیر، امنیت سایبری، زیرساخت ابری و هوش مصنوعی.',
   alternates: { canonical: '/about' },

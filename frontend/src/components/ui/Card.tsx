@@ -3,6 +3,41 @@
 import React, { useRef, useState, useEffect, createContext, useContext } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate, MotionValue } from 'framer-motion';
 
+/**
+ * Shared, module-level mouse tracker.
+ *
+ * Instead of every <Card> attaching its own `window` mousemove listener
+ * (N cards => N global listeners firing on every move), all cards subscribe
+ * to this single delegated source. The one window listener is attached lazily
+ * when the first subscriber registers and removed when the last unsubscribes.
+ * Each card still runs its identical per-card math using the shared clientX/Y.
+ */
+type MouseSubscriber = (clientX: number, clientY: number) => void;
+
+const mouseSubscribers = new Set<MouseSubscriber>();
+let latestClientX = -1000;
+let latestClientY = -1000;
+
+const handleGlobalMouseMove = (e: MouseEvent) => {
+  latestClientX = e.clientX;
+  latestClientY = e.clientY;
+  mouseSubscribers.forEach((cb) => cb(e.clientX, e.clientY));
+};
+
+const subscribeToMouse = (cb: MouseSubscriber): (() => void) => {
+  if (mouseSubscribers.size === 0 && typeof window !== 'undefined') {
+    window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
+  }
+  mouseSubscribers.add(cb);
+
+  return () => {
+    mouseSubscribers.delete(cb);
+    if (mouseSubscribers.size === 0 && typeof window !== 'undefined') {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+    }
+  };
+};
+
 interface CardContextType {
   tiltX: MotionValue<number>;
   tiltY: MotionValue<number>;
@@ -43,7 +78,6 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   const mouseX = useMotionValue(-1000);
   const mouseY = useMotionValue(-1000);
@@ -75,19 +109,17 @@ export const Card: React.FC<CardProps> = ({
   useEffect(() => {
     if (isTouchDevice || !isHoverable) return;
 
-    const onMouseMove = (e: MouseEvent) => {
+    const onMouseMove = (clientX: number, clientY: number) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const isMouseOver = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      const isMouseOver = clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-      const dist = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
+      const dist = Math.sqrt(Math.pow(clientX - centerX, 2) + Math.pow(clientY - centerY, 2));
 
-      setIsHovered(isMouseOver);
-      
       if (isMouseOver) {
         mouseX.set(rect.width - x);
         mouseY.set(rect.height - y);
@@ -106,8 +138,11 @@ export const Card: React.FC<CardProps> = ({
       borderOpacity.set(dist < 800 ? (isMouseOver ? 1 : 0.4) : 0.2);
     };
 
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', onMouseMove);
+    const unsubscribe = subscribeToMouse(onMouseMove);
+    // Prime with the last known cursor position so a card mounting under the
+    // cursor reacts immediately, matching the previous per-card behavior.
+    onMouseMove(latestClientX, latestClientY);
+    return unsubscribe;
   }, [isTouchDevice, isHoverable, innerGlowOpacity, borderOpacity, scale, tiltX, tiltY, mouseX, mouseY, colorOnHoverOnly, colorOpacity]);
 
   // Touch devices / non-hoverable cards can't hover, so keep them colored.

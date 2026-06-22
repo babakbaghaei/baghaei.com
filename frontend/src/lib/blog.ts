@@ -51,7 +51,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       readingTime: faReadingTime,
       content: mdxContent,
     } as BlogPost;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

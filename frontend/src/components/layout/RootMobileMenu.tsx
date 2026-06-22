@@ -3,14 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { MobileMenu } from '../ui/MobileMenu';
 import { usePathname, useRouter } from 'next/navigation';
-
-const navLinks = [
- { id: 'hero', label: 'خانه' },
- { id: 'projects', label: 'محصولات' },
- { id: 'tools', label: 'ابزارها' },
- { id: 'services', label: 'خدمات' },
- { id: 'about', label: 'درباره ما' },
-];
+import { navLinks } from '@/lib/nav';
 
 export function RootMobileMenu() {
  const [isOpen, setIsOpen] = useState(false);

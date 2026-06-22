@@ -6,15 +6,16 @@
  * جلوگیری از تکرار قالب در هر صفحه.
  */
 
-import React, { useState, useCallback, useSyncExternalStore } from 'react';
+import React, { useState, useCallback, useSyncExternalStore, useId, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight,
   ChevronDown,
-  RefreshCcw,
+  X,
   Share2,
   Check,
+  Copy,
   AlertTriangle,
   Info,
   BookOpen,
@@ -25,6 +26,7 @@ import {
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils/format';
 import { numToPersian } from '@/lib/utils/num-to-persian';
+import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 
 /* ───────────── helpers ───────────── */
 
@@ -200,12 +202,42 @@ export function VerdictPanel({
   children: React.ReactNode;
   delay?: number;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduced = usePrefersReducedMotion();
+  // قابلیت کشف نتیجه روی موبایل: پنل نتیجه فقط lg:sticky است، پس کاربر موبایل
+  // پس از وارد کردن مقادیر باید پایین برود تا نتیجه را ببیند. وقتی محتوای پنل
+  // برای نخستین‌بار از حالت خالی فراتر می‌رود (نتیجه ظاهر می‌شود)، یک‌بار و فقط
+  // در صفحه‌های کوچک، پنل را با حرکت ملایم به دید می‌آوریم.
+  const scrolledRef = useRef(false);
+  const baseHeightRef = useRef(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const isSmall = () =>
+      typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
+    const ro = new ResizeObserver(() => {
+      const h = el.offsetHeight;
+      if (baseHeightRef.current === 0) {
+        baseHeightRef.current = h;
+        return;
+      }
+      // یک جهش معنادار ارتفاع = ظهور نتیجه (نسبت به حالت خالی).
+      if (!scrolledRef.current && h > baseHeightRef.current + 40 && isSmall()) {
+        scrolledRef.current = true;
+        el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [reduced]);
+
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="lg:sticky lg:top-24 rounded-[2rem] border overflow-hidden"
+      className="lg:sticky lg:top-24 rounded-[2rem] border overflow-hidden scroll-mt-24"
       style={{ borderColor: `rgba(${accent}, 0.25)` }}
     >
       <div
@@ -220,36 +252,56 @@ export function VerdictPanel({
 
 /* ───────────── inputs ───────────── */
 
+/**
+ * id جاری فیلد — به ورودی داخل هر Field تزریق می‌شود تا برچسب (label) واقعی با
+ * htmlFor به کنترل گره بخورد و کلیک روی برچسب، ورودی را فوکوس کند.
+ */
+const FieldContext = React.createContext<string | undefined>(undefined);
+
+/** id فیلد جاری را برمی‌گرداند تا روی <input>/<select> داخل Field گذاشته شود. */
+export function useFieldId() {
+  return React.useContext(FieldContext);
+}
+
 export function Field({
   label,
   action,
   hint,
   children,
   center,
+  htmlFor,
 }: {
   label: string;
   action?: React.ReactNode;
   hint?: string;
   children: React.ReactNode;
   center?: boolean;
+  htmlFor?: string;
 }) {
+  const generatedId = useId();
+  const id = htmlFor ?? generatedId;
   return (
-    <div className="space-y-3">
-      <div
-        className={`relative flex items-center min-h-[28px] ${center ? 'justify-center' : 'justify-between'}`}
-      >
-        <span className="text-[11px] font-black text-muted-foreground uppercase tracking-wide">
-          {label}
-        </span>
-        {action && (
-          <div className={center ? 'absolute left-0 top-1/2 -translate-y-1/2' : ''}>{action}</div>
+    <FieldContext.Provider value={id}>
+      <div className="space-y-3">
+        <div
+          className={`relative flex items-center min-h-[28px] ${center ? 'justify-center' : 'justify-between'}`}
+        >
+          <label
+            htmlFor={id}
+            className="text-[11px] font-black text-muted-foreground uppercase tracking-wide"
+          >
+            {label}
+          </label>
+          {action && (
+            <div className={center ? 'absolute left-0 top-1/2 -translate-y-1/2' : ''}>{action}</div>
+          )}
+        </div>
+        {hint && (
+          <p className="text-[10px] text-muted-foreground/70 font-display leading-relaxed">{hint}</p>
         )}
+        {children}
       </div>
-      {hint && (
-        <p className="text-[10px] text-muted-foreground/70 font-display leading-relaxed">{hint}</p>
-      )}
-      {children}
-    </div>
+    </FieldContext.Provider>
   );
 }
 
@@ -301,36 +353,63 @@ export function MoneyField({
         )
       }
     >
-      <div className="relative">
-        <input
-          type="text"
-          inputMode="numeric"
-          value={toPersianDigits(amount)}
-          onChange={onChange}
-          placeholder="۰"
-          dir="ltr"
-          aria-label={label}
-          className="w-full bg-background border-2 border-border rounded-2xl py-5 px-5 pl-14 font-bold font-display text-center focus:border-primary transition-all outline-none text-2xl md:text-4xl placeholder:text-muted/30"
-        />
-        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40">
-          {unitLabel(unit)}
-        </span>
-        {amount && (
-          <button
-            onClick={() => setAmount('')}
-            aria-label="پاک کردن"
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-muted text-muted-foreground transition-all"
-          >
-            <RefreshCcw className="w-4 h-4" />
-          </button>
-        )}
-      </div>
+      <MoneyInput
+        amount={amount}
+        onChange={onChange}
+        onClear={() => setAmount('')}
+        label={label}
+        unit={unit}
+      />
       {showWords && clean > 0 && (
         <p className="text-[11px] text-muted-foreground/70 font-display text-center mt-2">
           {toWords(clean)} {unitLabel(unit)}
         </p>
       )}
     </Field>
+  );
+}
+
+/** ورودی داخلی MoneyField — از FieldContext، id برچسب را می‌گیرد. */
+function MoneyInput({
+  amount,
+  onChange,
+  onClear,
+  label,
+  unit,
+}: {
+  amount: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClear: () => void;
+  label: string;
+  unit: Unit;
+}) {
+  const id = useFieldId();
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        type="text"
+        inputMode="numeric"
+        value={toPersianDigits(amount)}
+        onChange={onChange}
+        placeholder="۰"
+        dir="ltr"
+        aria-label={label}
+        className="w-full bg-background border-2 border-border rounded-2xl py-5 px-5 pl-14 font-bold font-display text-center focus:border-primary transition-all outline-none text-2xl md:text-4xl placeholder:text-muted/30"
+      />
+      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40">
+        {unitLabel(unit)}
+      </span>
+      {amount && (
+        <button
+          onClick={onClear}
+          aria-label="پاک کردن"
+          className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-muted text-muted-foreground transition-all"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -345,9 +424,11 @@ export function Select({
   ariaLabel: string;
   children: React.ReactNode;
 }) {
+  const id = useFieldId();
   return (
     <div className="relative">
       <select
+        id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={ariaLabel}
@@ -375,23 +456,26 @@ export function SelectField({
   onChange: (v: string) => void;
   children: React.ReactNode;
 }) {
+  const id = useId();
   return (
-    <div className="bg-muted/30 border border-border rounded-2xl p-4 space-y-3">
-      <div className="flex items-center gap-2 text-foreground font-bold font-display text-sm">
-        {icon && (
-          <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-            {icon}
-          </div>
+    <FieldContext.Provider value={id}>
+      <div className="bg-muted/30 border border-border rounded-2xl p-4 space-y-3">
+        <label htmlFor={id} className="flex items-center gap-2 text-foreground font-bold font-display text-sm">
+          {icon && (
+            <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+              {icon}
+            </div>
+          )}
+          <span>{label}</span>
+        </label>
+        {hint && (
+          <p className="text-[10px] text-muted-foreground/70 font-display leading-relaxed">{hint}</p>
         )}
-        <span>{label}</span>
+        <Select value={value} onChange={onChange} ariaLabel={label}>
+          {children}
+        </Select>
       </div>
-      {hint && (
-        <p className="text-[10px] text-muted-foreground/70 font-display leading-relaxed">{hint}</p>
-      )}
-      <Select value={value} onChange={onChange} ariaLabel={label}>
-        {children}
-      </Select>
-    </div>
+    </FieldContext.Provider>
   );
 }
 
@@ -512,8 +596,14 @@ export function Headline({
   suffix?: string;
   sub?: React.ReactNode;
 }) {
+  // متن کپی: مقدار نتیجه و در صورت وجود، واحد آن.
+  const copyText = suffix ? `${value} ${suffix}` : value;
+  const hasResult = value != null && String(value).trim() !== '';
   return (
-    <div className="text-center space-y-1.5">
+    <div className="relative text-center space-y-1.5">
+      {hasResult && (
+        <CopyButton accent={accent} text={copyText} className="absolute top-0 left-0" />
+      )}
       <span className="text-[11px] font-black text-muted-foreground uppercase tracking-wide">
         {label}
       </span>
@@ -528,6 +618,53 @@ export function Headline({
       </p>
       {sub && <p className="text-[11px] text-muted-foreground/70 font-display px-2">{sub}</p>}
     </div>
+  );
+}
+
+/**
+ * کلید «کپی نتیجه» — عمومی برای تمام ابزارهای مبتنی بر shell. مقدار سرتیتر
+ * (و در صورت وجود واحد) را در حافظهٔ موقت می‌گذارد و بازخورد کوتاه «کپی شد»
+ * نشان می‌دهد. فقط زمانی نمایش داده می‌شود که نتیجه‌ای وجود داشته باشد.
+ */
+export function CopyButton({
+  accent,
+  text,
+  className = '',
+}: {
+  accent: string;
+  text: string;
+  className?: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard unavailable — ignore */
+    }
+  };
+  return (
+    <button
+      onClick={onCopy}
+      aria-label="کپی نتیجه"
+      title="کپی نتیجه"
+      className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-black font-display transition-all ${className}`}
+      style={{
+        background: `rgba(${accent}, ${copied ? 0.15 : 0.08})`,
+        color: `rgb(${accent})`,
+        border: `1px solid rgba(${accent}, 0.2)`,
+      }}
+    >
+      {copied ? (
+        <>
+          <Check className="w-3.5 h-3.5" /> کپی شد
+        </>
+      ) : (
+        <Copy className="w-3.5 h-3.5" />
+      )}
+    </button>
   );
 }
 

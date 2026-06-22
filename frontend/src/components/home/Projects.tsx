@@ -1,72 +1,23 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import ProjectModal from './ProjectModal';
 import { Project, ProjectCard } from '../ui/ProjectCard';
 import { Card } from '../ui/Card';
 import { Section, Heading } from '../ui/Layout';
-import { Box, ArrowUpLeft } from 'lucide-react';
+import { Box, ArrowUpLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { PROJECTS_DATA } from '@/lib/data/projects';
 import { TOOLS, type Tool } from '@/lib/data/tools';
 
-// Selected High-Impact Projects for the Top Slider
-const SELECTED_PROJECTS: Project[] = [
-  {
-    id: 2,
-    slug: 'ravro-platform',
-    title: 'پلتفرم راورو',
-    category: 'امنیت سایبری',
-    role: 'طراح ارشد رابط کاربری',
-    desc: 'توسعه پلتفرم باگ‌بانتی با هدف شناسایی شکاف‌های امنیتی توسط هکرهای کلاه سفید در مقیاس ملی.',
-    metrics: [{ label: 'باگ کشف شده', value: '۱K+' }, { label: 'شرکت فعال', value: '۵۰+' }],
-    color: 'rgba(245, 158, 11, 0.2)',
-    borderColor: 'rgba(245, 158, 11, 0.8)',
-    isLocked: false,
-    images: ['/assets/projects/ravro-dashboard.jpg', '/assets/projects/ravro-target.jpg'],
-    tech: ['React', 'Node.js', 'PostgreSQL', 'Docker']
-  },
-  {
-    id: 1,
-    slug: 'kish-airport-fids',
-    title: 'FIDS فرودگاه کیش',
-    category: 'زیرساخت فرودگاهی',
-    role: 'طراح ارشد رابط کاربری',
-    desc: 'طراحی سیستم‌های نمایش اطلاعات پرواز و رابط کاربری کانترهای فرودگاه بین‌المللی کیش.',
-    metrics: [{ label: 'دقت نمایش', value: '۹۹.۹٪' }, { label: 'ترافیک روزانه', value: '۲۰K+' }],
-    color: 'rgba(30, 64, 175, 0.2)',
-    borderColor: 'rgba(30, 64, 175, 0.8)',
-    isLocked: false,
-    images: ['/assets/projects/fids-kish-gate.jpg', '/assets/projects/fids-kish-system.jpg'],
-    tech: ['C++', 'Qt', 'WebSockets', 'Linux']
-  },
-  {
-    id: 9,
-    slug: 'kevany-tuning',
-    title: 'تیونینگ کیوانی',
-    category: 'خودرو / لوکس',
-    role: 'طراح رابط کاربری',
-    desc: 'طراحی پلتفرم اختصاصی و سیستم پیکربندی خودروهای فوق‌لوکس برای برند جهانی Kevany.',
-    metrics: [{ label: 'خودرو اختصاصی', value: '۱۰۰+' }, { label: 'بازدید جهانی', value: '۱M+' }],
-    color: 'rgba(153, 27, 27, 0.3)',
-    borderColor: 'rgba(153, 27, 27, 0.8)',
-    isLocked: false,
-    images: ['/assets/projects/keyvani-configurator.jpg'],
-    tech: ['WebGL', 'Three.js', 'React', 'Next.js']
-  },
-  {
-    id: 5,
-    title: 'پلتفرم مالاتا',
-    category: 'تجارت الکترونیک',
-    role: 'بنیان‌گذار فنی و معمار نرم‌افزار',
-    desc: 'اولین بازار آنلاین محصولات تازه دریایی با هدف حذف واسطه‌ها و اتصال مستقیم صیاد به مشتری.',
-    metrics: [{ label: 'فروشنده فعال', value: '۵۰۰+' }, { label: 'رضایت مشتری', value: '۹۵٪' }],
-    color: 'rgba(14, 165, 233, 0.2)',
-    borderColor: 'rgba(14, 165, 233, 0.8)',
-    isLocked: false,
-    tech: ['Next.js', 'Go', 'Redis', 'Kubernetes']
-  }
-];
+// Selected High-Impact Projects for the Top Slider — sourced from the single
+// PROJECTS_DATA store (by slug, in display order) so descriptions/metrics never
+// drift from the canonical data.
+const SELECTED_SLUGS = ['ravro-platform', 'kish-airport-fids', 'pixel-ball', 'malata-platform'];
+const SELECTED_PROJECTS: Project[] = SELECTED_SLUGS
+  .map((slug) => PROJECTS_DATA.find((p) => p.slug === slug))
+  .filter((p): p is Project => !!p && !p.hidden);
 
 // Most-used tools — shown as square Card-based tiles continuing the projects scroll.
 const FEATURED_TOOLS = TOOLS.filter((t) => t.featured && t.status !== 'soon');
@@ -86,7 +37,6 @@ function SquareToolCard({ tool }: { tool: Tool }) {
   return (
     <Link
       href={`/tools/${tool.slug}`}
-      aria-label={tool.title}
       className="block h-full w-full rounded-[1.75rem] outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
     >
       <Card
@@ -148,10 +98,12 @@ export default function Projects() {
  });
  const bgY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
- const [canScrollLeft, setCanScrollLeft] = useState(true);
+ // Start both fades hidden, then derive them from real measurements on mount
+ // so the gradients never flash wrong before the first scroll event (RTL paint).
+ const [canScrollLeft, setCanScrollLeft] = useState(false);
  const [canScrollRight, setCanScrollRight] = useState(false);
 
- const handleScroll = () => {
+ const handleScroll = useCallback(() => {
   if (scrollContainerRef.current) {
    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
    const absScroll = Math.abs(scrollLeft);
@@ -159,7 +111,52 @@ export default function Projects() {
    setCanScrollLeft(absScroll < maxScroll - 10);
    setCanScrollRight(absScroll > 10);
   }
- };
+ }, []);
+
+ // Sync fades with the real scroll position/overflow immediately on mount and
+ // whenever the viewport resizes (overflow can appear/disappear at breakpoints).
+ useLayoutEffect(() => {
+  handleScroll();
+  window.addEventListener('resize', handleScroll);
+  return () => window.removeEventListener('resize', handleScroll);
+ }, [handleScroll]);
+
+ // Wheel-to-horizontal: while the pointer is over the card row, translate the
+ // vertical wheel into horizontal scrolling and LOCK the page's vertical scroll
+ // (preventDefault). At the horizontal edges the wheel is released back to the
+ // page so the user is never trapped. `data-lenis-prevent` on the scroller stops
+ // Lenis from also driving the wheel here.
+ useEffect(() => {
+  const el = scrollContainerRef.current;
+  if (!el) return;
+  const onWheel = (e: WheelEvent) => {
+   if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; // already a horizontal gesture
+   const maxScroll = el.scrollWidth - el.clientWidth;
+   if (maxScroll <= 0) return;
+   const abs = Math.abs(el.scrollLeft);
+   const forward = e.deltaY > 0; // wheel down = advance toward the end
+   if ((forward && abs >= maxScroll - 1) || (!forward && abs <= 1)) return; // edge → release
+   e.preventDefault();
+   el.scrollLeft -= e.deltaY; // RTL: down → more negative (toward the end/left)
+   handleScroll();
+  };
+  el.addEventListener('wheel', onWheel, { passive: false });
+  return () => el.removeEventListener('wheel', onWheel);
+ }, [handleScroll]);
+
+ // Nav buttons / arrow keys scroll by roughly one viewport of cards.
+ const scrollByCards = useCallback((dir: 'next' | 'prev') => {
+  const el = scrollContainerRef.current;
+  if (!el) return;
+  const amount = Math.round(el.clientWidth * 0.8);
+  // RTL: "next" (forward) moves toward the end → more negative scrollLeft.
+  el.scrollBy({ left: dir === 'next' ? -amount : amount, behavior: 'smooth' });
+ }, []);
+
+ const onScrollerKeyDown = useCallback((e: React.KeyboardEvent) => {
+  if (e.key === 'ArrowLeft') { e.preventDefault(); scrollByCards('next'); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); scrollByCards('prev'); }
+ }, [scrollByCards]);
 
  return (
  <Section id="projects" sectionRef={sectionRef} className="border-t border-border overflow-visible !pb-fib-55 bg-transparent">
@@ -170,12 +167,39 @@ export default function Projects() {
   <Heading subtitle="منتخب">پروژه‌های</Heading>
 
   <div className="relative group/projects-container mb-fib-34 -mr-fib-5 md:-mr-fib-8">
-  <div className={`absolute inset-y-0 right-0 w-fib-55 bg-gradient-to-l from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
-  <div className={`absolute inset-y-0 left-0 w-fib-55 bg-gradient-to-r from-background to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
+  <div className={`absolute inset-y-0 right-0 w-20 md:w-fib-55 bg-gradient-to-l from-background via-background/80 to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
+  <div className={`absolute inset-y-0 left-0 w-20 md:w-fib-55 bg-gradient-to-r from-background via-background/80 to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
 
-  <div ref={scrollContainerRef} onScroll={handleScroll} className="flex items-center overflow-x-auto overscroll-x-contain pb-20 no-scrollbar relative z-10 gap-0">
+  {/* Desktop scroll controls — RTL: "next/forward" sits on the left (chevron
+      left), "prev/back" on the right. Shown only when there is room to move. */}
+  <button
+   type="button"
+   aria-label="پروژه‌های بعدی"
+   onClick={() => scrollByCards('next')}
+   className={`hidden md:flex absolute top-1/2 left-3 -translate-y-1/2 z-30 h-11 w-11 items-center justify-center rounded-full bg-background/70 border border-border backdrop-blur-md text-foreground shadow-lg transition-all duration-300 hover:bg-secondary focus-visible:ring-2 focus-visible:ring-primary/50 outline-none ${canScrollLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+  >
+   <ChevronLeft className="h-5 w-5" />
+  </button>
+  <button
+   type="button"
+   aria-label="پروژه‌های قبلی"
+   onClick={() => scrollByCards('prev')}
+   className={`hidden md:flex absolute top-1/2 right-3 -translate-y-1/2 z-30 h-11 w-11 items-center justify-center rounded-full bg-background/70 border border-border backdrop-blur-md text-foreground shadow-lg transition-all duration-300 hover:bg-secondary focus-visible:ring-2 focus-visible:ring-primary/50 outline-none ${canScrollRight ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+  >
+   <ChevronRight className="h-5 w-5" />
+  </button>
+
+  <div
+   ref={scrollContainerRef}
+   onScroll={handleScroll}
+   onKeyDown={onScrollerKeyDown}
+   data-lenis-prevent
+   tabIndex={0}
+   role="region"
+   aria-label="اسکرول افقی پروژه‌ها و ابزارها — برای پیمایش از کلیدهای جهت‌نما استفاده کنید"
+   className="flex items-center overflow-x-auto overscroll-x-contain pb-20 scrollbar-hide relative z-10 gap-0 outline-none rounded-[2rem]">
    {SELECTED_PROJECTS.map((p) => (
-   <div key={p.id} data-project-frame className="w-[280px] md:w-[320px] h-[420px] md:h-[480px] shrink-0 relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
+   <div key={p.id} data-project-frame className="w-[280px] md:w-[320px] h-[360px] md:h-[380px] shrink-0 relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
     <ProjectCard project={p} onClick={(e) => openProject(p, e)} />
    </div>
    ))}
@@ -190,7 +214,7 @@ export default function Projects() {
    {/* Most-used tools continuing the same horizontal scroll — two square tiles
        per column so a pair fits the exact height of one project card. */}
    {TOOL_COLUMNS.map((col, ci) => (
-   <div key={ci} className="w-[210px] md:w-[240px] h-[420px] md:h-[480px] shrink-0 flex flex-col">
+   <div key={ci} className="w-[210px] md:w-[240px] h-[360px] md:h-[380px] shrink-0 flex flex-col">
     {col.map((tool) => (
     <div key={tool.slug} className="flex-1 min-h-0">
      <SquareToolCard tool={tool} />

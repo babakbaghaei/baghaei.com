@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Logo from './Logo';
+import { Button } from '../ui/Button';
 
 interface ErrorLayoutProps {
  code: string;
@@ -12,10 +13,11 @@ interface ErrorLayoutProps {
 }
 
 export default function ErrorLayout({ code, title, description }: ErrorLayoutProps) {
+ const router = useRouter();
  return (
   <main className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 relative overflow-hidden">
    {/* Background Grid */}
-   <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
+   <div className="absolute inset-0 noise-texture opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
    
    <div className="relative z-10 flex flex-col items-center text-center space-y-12 max-w-2xl">
     <motion.div 
@@ -57,12 +59,9 @@ export default function ErrorLayout({ code, title, description }: ErrorLayoutPro
      animate={{ opacity: 1, y: 0 }}
      transition={{ delay: 0.3 }}
     >
-     <Link 
-      href="/" 
-      className="btn-primary"
-     >
+     <Button onClick={() => router.push('/')}>
       بازگشت به خانه
-     </Link>
+     </Button>
     </motion.div>
    </div>
 

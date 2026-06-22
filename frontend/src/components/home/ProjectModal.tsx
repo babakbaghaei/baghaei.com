@@ -17,6 +17,7 @@ import {
  Terminal,
  Box,
  Braces,
+ Lock,
  Image as ImageIcon
 } from 'lucide-react';
 import Logo from '../layout/Logo';
@@ -314,15 +315,27 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
           <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
           <span className="text-muted-foreground">{display.role}</span>
          </motion.div>
-         <motion.h2
-          id={titleId}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-black font-display leading-[1.05] tracking-tight text-foreground"
-         >
-          {display.title}
-         </motion.h2>
+         <div className="flex items-center gap-4 md:gap-5">
+          {display.logo && (
+           <Image
+            src={display.logo}
+            alt=""
+            aria-hidden
+            width={72}
+            height={72}
+            className="w-14 h-14 md:w-[4.5rem] md:h-[4.5rem] object-contain shrink-0 drop-shadow-lg"
+           />
+          )}
+          <motion.h2
+           id={titleId}
+           initial={{ opacity: 0, y: 12 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.2 }}
+           className="text-4xl md:text-6xl lg:text-7xl font-black font-display leading-[1.05] tracking-tight text-foreground"
+          >
+           {display.title}
+          </motion.h2>
+         </div>
          <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -334,7 +347,7 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
         </div>
        </div>
 
-       {display.slug && (
+       {!display.hidden && display.slug && (
         <a
          href={`/projects/${display.slug}`}
          className="inline-flex items-center gap-2 mt-8 text-sm font-black font-display text-primary hover:opacity-80 transition-opacity"
@@ -343,10 +356,12 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
         </a>
        )}
 
-       {/* MEDIA — clearly defined slot for project imagery */}
+       {/* MEDIA — clearly defined slot for project imagery. The inner strip stays
+           dir="ltr" so screenshots read in filename order (01→05) and the modal
+           opens on the first image; the outer scroll container keeps dir="rtl". */}
        <div className="mt-10 md:mt-12">
         {hasImages ? (
-         <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-6 px-6 md:mx-0 md:px-0 snap-x" dir="ltr">
+         <div className="flex gap-4 overflow-x-auto scrollbar-hide -mx-6 px-6 md:mx-0 md:px-0 snap-x" dir="ltr">
           {display.images!.map((src, i) => (
            <div
             key={i}
@@ -354,11 +369,18 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
            >
             <Image
              src={src}
-             alt={`${display.title} — ${i + 1}`}
+             alt={display.imagesLocked ? '' : `${display.title} — نمای ${i + 1}`}
              fill
              sizes="(max-width: 768px) 85vw, 62vw"
-             className="object-cover"
+             draggable={false}
+             className={`object-cover ${display.imagesLocked ? 'blur-[26px] scale-150 select-none pointer-events-none' : ''}`}
             />
+            {display.imagesLocked && (
+             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-background/40 backdrop-blur-2xl text-muted-foreground" role="img" aria-label="تصاویر محرمانه">
+              <Lock className="w-6 h-6" />
+              <span className="text-[11px] md:text-xs font-display font-bold">تصاویر این پروژه محرمانه است</span>
+             </div>
+            )}
            </div>
           ))}
          </div>
@@ -425,7 +447,7 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
          {display.tech && display.tech.length > 0 && (
           <div className="space-y-5">
            <SectionLabel accent={accent}>پشته فناوری</SectionLabel>
-           <div className="flex flex-wrap gap-2" dir="ltr">
+           <div className="flex flex-wrap gap-2 justify-end" dir="ltr">
             {display.tech.map((t, i) => (
              <span
               key={i}

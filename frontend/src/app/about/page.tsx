@@ -125,7 +125,7 @@ export default function AboutPage() {
 
       {/* ── Stats ──────────────────────────────────────────── */}
       <section className="relative z-10 border-y border-border bg-card/20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-16 grid grid-cols-2 md:grid-cols-4">
+        <div className="max-w-7xl mx-auto px-6 lg:px-16 grid grid-cols-2 md:grid-cols-4 divide-x divide-x-reverse divide-border">
           {STATS.map((s, i) => (
             <motion.div
               key={s.label}
@@ -133,7 +133,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.06 }}
-              className="flex flex-col items-center justify-center gap-2 py-12 border-border first:border-r-0 md:[&:not(:first-child)]:border-r"
+              className="flex flex-col items-center justify-center gap-2 py-12"
             >
               <span className="text-3xl md:text-5xl font-black font-display text-foreground tabular-nums">
                 {s.value}
@@ -234,8 +234,8 @@ export default function AboutPage() {
                 transition={{ duration: 0.5, delay: i * 0.08 }}
                 className="flex flex-col items-start gap-4"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-card text-foreground">
-                  <Icon className="h-6 w-6" strokeWidth={1.5} />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <Icon className="h-6 w-6" strokeWidth={1.6} />
                 </div>
                 <h3 className="font-display text-xl font-black text-foreground">
                   {item.title}
@@ -270,7 +270,7 @@ export default function AboutPage() {
               className="group mt-10 inline-flex items-center justify-center gap-2 rounded-2xl bg-foreground px-7 py-4 text-sm font-black font-display text-background transition-transform hover:scale-[1.02]"
             >
               شروع گفتگو
-              <ArrowUpLeft className="h-4 w-4 -translate-x-1 opacity-70 transition-transform group-hover:translate-x-0" />
+              <ArrowUpLeft className="h-4 w-4 opacity-70 transition-transform group-hover:-translate-x-1" />
             </Link>
           </div>
         </div>

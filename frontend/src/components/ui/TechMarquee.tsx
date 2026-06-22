@@ -1,7 +1,6 @@
 'use client';
 
 import React from "react";
-import { motion } from "framer-motion";
 
 const items = [
   "NEXT.JS", "NESTJS", "TYPESCRIPT", "KUBERNETES", "DOCKER", "AWS", "SYSTEM ARCHITECTURE",

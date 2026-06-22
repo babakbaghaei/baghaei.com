@@ -7,7 +7,7 @@ export default function BadGateway() {
  return (
   <ErrorLayout 
    code="۵۰۲" 
-   title="خطای درگاه." 
+   title="خطای درگاه"
    description="ارتباط با سرور اصلی برقرار نشد. لطفاً چند لحظه دیگر تلاش کنید."
   />
  );

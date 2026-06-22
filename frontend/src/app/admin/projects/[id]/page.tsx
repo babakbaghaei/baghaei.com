@@ -15,7 +15,7 @@ export default function EditProjectPage() {
    try {
     const res = await api.get(`/projects/${id}`);
     setProject(res.data);
-   } catch (error) {
+   } catch {
     console.error('Failed to fetch project');
    } finally {
     setLoading(false);
@@ -24,17 +24,15 @@ export default function EditProjectPage() {
   fetchProject();
  }, [id]);
 
- if (loading) return <div className="min-h-screen bg-background text-foreground p-20 text-center font-display">در حال بارگذاری...</div>;
- if (!project) return <div className="min-h-screen bg-background text-foreground p-20 text-center font-display">پروژه یافت نشد.</div>;
+ if (loading) return <div className="py-20 text-center font-display text-foreground">در حال بارگذاری...</div>;
+ if (!project) return <div className="py-20 text-center font-display text-foreground">پروژه یافت نشد.</div>;
 
  return (
-  <div className="min-h-screen bg-background text-foreground p-8 md:p-20">
-   <div className="max-w-5xl mx-auto space-y-12">
-    <header className="border-b border-border pb-8">
-     <h1 className="text-3xl font-black font-display uppercase">ویرایش پروژه</h1>
-    </header>
-    <ProjectForm initialData={project} isEditing />
-   </div>
+  <div className="space-y-12">
+   <header className="border-b border-border pb-8">
+    <h1 className="text-3xl font-black font-display uppercase">ویرایش پروژه</h1>
+   </header>
+   <ProjectForm initialData={project} isEditing />
   </div>
  );
 }

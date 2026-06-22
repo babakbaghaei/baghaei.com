@@ -1,44 +1,47 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
-import Script from "next/script";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import AnalyticsGate from "@/components/providers/AnalyticsGate";
-import BackgroundGrid from "@/components/effects/BackgroundGrid";
+import BackgroundGrid from "@/components/ui/effects/BackgroundGrid";
 import CookieConsent from "@/components/layout/CookieConsent";
 import { RootMobileMenu } from "@/components/layout/RootMobileMenu";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import MotionProvider from "@/components/providers/MotionProvider";
+import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { CommandMenu } from "@/components/ui/CommandMenu";
 import PageTransition from "@/components/effects/PageTransition";
+import ProgressBar from "@/components/effects/ProgressBar";
 import CustomCursor from "@/components/effects/CustomCursor";
 import Preloader from "@/components/effects/Preloader";
 import ChatWidget from "@/components/layout/ChatWidget";
 
+const CommandMenu = dynamic(() =>
+ import("@/components/ui/CommandMenu").then((mod) => mod.CommandMenu)
+);
+
 const iransans = localFont({
  src: [
-  { path: "../../public/fonts/IRANSans/IRANSans_UltraLight.ttf", weight: "200", style: "normal" },
-  { path: "../../public/fonts/IRANSans/IRANSans_Light.ttf", weight: "300", style: "normal" },
   { path: "../../public/fonts/IRANSans/IRANSans.ttf", weight: "400", style: "normal" },
   { path: "../../public/fonts/IRANSans/IRANSans_Medium.ttf", weight: "500", style: "normal" },
   { path: "../../public/fonts/IRANSans/IRANSans_Bold.ttf", weight: "700", style: "normal" },
   { path: "../../public/fonts/IRANSans/IRANSans_Black.ttf", weight: "900", style: "normal" },
  ],
  variable: "--font-iransans",
+ display: "swap",
 });
 
 const yekanbakh = localFont({
  src: [
-  { path: "../../public/fonts/YekanBakh/YekanBakh-Thin.ttf", weight: "100", style: "normal" },
-  { path: "../../public/fonts/YekanBakh/YekanBakh-Light.ttf", weight: "300", style: "normal" },
   { path: "../../public/fonts/YekanBakh/YekanBakh-Regular.ttf", weight: "400", style: "normal" },
   { path: "../../public/fonts/YekanBakh/YekanBakh-Medium.ttf", weight: "500", style: "normal" },
   { path: "../../public/fonts/YekanBakh/YekanBakh-Bold.ttf", weight: "700", style: "normal" },
-  { path: "../../public/fonts/YekanBakh/YekanBakh-Heavy.ttf", weight: "800", style: "normal" },
   { path: "../../public/fonts/YekanBakh/YekanBakh-Fat.ttf", weight: "900", style: "normal" },
  ],
  variable: "--font-yekanbakh",
+ display: "swap",
 });
 
 import GlobalUniverse from "@/components/effects/GlobalUniverseLazy";
@@ -55,14 +58,8 @@ export const metadata: Metadata = {
  generator: "Next.js",
  keywords: ["گروه فناوری بقایی", "بابک بقایی", "مهندسی نرم‌افزار", "معماری سیستم", "هوش مصنوعی", "امنیت سایبری", "طراحی وب", "توسعه دهنده ارشد", "ایران", "تکنولوژی لوکس"],
  referrer: "origin-when-cross-origin",
- metadataBase: new URL('https://baghaei.com'),
+ metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://baghaei.com'),
  alternates: {
-  canonical: '/',
-  // hreflang structure. 'en-US': '/en' should be added once English pages exist.
-  languages: {
-   'fa-IR': '/',
-   'x-default': '/',
-  },
   types: {
    'application/rss+xml': '/feed.xml',
   },
@@ -79,19 +76,14 @@ export const metadata: Metadata = {
   title: "گروه فناوری بقایی | مهندسی فراتر از مرز کدها",
   description: "طراحی و توسعه زیرساخت‌های نرم‌افزاری مدرن با تمرکز بر پایداری، امنیت و مقیاس‌پذیری در مقیاس جهانی.",
   siteName: "گروه فناوری بقایی",
-  images: [{
-   url: "/og-image.png",
-   width: 1200,
-   height: 630,
-   alt: "گروه فناوری بقایی - Baghaei Tech Group",
-  }],
+  // og:image is provided automatically by src/app/opengraph-image.tsx.
  },
  twitter: {
   card: "summary_large_image",
   title: "گروه فناوری بقایی | مهندسی دقیق",
   description: "معماری آینده با قدرت هوش مصنوعی و مهندسی دقیق نرم‌افزار.",
   creator: "@babakbaghaei",
-  images: ["/og-image.png"],
+  // twitter:image is provided automatically by src/app/twitter-image.tsx.
  },
  robots: {
   index: true,
@@ -127,7 +119,7 @@ export default async function RootLayout({
  const locale = await getLocale();
  const messages = await getMessages();
  return (
-  <html lang={locale} dir="rtl" suppressHydrationWarning className={`${iransans.variable} ${yekanbakh.variable} bg-background`}>
+  <html lang={locale || 'fa'} dir="rtl" suppressHydrationWarning className={`${iransans.variable} ${yekanbakh.variable} bg-background`}>
    <body className="antialiased text-foreground selection:bg-primary selection:text-primary-foreground font-sans bg-transparent">
     <a
      href="#main-content"
@@ -142,9 +134,10 @@ export default async function RootLayout({
      enableSystem
      disableTransitionOnChange
     >
-     <Script id="json-ld" type="application/ld+json" strategy="afterInteractive">
-      {`
-       {
+     <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+       __html: JSON.stringify({
         "@context": "https://schema.org",
         "@graph": [
          {
@@ -168,7 +161,7 @@ export default async function RootLayout({
           "@type": "Person",
           "name": "بابک بقایی",
           "url": "https://baghaei.com",
-          "image": "https://baghaei.com/og-image.png",
+          "image": "https://baghaei.com/logo.svg",
           "jobTitle": "Lead Software Architect",
           "worksFor": {
            "@type": "Organization",
@@ -178,25 +171,40 @@ export default async function RootLayout({
            "https://linkedin.com/in/babakbaghaei",
            "https://github.com/baghaei"
           ]
+         },
+         {
+          "@type": "WebSite",
+          "@id": "https://baghaei.com/#website",
+          "url": "https://baghaei.com",
+          "name": "گروه فناوری بقایی",
+          "inLanguage": "fa-IR"
          }
         ]
-       }
-      `}
-     </Script>
+       })
+      }}
+     />
 
      <MotionProvider>
       <Preloader />
+      {/* NProgress route progress. useSearchParams requires a Suspense boundary. */}
+      <Suspense fallback={null}>
+        <ProgressBar />
+      </Suspense>
       <div className="fixed inset-0 z-[-2] pointer-events-none print:hidden">
         <GlobalUniverse renderBackground />
       </div>
       <div className="noise-bg opacity-[0.03] pointer-events-none" />
-      <BackgroundGrid />
+      <BackgroundGrid variant="dots" />
       <CustomCursor />
-      <div id="main-content">
-        <PageTransition>
-          {children}
-        </PageTransition>
-      </div>
+      {/* Lenis drives native window scroll, so the fixed GlobalUniverse
+          background (Framer useScroll) and scrollIntoView anchors still work. */}
+      <SmoothScrollProvider>
+        <div id="main-content" tabIndex={-1}>
+          <PageTransition>
+            {children}
+          </PageTransition>
+        </div>
+      </SmoothScrollProvider>
       <ChatWidget />
       <CommandMenu />
       <CookieConsent />

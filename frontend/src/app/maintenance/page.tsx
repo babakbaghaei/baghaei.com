@@ -1,5 +1,4 @@
 import React from 'react';
-import { Settings } from 'lucide-react';
 import ErrorLayout from '@/components/layout/ErrorLayout';
 
 export default function MaintenancePage() {

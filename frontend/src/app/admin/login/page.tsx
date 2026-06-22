@@ -35,6 +35,10 @@ export default function AdminLoginPage() {
      setError('امکان ذخیره‌سازی نشست وجود ندارد (حالت ناشناس مرورگر؟).');
      return;
     }
+    // Mirror the token into a cookie so the edge middleware (proxy.ts) can gate
+    // /admin routes — localStorage is invisible to middleware. SameSite=Strict;
+    // 7d to match the refresh window. The API still validates the JWT itself.
+    document.cookie = `admin_token=${res.access_token}; path=/; max-age=604800; samesite=strict`;
     router.push('/admin');
    } else {
     setError('ایمیل یا رمز عبور اشتباه است.');
@@ -65,7 +69,7 @@ export default function AdminLoginPage() {
     <Card className="!p-8">
      <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-       <label htmlFor="admin-email" className="text-[10px] uppercase text-muted-foreground font-black px-1">Identity</label>
+       <label htmlFor="admin-email" className="text-[10px] uppercase text-muted-foreground font-black px-1">شناسه</label>
        <div className="relative group">
         <div aria-hidden="true" className="absolute inset-y-0 start-4 flex items-center text-muted-foreground group-focus-within:text-foreground transition-colors">
          <User className="w-4 h-4" />
@@ -85,7 +89,7 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="space-y-2">
-       <label htmlFor="admin-password" className="text-[10px] uppercase text-muted-foreground font-black px-1">Access Key</label>
+       <label htmlFor="admin-password" className="text-[10px] uppercase text-muted-foreground font-black px-1">کلید دسترسی</label>
        <div className="relative group">
         <div aria-hidden="true" className="absolute inset-y-0 start-4 flex items-center text-muted-foreground group-focus-within:text-foreground transition-colors">
          <Lock className="w-4 h-4" />
@@ -106,7 +110,7 @@ export default function AdminLoginPage() {
 
       {twoFARequired && (
        <div className="space-y-2">
-        <label htmlFor="admin-2fa" className="text-[10px] uppercase text-muted-foreground font-black px-1">Two-Factor Code</label>
+        <label htmlFor="admin-2fa" className="text-[10px] uppercase text-muted-foreground font-black px-1">کد دو مرحله‌ای</label>
         <input
          id="admin-2fa"
          name="twoFactorCode"

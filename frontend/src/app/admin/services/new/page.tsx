@@ -2,20 +2,30 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useFormStatus } from 'react-dom';
 import { createService } from '../actions';
 import { Card } from '../../../../components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Heading } from '@/components/ui/Layout';
+import { AdminInput, AdminTextarea, AdminSelect } from '@/components/admin/AdminField';
 
 const ICONS = [
-  'SearchCode', 'Share2', 'Code2', 'ShieldCheck', 'Infinity', 'TrendingUp', 
+  'SearchCode', 'Share2', 'Code2', 'ShieldCheck', 'Infinity', 'TrendingUp',
   'Zap', 'Database', 'Cloud', 'Server', 'Smartphone', 'Globe'
 ];
 
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" isLoading={pending} disabled={pending} className="w-full py-4 text-lg">
+      ثبت خدمت
+    </Button>
+  );
+}
+
 export default function NewServicePage() {
   return (
-    <div className="min-h-screen bg-background text-foreground p-8 md:p-20">
-      <div className="max-w-2xl mx-auto space-y-8">
+    <div className="max-w-2xl mx-auto space-y-8">
         <header>
           <Link href="/admin/services" className="text-muted-foreground hover:text-foreground text-sm mb-4 block font-display">
             ← بازگشت به لیست خدمات
@@ -25,59 +35,44 @@ export default function NewServicePage() {
 
         <Card className="p-8">
           <form action={createService} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-bold font-display">عنوان خدمت</label>
-              <input 
-                name="title" 
-                required 
-                className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-colors"
-                placeholder="مثلاً: توسعه اپلیکیشن موبایل"
-              />
-            </div>
+            <AdminInput
+              id="service-title"
+              name="title"
+              label="عنوان خدمت"
+              required
+              placeholder="مثلاً: توسعه اپلیکیشن موبایل"
+            />
 
-            <div className="space-y-2">
-              <label className="text-sm font-bold font-display">توضیحات</label>
-              <textarea 
-                name="description" 
-                required 
-                rows={4}
-                className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-colors resize-none"
-                placeholder="توضیحات کوتاه درباره خدمت..."
-              />
-            </div>
+            <AdminTextarea
+              id="service-description"
+              name="description"
+              label="توضیحات"
+              required
+              rows={4}
+              placeholder="توضیحات کوتاه درباره خدمت..."
+            />
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold font-display">ترتیب نمایش</label>
-                <input 
-                  name="order" 
-                  type="number" 
-                  defaultValue={0}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-colors"
-                />
-              </div>
+              <AdminInput
+                id="service-order"
+                name="order"
+                type="number"
+                label="ترتیب نمایش"
+                defaultValue={0}
+              />
 
-              <div className="space-y-2">
-                <label className="text-sm font-bold font-display">آیکون</label>
-                <select 
-                  name="iconName" 
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-colors appearance-none"
-                >
-                  {ICONS.map(icon => (
-                    <option key={icon} value={icon}>{icon}</option>
-                  ))}
-                </select>
-              </div>
+              <AdminSelect id="service-icon" name="iconName" label="آیکون">
+                {ICONS.map(icon => (
+                  <option key={icon} value={icon}>{icon}</option>
+                ))}
+              </AdminSelect>
             </div>
 
             <div className="pt-4">
-              <Button type="submit" className="w-full py-4 text-lg">
-                ثبت خدمت
-              </Button>
+              <SubmitButton />
             </div>
           </form>
         </Card>
-      </div>
     </div>
   );
 }

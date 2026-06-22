@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { ShieldCheck, ArrowRight, Smartphone, Check } from 'lucide-react';
+import { ShieldCheck, Smartphone, Check } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { api } from '../../../lib/api';
@@ -57,17 +56,12 @@ export default function AdminSecurity() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-8 md:p-20">
-      <div className="max-w-2xl mx-auto space-y-12">
+    <div className="max-w-2xl mx-auto space-y-12">
         <header className="flex justify-between items-center border-b border-border pb-8">
           <div className="flex items-center gap-4">
             <ShieldCheck className="w-8 h-8 text-primary" />
             <h1 className="text-3xl font-black font-display uppercase tracking-tight">امنیت حساب</h1>
           </div>
-          <Link href="/admin" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-display">
-            <span>داشبورد</span>
-            <ArrowRight className="w-5 h-5" />
-          </Link>
         </header>
 
         <Card className="space-y-6">
@@ -116,7 +110,6 @@ export default function AdminSecurity() {
 
           {error && <p role="alert" className="text-red-500 text-xs font-display">{error}</p>}
         </Card>
-      </div>
     </div>
   );
 }

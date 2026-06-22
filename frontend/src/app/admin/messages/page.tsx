@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { ArrowRight, Mail, Phone, Trash2, MailOpen, MailWarning, Inbox } from 'lucide-react';
+import { Mail, Phone, Trash2, MailOpen, MailWarning, Inbox } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
+import { ListSkeleton } from '../../../components/admin/EmptyState';
 import { api } from '../../../lib/api';
 
 interface Message {
@@ -60,8 +60,7 @@ export default function AdminMessages() {
   const unreadCount = messages.filter((m) => !m.isRead).length;
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-8 md:p-20">
-      <div className="max-w-4xl mx-auto space-y-12">
+    <div className="max-w-4xl mx-auto space-y-12">
         <header className="flex justify-between items-center border-b border-border pb-8">
           <div className="flex items-center gap-4">
             <Inbox className="w-8 h-8 text-primary" />
@@ -74,14 +73,10 @@ export default function AdminMessages() {
               )}
             </div>
           </div>
-          <Link href="/admin" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-display">
-            <span>داشبورد</span>
-            <ArrowRight className="w-5 h-5" />
-          </Link>
         </header>
 
         {loading ? (
-          <div className="text-center py-32 text-muted-foreground font-display">در حال دریافت پیام‌ها...</div>
+          <ListSkeleton count={4} />
         ) : error ? (
           <Card className="text-center py-20">
             <MailWarning className="w-10 h-10 mx-auto text-muted-foreground/50 mb-4" />
@@ -144,7 +139,6 @@ export default function AdminMessages() {
             ))}
           </div>
         )}
-      </div>
     </div>
   );
 }

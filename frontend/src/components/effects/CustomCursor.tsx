@@ -61,10 +61,14 @@ export default function CustomCursor() {
         y: y,
         translateX: '-50%',
         translateY: '-50%',
-        scale: isHovered ? 1 : 0.35,
         willChange: 'transform',
       }}
-      transition={{ scale: { type: 'spring', stiffness: 300, damping: 20 } }}
+      // Scale lives in `animate` (not `style`) so the spring transition actually
+      // runs — a `style` number is applied instantly. Gentle, slightly-damped
+      // spring: smooth grow/shrink between the dot (0.3) and the ring (0.9),
+      // tasteful rather than a big bouncy pop.
+      animate={{ scale: isHovered ? 0.9 : 0.3 }}
+      transition={{ type: 'spring', stiffness: 250, damping: 24, mass: 0.6 }}
     />
   );
 }

@@ -7,7 +7,7 @@ export default function Forbidden() {
  return (
   <ErrorLayout 
    code="۴۰۳" 
-   title="دسترسی غیرمجاز." 
+   title="دسترسی غیرمجاز"
    description="شما اجازه دسترسی به این بخش از زیرساخت را ندارید."
   />
  );

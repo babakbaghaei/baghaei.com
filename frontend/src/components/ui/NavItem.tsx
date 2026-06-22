@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-interface NavItemProps {
+interface NavItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  label: string;
  isActive: boolean;
  onClick: () => void;
@@ -14,12 +14,14 @@ export const NavItem: React.FC<NavItemProps> = ({
  label,
  isActive,
  onClick,
- className = "" 
+ className = "",
+ ...rest
 }) => {
  return (
   <button
    onClick={onClick}
    className={`relative py-2 hover:text-foreground transition-colors font-display ${isActive ? 'text-foreground font-bold' : 'text-muted-foreground'} ${className}`}
+   {...rest}
   >
    {label}
    {isActive && (

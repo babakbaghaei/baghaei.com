@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { motion, useScroll } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import Magnetic from '@/components/effects/Magnetic';
-import GlobalUniverse from '@/components/effects/GlobalUniverse';
-import MaskText from '@/components/effects/MaskText';
+import GlobalUniverse from '@/components/effects/GlobalUniverseLazy';
+import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 
 export default function Hero({ children }: { children?: React.ReactNode }) {
-  const { scrollYProgress } = useScroll();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [displayTextLine1, setDisplayTextLine1] = useState('');
   const [displayTextLine2, setDisplayTextLine2] = useState('');
   const [phase, setTypingPhase] = useState<'line1' | 'line2'>('line1');
@@ -29,7 +29,14 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
     return 70 + Math.random() * 100;
   }, [isDeleting, phase, displayTextLine2.length]);
 
+  // Reduced-motion: skip the JS typing loop entirely and render the complete
+  // headline at rest (derived below). The global MotionConfig only neutralizes
+  // declarative Framer transforms, not this setTimeout-driven effect.
+  const shownLine1 = prefersReducedMotion ? line1Text : displayTextLine1;
+  const shownLine2 = prefersReducedMotion ? words[0] : displayTextLine2;
+
   useEffect(() => {
+    if (prefersReducedMotion) return;
     let timer: NodeJS.Timeout;
     const handleTyping = () => {
       if (phase === 'line1') {
@@ -62,12 +69,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
     };
     timer = setTimeout(handleTyping, 100);
     return () => clearTimeout(timer);
-  }, [displayTextLine1, displayTextLine2, isDeleting, phase, wordIndex, words, getDelay]);
-
-  const [progress, setProgress] = useState(0);
-  useEffect(() => {
-    return scrollYProgress.on('change', (v) => setProgress(v));
-  }, [scrollYProgress]);
+  }, [displayTextLine1, displayTextLine2, isDeleting, phase, wordIndex, words, getDelay, prefersReducedMotion]);
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -79,9 +81,15 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
 
   return (
       <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center bg-transparent overflow-hidden pt-32 pb-20 lg:pt-28">
-      <div className="max-w-7xl mx-auto px-6 lg:px-16 w-full flex flex-col relative z-10">        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 mb-8">
-          <div className="order-1 space-y-6 flex flex-col items-start text-right">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="inline-flex items-center gap-3 px-4 py-1.5 bg-secondary/50 border border-border rounded-full">
+      <div className="max-w-7xl mx-auto px-6 lg:px-16 w-full flex flex-col relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 mb-8">
+          <motion.div
+            className="order-1 space-y-6 flex flex-col items-start text-right"
+            initial="hidden"
+            animate="visible"
+            variants={{ visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } }}
+          >
+            <motion.div variants={itemVariants} className="inline-flex items-center gap-3 px-4 py-1.5 bg-secondary/50 border border-border rounded-full">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/30 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -91,12 +99,16 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               </span>
             </motion.div>
             
-            <h1 className="text-[7vw] sm:text-6xl md:text-8xl lg:text-9xl font-display tracking-tight leading-[1.1] w-full">
-              <div className="w-full flex flex-col items-start text-right gap-2">
+            <motion.h1 variants={itemVariants} className="text-[7vw] sm:text-6xl md:text-8xl lg:text-9xl font-display tracking-tight leading-[1.1] w-full">
+              {/* Stable, complete headline for screen readers. The animated typing
+                  below only ever exposes mutating partial text, so it is hidden
+                  from assistive tech via aria-hidden. */}
+              <span className="sr-only">{`${line1Text} ${words[0]}`}</span>
+              <div aria-hidden="true" className="w-full flex flex-col items-start text-right gap-2">
                 <div className="h-[52px] sm:h-[70px] md:h-[110px] lg:h-[150px] flex items-center justify-start whitespace-nowrap overflow-visible">
-                  <span className="text-muted-foreground font-bold">{displayTextLine1}</span>
-                  {phase === 'line1' && (
-                    <motion.div 
+                  <span className="text-muted-foreground font-bold">{shownLine1}</span>
+                  {!prefersReducedMotion && phase === 'line1' && (
+                    <motion.div
                       animate={{ opacity: [0.4, 0.4, 0, 0] }}
                       transition={{ duration: 1.1, repeat: Infinity, times: [0, 0.5, 0.5, 1] }}
                       className="w-[3px] md:w-[4px] h-[0.8em] bg-foreground mr-1.5"
@@ -105,14 +117,14 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                 </div>
                 <div className="h-[52px] sm:h-[70px] md:h-[110px] lg:h-[150px] flex items-center justify-start whitespace-nowrap overflow-visible">
                   <span className="text-foreground font-black">
-                    {displayTextLine2.endsWith('.') ? (
-                      <>{displayTextLine2.slice(0, -1)}<span className="text-muted-foreground font-bold">.</span></>
+                    {shownLine2.endsWith('.') ? (
+                      <>{shownLine2.slice(0, -1)}<span className="text-muted-foreground font-bold">.</span></>
                     ) : (
-                      displayTextLine2
+                      shownLine2
                     )}
                   </span>
-                  {phase === 'line2' && (
-                    <motion.div 
+                  {!prefersReducedMotion && phase === 'line2' && (
+                    <motion.div
                       animate={{ opacity: [0.4, 0.4, 0, 0] }}
                       transition={{ duration: 1.1, repeat: Infinity, times: [0, 0.5, 0.5, 1] }}
                       className="w-[3px] md:w-[4px] h-[0.8em] bg-foreground mr-1.5"
@@ -120,13 +132,13 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                   )}
                 </div>
               </div>
-            </h1>
+            </motion.h1>
 
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl text-xl md:text-2xl text-muted-foreground font-sans leading-relaxed text-right">
+            <motion.p variants={itemVariants} className="max-w-2xl text-xl md:text-2xl text-muted-foreground font-sans leading-relaxed text-right">
               گروه فناوری بقایی؛ طراحی و توسعه نرم‌افزارهای مقیاس‌پذیر و زیرساخت‌های مهندسی شده برای کسب‌وکارهای مدرن.
             </motion.p>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap justify-start gap-4 pt-2">
+            <motion.div variants={itemVariants} className="flex flex-wrap justify-start gap-4 pt-2">
               <Magnetic>
                 <Button className="rounded-full px-8 py-4 text-base" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>
                   شروع همکاری
@@ -138,7 +150,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                 </Button>
               </Magnetic>
             </motion.div>
-          </div>
+          </motion.div>
 
           <div className="order-2 h-[280px] sm:h-[360px] lg:h-[500px] w-full relative">
             <GlobalUniverse />

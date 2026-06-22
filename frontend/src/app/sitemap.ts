@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
  // Static routes
  const routes = [
   '',
+  '/about',
   '/projects',
   '/tools',
   '/blog',
@@ -32,7 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
  }));
 
  // Project case-study pages — derived from the static project data.
- const projects = PROJECTS_DATA.filter((p) => p.slug).map((project) => ({
+ const projects = PROJECTS_DATA.filter((p) => p.slug && !p.hidden).map((project) => ({
   url: `${baseUrl}/projects/${project.slug}`,
   lastModified: new Date(),
   changeFrequency: 'weekly' as const,

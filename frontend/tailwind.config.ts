@@ -15,6 +15,22 @@ const config: Config = {
         sans: ["var(--font-iransans)"],
         display: ["var(--font-yekanbakh)"],
       },
+      // Fibonacci spacing rhythm used across the home sections (pb-fib-55,
+      // mr-fib-34, w-fib-55, px-fib-5…). Each fib-N maps to N × 0.25rem so it
+      // aligns with Tailwind's own spacing semantics (fib-5 === spacing 5).
+      // Negative variants (-mr-fib-34) are generated automatically.
+      spacing: {
+        "fib-1": "0.25rem",
+        "fib-2": "0.5rem",
+        "fib-3": "0.75rem",
+        "fib-5": "1.25rem",
+        "fib-8": "2rem",
+        "fib-13": "3.25rem",
+        "fib-21": "5.25rem",
+        "fib-34": "8.5rem",
+        "fib-55": "13.75rem",
+        "fib-89": "22.25rem",
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

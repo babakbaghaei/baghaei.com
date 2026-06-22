@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface HeadingProps {
  children: React.ReactNode;
@@ -17,8 +17,7 @@ export const Heading: React.FC<HeadingProps> = ({
  align = 'right' 
 }) => {
  const ref = useRef(null);
- const isInView = useInView(ref, { once: true, amount: 0.5 });
- 
+
  const alignmentClasses = {
   right: "text-right items-start",
   left: "text-left items-end",
@@ -27,7 +26,8 @@ export const Heading: React.FC<HeadingProps> = ({
 
  return (
   <div ref={ref} className={`flex flex-col gap-6 mb-20 ${alignmentClasses[align]} ${className}`}>
-   <motion.div 
+   <motion.div
+    aria-hidden="true"
     initial={{ width: 0 }}
     whileInView={{ width: 48 }}
     viewport={{ once: true }}

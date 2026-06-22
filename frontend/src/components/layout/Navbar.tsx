@@ -3,30 +3,14 @@ import React, { useState, useEffect } from 'react';
 import Logo from './Logo';
 import { AnimatePresence, motion } from 'framer-motion';
 import { NavItem } from '../ui/NavItem';
-import { Menu, ChevronDown, Layout, Globe, Briefcase, Sparkles, Plane, Car, ArrowLeft, Cpu, SearchCode, Share2, Code2, ShieldCheck, Cloud, BrainCircuit } from 'lucide-react';
-import { useSound } from '@/lib/utils/sounds';
+import { Menu, ChevronDown, Layout, Globe, Briefcase, Sparkles, Plane, Car, ArrowLeft, Search } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { TOOLS, TOOL_CATEGORIES, getCategoryMeta } from '@/lib/data/tools';
+import { Button } from '../ui/Button';
+import { navLinks } from '@/lib/nav';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-
-const navLinks = [
- { id: 'hero', label: 'خانه' },
- { id: 'products', label: 'محصولات', hasDropdown: true },
- { id: 'tools', label: 'ابزارها', hasDropdown: true },
- { id: 'services', label: 'خدمات', hasDropdown: true },
- { id: 'about', label: 'درباره ما' },
-];
-
-const servicesMenu = [
-  { title: 'تحلیل و مشاوره', desc: 'بررسی دقیق نیازها و تدوین نقشهٔ راه تکنولوژی برای پروژه‌های مقیاس‌پذیر.', icon: SearchCode },
-  { title: 'مهندسی معماری', desc: 'طراحی زیرساخت‌های توزیع‌شده با تمرکز بر پایداری حداکثری و ترافیک بالا.', icon: Share2 },
-  { title: 'توسعهٔ محصول', desc: 'پیاده‌سازی کدهای بهینه با بالاترین استانداردهای مهندسی نرم‌افزار.', icon: Code2 },
-  { title: 'امنیت سایبری', desc: 'تست نفوذ و ایمن‌سازی زیرساخت‌های حیاتی در برابر تهدیدات پیشرفته.', icon: ShieldCheck },
-  { title: 'زیرساخت ابری', desc: 'مدیریت و خودکارسازی سرویس‌ها با Docker و Kubernetes.', icon: Cloud },
-  { title: 'هوش مصنوعی', desc: 'توسعه و ادغام مدل‌های یادگیری ماشین برای هوشمندسازی کسب‌وکار.', icon: BrainCircuit },
-];
 
 const featuredProjects = [
   { id: 'ravaro', name: 'پلتفرم راورو', desc: 'بزرگترین پلتفرم باگ‌بانتی و امنیت سایبری در مقیاس ملی.', icon: Globe },
@@ -40,7 +24,6 @@ export default function Navbar() {
  const [scrolled, setScrolled] = useState(false);
  const [activeSection, setActiveSection] = useState('hero');
  const [openMenu, setOpenMenu] = useState<string | null>(null);
- const { play } = useSound();
  const pathname = usePathname();
  const router = useRouter();
 
@@ -52,7 +35,8 @@ export default function Navbar() {
   if (isSubPage) return;
   const handleScroll = () => {
    setScrolled(window.scrollY > 20);
-   const sectionIds = [...navLinks.map(l => l.id), 'projects'];
+   // navLinks already use the real section element ids (e.g. 'projects').
+   const sectionIds = navLinks.map(l => l.id);
    const sections = sectionIds.map(id => document.getElementById(id));
    const currentSection = sections.find(section => {
     if (!section) return false;
@@ -60,8 +44,7 @@ export default function Navbar() {
     return rect.top <= 100 && rect.bottom >= 100;
    });
    if (currentSection) {
-    // The projects section maps to the 'محصولات' nav item.
-    setActiveSection(currentSection.id === 'projects' ? 'products' : currentSection.id);
+    setActiveSection(currentSection.id);
    }
   };
   handleScroll();
@@ -91,6 +74,7 @@ export default function Navbar() {
 
  return (
   <nav
+   aria-label="ناوبری اصلی"
    onBlur={(e) => {
     // Close the mega-menu once focus leaves the whole nav (keyboard users).
     if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpenMenu(null);
@@ -105,11 +89,11 @@ export default function Navbar() {
    }`}
   >
    <div className="max-w-7xl mx-auto px-6 lg:px-16 flex items-center justify-between">
-    {/* Brand */}
-    <Link 
-     href="https://baghaei.com" 
+    {/* Brand — internal home link so staging/localhost/preview route home. */}
+    <Link
+     href="/"
      onClick={(e) => {
-      if (pathname === '/' && typeof window !== 'undefined' && window.location.hostname === 'baghaei.com') {
+      if (pathname === '/') {
        e.preventDefault();
        window.scrollTo({
         top: 0,
@@ -136,6 +120,8 @@ export default function Navbar() {
         <NavItem
          label={link.label}
          isActive={currentActive === link.id}
+         aria-haspopup={link.hasDropdown ? 'menu' : undefined}
+         aria-expanded={link.hasDropdown ? openMenu === link.id : undefined}
          onClick={() => {
           if (link.id === 'tools') { router.push('/tools'); return; }
           if (link.id === 'about') { router.push('/about'); return; }
@@ -153,20 +139,28 @@ export default function Navbar() {
 
     {/* Actions */}
     <div className="hidden md:flex items-center gap-6">
-     <div className="flex items-center gap-5">
+     <div className="flex items-center gap-3">
       <div className="h-6 w-px bg-border" />
+      <button
+       type="button"
+       onClick={() => window.dispatchEvent(new CustomEvent('command-menu:open'))}
+       aria-label="جستجو (Ctrl+K)"
+       className="flex h-9 items-center gap-2 rounded-full px-2.5 text-muted-foreground outline-none transition-colors hover:text-foreground hover:bg-secondary focus-visible:ring-2 focus-visible:ring-primary/50"
+      >
+       <Search aria-hidden="true" className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />
+       <kbd className="hidden lg:inline-block rounded border border-border px-1.5 py-0.5 text-[10px] font-mono leading-none text-muted-foreground">⌘K</kbd>
+      </button>
       <ThemeToggle />
       <div className="h-6 w-px bg-border" />
      </div>
-     
-     <button 
-      onClick={() => { play('pop'); scrollTo('contact'); }} 
-      onMouseEnter={() => play('hover')}
-      className="px-8 py-2.5 bg-primary text-primary-foreground text-[10px] font-display uppercase rounded-full hover:scale-105 active:scale-95 transition-all"
-      style={{ fontWeight: 500 }}
+
+     <Button
+      onClick={() => { scrollTo('contact'); }}
+      size="sm"
+      className="uppercase"
      >
       شروع همکاری
-     </button>
+     </Button>
     </div>
 
     <div className="md:hidden flex items-center gap-4 relative z-[210]">
@@ -177,7 +171,7 @@ export default function Navbar() {
       }}
       aria-label="باز کردن منو"
       aria-haspopup="menu"
-      className="p-3 bg-primary text-primary-foreground rounded-full active:scale-90 transition-transform shadow-xl"
+      className="p-3 bg-primary text-primary-foreground rounded-full active:scale-90 transition-transform shadow-xl outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
      >
       <Menu aria-hidden="true" className="w-5 h-5" />
      </button>
@@ -187,6 +181,8 @@ export default function Navbar() {
     <AnimatePresence>
      {openMenu && (
       <motion.div
+       role="region"
+       aria-label={openMenu === 'projects' ? 'محصولات و پلتفرم‌ها' : 'جعبه ابزار'}
        initial={{ opacity: 0, y: -10 }}
        animate={{ opacity: 1, y: 0 }}
        exit={{ opacity: 0, y: -10 }}
@@ -195,7 +191,7 @@ export default function Navbar() {
        className="absolute top-full start-0 w-full bg-background border-b border-border shadow-2xl z-0"
       >
        <div className="max-w-7xl mx-auto px-6 lg:px-16 py-12" dir="rtl">
-         {openMenu === 'products' ? (
+         {openMenu === 'projects' ? (
            /* Products / Projects */
            <div className="grid grid-cols-1 md:grid-cols-[0.85fr_2fr] gap-10 lg:gap-16">
              {/* intro */}
@@ -209,13 +205,14 @@ export default function Navbar() {
                    منتخبی از پلتفرم‌ها و محصولاتی که از ایده تا اجرا طراحی، توسعه و راه‌اندازی کرده‌ایم.
                  </p>
                </div>
-               <button
-                 onClick={() => { setOpenMenu(null); scrollTo('projects'); }}
+               <Link
+                 href="/projects"
+                 onClick={() => setOpenMenu(null)}
                  className="inline-flex items-center gap-2 text-xs font-black font-display text-primary transition-all hover:gap-3 self-start"
                >
                  مشاهده همهٔ پروژه‌ها
                  <ArrowLeft aria-hidden="true" className="w-4 h-4" />
-               </button>
+               </Link>
              </div>
              {/* projects grid */}
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -230,13 +227,13 @@ export default function Navbar() {
                    </div>
                    <div>
                      <div className="font-bold text-sm text-foreground mb-1 group-hover:text-primary transition-colors">{project.name}</div>
-                     <div className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{project.desc}</div>
+                     <div className="text-xs text-foreground/70 leading-relaxed line-clamp-2">{project.desc}</div>
                    </div>
                  </button>
                ))}
              </div>
            </div>
-         ) : openMenu === 'tools' ? (
+         ) : (
            /* Tools — full toolbox by category */
            <div className="grid grid-cols-1 md:grid-cols-[0.85fr_2fr] gap-10 lg:gap-16">
              {/* intro */}
@@ -293,47 +290,6 @@ export default function Navbar() {
                    </div>
                  );
                })}
-             </div>
-           </div>
-         ) : (
-           /* Services — what our team builds */
-           <div className="grid grid-cols-1 md:grid-cols-[0.85fr_2fr] gap-10 lg:gap-16">
-             {/* intro */}
-             <div className="flex flex-col justify-between gap-6 md:border-e md:border-border/50 md:pe-10">
-               <div className="space-y-3">
-                 <div className="flex items-center gap-2.5">
-                   <Cpu className="w-4 h-4 text-primary" />
-                   <h4 className="text-sm font-black uppercase text-foreground">خدمات مهندسی</h4>
-                 </div>
-                 <p className="text-[12px] text-muted-foreground leading-relaxed">
-                   از مشاوره و معماری تا توسعه، امنیت و هوش مصنوعی؛ تخصص‌هایی که تیم ما با آن‌ها محصول می‌سازد.
-                 </p>
-               </div>
-               <button
-                 onClick={() => { setOpenMenu(null); scrollTo('services'); }}
-                 className="inline-flex items-center gap-2 text-xs font-black font-display text-primary transition-all hover:gap-3 self-start"
-               >
-                 مشاهده همهٔ خدمات
-                 <ArrowLeft aria-hidden="true" className="w-4 h-4" />
-               </button>
-             </div>
-             {/* services grid */}
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-               {servicesMenu.map((service) => (
-                 <button
-                   key={service.title}
-                   onClick={() => { setOpenMenu(null); scrollTo('services'); }}
-                   className="p-4 rounded-2xl bg-secondary/30 border border-transparent hover:bg-secondary hover:border-border transition-all cursor-pointer group flex items-start gap-3.5 text-right"
-                 >
-                   <div className="w-10 h-10 rounded-xl bg-muted/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                     <service.icon className="w-5 h-5 text-foreground" />
-                   </div>
-                   <div>
-                     <div className="font-bold text-sm text-foreground mb-1 group-hover:text-primary transition-colors">{service.title}</div>
-                     <div className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{service.desc}</div>
-                   </div>
-                 </button>
-               ))}
              </div>
            </div>
          )}

@@ -13,7 +13,8 @@ export const PROJECTS_DATA: Project[] = [
    borderColor: 'rgba(245, 158, 11, 0.8)',
    isLocked: false,
    href: 'https://ravro.ir',
-   images: ['/assets/projects/ravro-dashboard.jpg', '/assets/projects/ravro-target.jpg'],
+   logo: '/assets/projects/ravro-platform/logo.png',
+   images: ['/assets/projects/ravro-platform/01.jpg', '/assets/projects/ravro-platform/02.jpg', '/assets/projects/ravro-platform/03.jpg', '/assets/projects/ravro-platform/04.jpg', '/assets/projects/ravro-platform/05.jpg'],
    tech: ['React', 'Node.js', 'PostgreSQL', 'Docker']
   },
   {
@@ -27,7 +28,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(30, 64, 175, 0.4)',
    borderColor: 'rgba(30, 64, 175, 0.8)',
    isLocked: false,
-   images: ['/assets/projects/fids-kish-gate.jpg', '/assets/projects/fids-kish-system.jpg'],
+   logo: '/assets/projects/kish-airport-fids/logo.png',
+   images: ['/assets/projects/kish-airport-fids/01.jpg', '/assets/projects/kish-airport-fids/02.jpg', '/assets/projects/kish-airport-fids/03.jpg', '/assets/projects/kish-airport-fids/04.jpg'],
    tech: ['C++', 'Qt', 'WebSockets', 'Linux']
   },
   {
@@ -41,7 +43,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(153, 27, 27, 0.4)',
    borderColor: 'rgba(153, 27, 27, 0.8)',
    isLocked: false,
-   images: ['/assets/projects/keyvani-configurator.jpg'],
+   icon: 'Globe',
+   images: ['/assets/projects/kevany-tuning/01.jpg', '/assets/projects/kevany-tuning/02.jpg', '/assets/projects/kevany-tuning/03.jpg'],
    tech: ['WebGL', 'Three.js', 'React', 'Next.js']
   },
   {
@@ -55,6 +58,10 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(34, 197, 94, 0.3)',
    borderColor: 'rgba(34, 197, 94, 0.8)',
    isLocked: false,
+   hidden: true,
+   imagesLocked: true,
+   logo: '/assets/projects/koolak-platform/logo.png',
+   images: ['/assets/projects/koolak-platform/01.jpg', '/assets/projects/koolak-platform/02.jpg', '/assets/projects/koolak-platform/03.jpg', '/assets/projects/koolak-platform/04.jpg'],
    tech: ['Next.js', 'Go', 'Docker', 'Kubernetes']
   },
   {
@@ -68,6 +75,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(120, 67, 40, 0.3)',
    borderColor: 'rgba(120, 67, 40, 0.8)',
    isLocked: false,
+   logo: '/assets/projects/online-backgammon/logo.png',
+   images: ['/assets/projects/online-backgammon/01.jpg', '/assets/projects/online-backgammon/02.jpg', '/assets/projects/online-backgammon/03.jpg', '/assets/projects/online-backgammon/04.jpg'],
    tech: ['Unity', 'C#', 'WebSockets', 'Socket.io']
   },
   {
@@ -81,6 +90,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(20, 83, 45, 0.3)',
    borderColor: 'rgba(20, 83, 45, 0.8)',
    isLocked: false,
+   hidden: true,
+   imagesLocked: true,
    tech: ['React Native', 'Node.js', 'Redis', 'GPS-API']
   },
   {
@@ -94,6 +105,7 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(254, 243, 199, 0.2)',
    borderColor: 'rgba(254, 243, 199, 0.8)',
    isLocked: false,
+   hidden: true,
    tech: ['Next.js', 'FastAPI', 'WebRTC', 'PostgreSQL']
   },
   {
@@ -107,6 +119,7 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(139, 92, 246, 0.3)',
    borderColor: 'rgba(139, 92, 246, 0.8)',
    isLocked: false,
+   hidden: true,
    tech: ['React', 'PostgreSQL', 'Prisma', 'Analytics']
   },
   {
@@ -120,6 +133,9 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(34, 197, 94, 0.3)',
    borderColor: 'rgba(34, 197, 94, 0.8)',
    isLocked: false,
+   href: 'https://cafebazaar.ir/app/com.BAK.PixelBall',
+   logo: '/assets/projects/pixel-ball/logo.png',
+   images: ['/assets/projects/pixel-ball/01.jpg', '/assets/projects/pixel-ball/02.jpg'],
    tech: ['Unity', 'C#', 'FMOD', 'Android']
   },
   {
@@ -159,6 +175,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(124, 58, 237, 0.4)',
    borderColor: 'rgba(124, 58, 237, 0.8)',
    isLocked: false,
+   imagesLocked: true,
+   images: ['/assets/projects/darso-platform/01.jpg', '/assets/projects/darso-platform/02.jpg', '/assets/projects/darso-platform/03.jpg', '/assets/projects/darso-platform/04.jpg'],
    tech: ['React', 'GraphQL', 'AWS', 'Node.js']
   },
   {
@@ -172,6 +190,9 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(56, 189, 248, 0.4)',
    borderColor: 'rgba(56, 189, 248, 0.8)',
    isLocked: false,
+   hidden: true,
+   imagesLocked: true,
+   images: ['/assets/projects/pushio/01.jpg', '/assets/projects/pushio/02.jpg', '/assets/projects/pushio/03.jpg', '/assets/projects/pushio/04.jpg'],
    tech: ['Go', 'Kafka', 'Elasticsearch', 'React']
   },
   {
@@ -185,6 +206,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(225, 29, 72, 0.4)',
    borderColor: 'rgba(225, 29, 72, 0.8)',
    isLocked: false,
+   icon: 'Dumbbell',
+   images: ['/assets/projects/royal-aghdasieh-club/01.jpg', '/assets/projects/royal-aghdasieh-club/02.jpg', '/assets/projects/royal-aghdasieh-club/03.jpg', '/assets/projects/royal-aghdasieh-club/04.jpg'],
    tech: ['Branding', 'UI/UX', 'Next.js', 'Prisma']
   }
 ];

@@ -1,8 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Plus, Layers } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/admin/EmptyState';
 import { toPersianDigits } from '@/lib/utils/format';
 
 export const dynamic = 'force-dynamic';
@@ -30,15 +31,9 @@ export default async function ServicesAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-8 md:p-20">
-      <div className="max-w-5xl mx-auto space-y-16">
+    <div className="space-y-16">
         <header className="flex justify-between items-center border-b border-border pb-8">
-          <div>
-            <Link href="/admin" className="text-muted-foreground hover:text-foreground text-sm mb-2 block font-display">
-              ← بازگشت به داشبورد
-            </Link>
-            <h1 className="text-3xl font-black font-display uppercase tracking-tight">مدیریت خدمات</h1>
-          </div>
+          <h1 className="text-3xl font-black font-display uppercase tracking-tight">مدیریت خدمات</h1>
           <Link href="/admin/services/new">
             <Button className="gap-2">
               <Plus className="w-4 h-4" />
@@ -49,34 +44,23 @@ export default async function ServicesAdmin() {
 
         <div className="grid gap-6">
           {services.map((service) => (
-            <Card key={service.id} className="flex justify-between items-center p-6">
-              <div>
-                <h3 className="text-xl font-bold font-display">{service.title}</h3>
-                <p className="text-muted-foreground text-sm mt-1 max-w-xl">{service.description}</p>
-                <div className="flex gap-4 mt-4 text-xs font-mono text-muted-foreground/50">
-                  <span>ID: {toPersianDigits(service.id)}</span>
-                  <span>Order: {toPersianDigits(service.order)}</span>
-                  <span>Icon: {service.iconName}</span>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon">
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-500/10">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
+            <Card key={service.id} className="p-6">
+              <h3 className="text-xl font-bold font-display">{service.title}</h3>
+              <p className="text-muted-foreground text-sm mt-1 max-w-xl">{service.description}</p>
+              <p className="mt-3 text-[11px] text-muted-foreground/60 font-display">
+                ترتیب نمایش: {toPersianDigits(service.order)}
+              </p>
             </Card>
           ))}
-          
+
           {services.length === 0 && (
-            <div className="text-center py-20 text-muted-foreground font-display">
-              هیچ خدمتی یافت نشد. اولین خدمت را اضافه کنید!
-            </div>
+            <EmptyState
+              icon={Layers}
+              title="هنوز خدمتی ثبت نشده است"
+              subtitle="اولین خدمت گروه فناوری بقایی را اضافه کنید."
+            />
           )}
         </div>
-      </div>
     </div>
   );
 }
