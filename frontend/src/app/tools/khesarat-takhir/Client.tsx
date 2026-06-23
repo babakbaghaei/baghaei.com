@@ -203,7 +203,7 @@ export default function KhesaratTakhir() {
             </SelectField>
           </div>
 
-          <p className="flex items-center gap-2 text-[11px] text-muted-foreground/70 font-display">
+          <p className="flex items-center gap-2 text-xs text-muted-foreground/70 font-display">
             <Info className="w-3.5 h-3.5 shrink-0" />
             مبنا «متوسط شاخص سالانه» است؛ آخرین سال قطعی {toPersianDigits(CPI_LAST_COMPLETE_YEAR)} و سال {toPersianDigits(CPI_LAST_YEAR)} تخمینی است.
           </p>

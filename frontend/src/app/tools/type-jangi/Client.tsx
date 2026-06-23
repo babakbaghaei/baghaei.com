@@ -53,15 +53,15 @@ const HUD = memo(({ wpm, accuracy }: { wpm: number, accuracy: number }) => (
   <div className="flex justify-between items-end mb-16 px-4" dir="rtl">
     <div className="flex flex-col gap-2 text-right">
       <h1 className="text-4xl font-black font-display text-foreground text-right">سرعت‌سنج تایپ</h1>
-      <div className="text-[10px] font-bold text-muted-foreground uppercase text-right">تست سرعت و دقت تایپ فارسی</div>
+      <div className="text-xs font-bold text-muted-foreground uppercase text-right">تست سرعت و دقت تایپ فارسی</div>
     </div>
     <div className="flex gap-10">
       <div className="text-right border-r border-border pr-6">
-        <div className="text-[10px] font-black text-muted-foreground uppercase mb-1">سرعت (WPM)</div>
+        <div className="text-xs font-black text-muted-foreground uppercase mb-1">سرعت (WPM)</div>
         <div className="text-3xl font-black font-display text-primary">{toPersianDigits(wpm)}</div>
       </div>
       <div className="text-right">
-        <div className="text-[10px] font-black text-muted-foreground uppercase mb-1">دقت</div>
+        <div className="text-xs font-black text-muted-foreground uppercase mb-1">دقت</div>
         <div className="text-3xl font-black font-display text-primary">{toPersianDigits(accuracy)}٪</div>
       </div>
     </div>
@@ -236,7 +236,7 @@ export default function TypeJangi() {
         {/* Settings Bar */}
         <div className="flex flex-wrap justify-center gap-6 mb-12 bg-card/30 border border-border p-4 rounded-3xl backdrop-blur-md" dir="rtl">
           <div className="flex items-center gap-2 border-l border-border pl-6">
-            <span className="text-[10px] font-black text-muted-foreground uppercase">دسته بندی:</span>
+            <span className="text-xs font-black text-muted-foreground uppercase">دسته بندی:</span>
             <select value={settings.category} onChange={(e) => { setSettings({...settings, category: e.target.value as any}); restartAll(); }} className="bg-transparent text-sm font-bold text-foreground outline-none">
               <option value="all">همه</option>
               <option value="movies">سینما</option>
@@ -248,12 +248,12 @@ export default function TypeJangi() {
           </div>
 
           <div className="flex items-center gap-3 border-l border-border pl-6">
-            <span className="text-[10px] font-black text-muted-foreground uppercase">اوپسیتی:</span>
+            <span className="text-xs font-black text-muted-foreground uppercase">اوپسیتی:</span>
             <input type="range" min="0.1" max="0.8" step="0.1" value={settings.opacity} onChange={(e) => setSettings({...settings, opacity: parseFloat(e.target.value)})} className="w-20 accent-primary" />
           </div>
 
           <div className="flex items-center gap-3 border-l border-border pl-6">
-            <span className="text-[10px] font-black text-muted-foreground uppercase">سایز:</span>
+            <span className="text-xs font-black text-muted-foreground uppercase">سایز:</span>
             <div className="flex gap-2">
               {[32, 40, 56].map(s => (
                 <button key={s} onClick={() => setSettings({...settings, fontSize: s})} className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${settings.fontSize === s ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'}`}>
@@ -264,7 +264,7 @@ export default function TypeJangi() {
           </div>
 
           <div className="flex items-center gap-3 border-l border-border pl-6">
-            <span className="text-[10px] font-black text-muted-foreground uppercase">وزن:</span>
+            <span className="text-xs font-black text-muted-foreground uppercase">وزن:</span>
             <div className="flex gap-2">
               {(['normal', 'bold'] as const).map(w => (
                 <button key={w} onClick={() => setSettings({...settings, fontWeight: w})} className={`px-3 h-8 rounded-lg text-xs font-bold transition-all ${settings.fontWeight === w ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'}`}>
@@ -276,9 +276,9 @@ export default function TypeJangi() {
 
           <div className="flex items-center gap-3 pl-4">
             <div className="flex items-center gap-1.5 group/help relative">
-              <span className="text-[10px] font-black text-muted-foreground uppercase">حالت تفریحی:</span>
+              <span className="text-xs font-black text-muted-foreground uppercase">حالت تفریحی:</span>
               <HelpCircle className="w-3 h-3 text-muted-foreground cursor-help" />
-              <div className="absolute top-full mt-2 right-0 w-56 p-3 bg-background border border-border rounded-xl text-[10px] text-muted-foreground opacity-0 group-hover/help:opacity-100 transition-all pointer-events-none z-50 shadow-2xl leading-relaxed text-right">
+              <div className="absolute top-full mt-2 right-0 w-56 p-3 bg-background border border-border rounded-xl text-xs text-muted-foreground opacity-0 group-hover/help:opacity-100 transition-all pointer-events-none z-50 shadow-2xl leading-relaxed text-right">
                 در این حالت علائم نگارشی خودکار درج شده و نام منبع اثر برای استراحت کوتاه نمایش داده می‌شود.
               </div>
             </div>
@@ -339,8 +339,8 @@ export default function TypeJangi() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[ {l: 'سرعت خالص', v: stats.wpm, u: 'WPM', c: 'text-primary'}, {l: 'دقت کل', v: stats.accuracy, u: '%', c: 'text-primary'}, {l: 'کاراکتر/دقیقه', v: stats.cpm}, {l: 'زمان عملیات', v: stats.time, u: 'ثانیه'} ].map((s, i) => (
                     <div key={i} className="p-6 rounded-2xl bg-secondary/50 border border-border space-y-1 text-center">
-                      <div className="text-[8px] font-black text-muted-foreground uppercase">{s.l}</div>
-                      <div className={`text-3xl font-black font-display ${s.c || 'text-foreground'}`}>{toPersianDigits(s.v)} <span className="text-[10px]">{s.u || ''}</span></div>
+                      <div className="text-xs font-black text-muted-foreground uppercase">{s.l}</div>
+                      <div className={`text-3xl font-black font-display ${s.c || 'text-foreground'}`}>{toPersianDigits(s.v)} <span className="text-xs">{s.u || ''}</span></div>
                     </div>
                   ))}
                 </div>

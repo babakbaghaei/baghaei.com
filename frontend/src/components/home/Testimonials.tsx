@@ -74,7 +74,7 @@ export default function Testimonials() {
               </div>
               <div className="text-right">
                 <div className="font-bold font-display text-sm text-foreground leading-tight">{t.author}</div>
-                <div className="text-[10px] font-bold uppercase text-muted-foreground mt-1 font-display tracking-wider">{t.company}</div>
+                <div className="text-xs font-bold uppercase text-muted-foreground mt-1 font-display tracking-wider">{t.company}</div>
               </div>
             </div>
           </motion.div>

@@ -165,7 +165,7 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
                         {rp.title}
                       </h3>
                       <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{rp.excerpt}</p>
-                      <span className="mt-auto text-[11px] text-muted-foreground font-mono flex items-center gap-2">
+                      <span className="mt-auto text-xs text-muted-foreground font-mono flex items-center gap-2">
                         <Clock className="w-3 h-3" /> {rp.readingTime}
                       </span>
                     </div>

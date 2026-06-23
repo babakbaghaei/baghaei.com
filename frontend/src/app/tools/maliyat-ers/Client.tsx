@@ -62,13 +62,13 @@ function AssetInput({
       <div className="flex items-center justify-between gap-2">
         <span className="text-foreground font-bold font-display text-sm">{label}</span>
         <span
-          className="text-[11px] font-black font-display shrink-0 px-2 py-0.5 rounded-md"
+          className="text-xs font-black font-display shrink-0 px-2 py-0.5 rounded-md"
           style={{ background: `rgba(${ACCENT}, 0.12)`, color: `rgb(${ACCENT})` }}
         >
           {ratePct}
         </span>
       </div>
-      {hint && <p className="text-[10px] text-muted-foreground/70 font-display leading-relaxed">{hint}</p>}
+      {hint && <p className="text-xs text-muted-foreground/70 font-display leading-relaxed">{hint}</p>}
       <div className="relative">
         <input
           type="text"
@@ -80,7 +80,7 @@ function AssetInput({
           aria-label={label}
           className="w-full bg-background border-2 border-border rounded-xl py-3 px-4 pl-12 font-bold font-display text-center focus:border-primary transition-all outline-none text-lg placeholder:text-muted/30"
         />
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-black text-muted-foreground/40">
           {unitLabel(unit)}
         </span>
       </div>
@@ -195,7 +195,7 @@ export default function MaliyatErs() {
                 <button
                   key={un}
                   onClick={() => setUnit(un)}
-                  className={`px-3 py-1 rounded-md text-[11px] font-black transition-all ${
+                  className={`px-3 py-1 rounded-md text-xs font-black transition-all ${
                     unit === un ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground'
                   }`}
                 >

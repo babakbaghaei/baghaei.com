@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
     <Card className="!p-8">
      <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-       <label htmlFor="admin-email" className="text-[10px] uppercase text-muted-foreground font-black px-1">شناسه</label>
+       <label htmlFor="admin-email" className="text-xs uppercase text-muted-foreground font-black px-1">شناسه</label>
        <div className="relative group">
         <div aria-hidden="true" className="absolute inset-y-0 start-4 flex items-center text-muted-foreground group-focus-within:text-foreground transition-colors">
          <User className="w-4 h-4" />
@@ -89,7 +89,7 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="space-y-2">
-       <label htmlFor="admin-password" className="text-[10px] uppercase text-muted-foreground font-black px-1">کلید دسترسی</label>
+       <label htmlFor="admin-password" className="text-xs uppercase text-muted-foreground font-black px-1">کلید دسترسی</label>
        <div className="relative group">
         <div aria-hidden="true" className="absolute inset-y-0 start-4 flex items-center text-muted-foreground group-focus-within:text-foreground transition-colors">
          <Lock className="w-4 h-4" />
@@ -110,7 +110,7 @@ export default function AdminLoginPage() {
 
       {twoFARequired && (
        <div className="space-y-2">
-        <label htmlFor="admin-2fa" className="text-[10px] uppercase text-muted-foreground font-black px-1">کد دو مرحله‌ای</label>
+        <label htmlFor="admin-2fa" className="text-xs uppercase text-muted-foreground font-black px-1">کد دو مرحله‌ای</label>
         <input
          id="admin-2fa"
          name="twoFactorCode"

@@ -288,7 +288,7 @@ export function Field({
         >
           <label
             htmlFor={id}
-            className="text-[11px] font-black text-muted-foreground uppercase tracking-wide"
+            className="text-xs font-black text-muted-foreground uppercase tracking-wide"
           >
             {label}
           </label>
@@ -297,7 +297,7 @@ export function Field({
           )}
         </div>
         {hint && (
-          <p className="text-[10px] text-muted-foreground/70 font-display leading-relaxed">{hint}</p>
+          <p className="text-xs text-muted-foreground/70 font-display leading-relaxed">{hint}</p>
         )}
         {children}
       </div>
@@ -342,7 +342,7 @@ export function MoneyField({
               <button
                 key={u}
                 onClick={() => setUnit(u)}
-                className={`px-3 py-1 rounded-md text-[11px] font-black transition-all ${
+                className={`px-3 py-1 rounded-md text-xs font-black transition-all ${
                   unit === u ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground'
                 }`}
               >
@@ -361,7 +361,7 @@ export function MoneyField({
         unit={unit}
       />
       {showWords && clean > 0 && (
-        <p className="text-[11px] text-muted-foreground/70 font-display text-center mt-2">
+        <p className="text-xs text-muted-foreground/70 font-display text-center mt-2">
           {toWords(clean)} {unitLabel(unit)}
         </p>
       )}
@@ -397,7 +397,7 @@ function MoneyInput({
         aria-label={label}
         className="w-full bg-background border-2 border-border rounded-2xl py-5 px-5 pl-14 font-bold font-display text-center focus:border-primary transition-all outline-none text-2xl md:text-4xl placeholder:text-muted/30"
       />
-      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40">
+      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-muted-foreground/40">
         {unitLabel(unit)}
       </span>
       {amount && (
@@ -469,7 +469,7 @@ export function SelectField({
           <span>{label}</span>
         </label>
         {hint && (
-          <p className="text-[10px] text-muted-foreground/70 font-display leading-relaxed">{hint}</p>
+          <p className="text-xs text-muted-foreground/70 font-display leading-relaxed">{hint}</p>
         )}
         <Select value={value} onChange={onChange} ariaLabel={label}>
           {children}
@@ -500,7 +500,7 @@ export function Stepper({
     <div className="bg-muted/30 border border-border rounded-2xl p-4 flex items-center justify-between gap-3">
       <div className="min-w-0">
         <span className="text-foreground font-bold font-display text-sm">{label}</span>
-        {hint && <p className="text-[10px] text-muted-foreground/70 font-display mt-0.5">{hint}</p>}
+        {hint && <p className="text-xs text-muted-foreground/70 font-display mt-0.5">{hint}</p>}
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <button
@@ -541,7 +541,7 @@ export function Toggle({
     >
       <div className="min-w-0">
         <span className="text-foreground font-bold font-display text-sm">{label}</span>
-        {hint && <p className="text-[10px] text-muted-foreground/70 font-display mt-0.5">{hint}</p>}
+        {hint && <p className="text-xs text-muted-foreground/70 font-display mt-0.5">{hint}</p>}
       </div>
       <span
         className={`shrink-0 w-11 h-6 rounded-full p-0.5 transition-colors ${
@@ -604,7 +604,7 @@ export function Headline({
       {hasResult && (
         <CopyButton accent={accent} text={copyText} className="absolute top-0 left-0" />
       )}
-      <span className="text-[11px] font-black text-muted-foreground uppercase tracking-wide">
+      <span className="text-xs font-black text-muted-foreground uppercase tracking-wide">
         {label}
       </span>
       <p
@@ -616,7 +616,7 @@ export function Headline({
           <span className="text-sm md:text-base text-muted-foreground font-bold mr-2">{suffix}</span>
         )}
       </p>
-      {sub && <p className="text-[11px] text-muted-foreground/70 font-display px-2">{sub}</p>}
+      {sub && <p className="text-xs text-muted-foreground/70 font-display px-2">{sub}</p>}
     </div>
   );
 }
@@ -650,7 +650,7 @@ export function CopyButton({
       onClick={onCopy}
       aria-label="کپی نتیجه"
       title="کپی نتیجه"
-      className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-black font-display transition-all ${className}`}
+      className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-black font-display transition-all ${className}`}
       style={{
         background: `rgba(${accent}, ${copied ? 0.15 : 0.08})`,
         color: `rgb(${accent})`,
@@ -706,7 +706,7 @@ export function ErrorState({ children }: { children: React.ReactNode }) {
 export function Notice({ accent, children }: { accent: string; children: React.ReactNode }) {
   return (
     <div
-      className="flex items-start gap-2 text-[11px] font-display rounded-xl p-3 leading-relaxed"
+      className="flex items-start gap-2 text-xs font-display rounded-xl p-3 leading-relaxed"
       style={{ background: `rgba(${accent}, 0.08)`, color: `rgb(${accent})` }}
     >
       <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
@@ -902,7 +902,7 @@ export function HistoryPanel({
         <button
           onClick={onClear}
           aria-label="پاک‌کردن تاریخچه"
-          className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive transition-colors font-display"
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors font-display"
         >
           <Trash2 className="w-3.5 h-3.5" /> پاک‌کردن
         </button>

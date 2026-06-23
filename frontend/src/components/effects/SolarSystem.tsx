@@ -66,7 +66,7 @@ export default function SolarSystem() {
                   boxShadow: `0 0 15px ${planet.color}66`
                 }}
               />
-              <span className="text-[8px] font-mono uppercase tracking-tighter text-zinc-500 whitespace-nowrap opacity-0 md:opacity-100">
+              <span className="text-xs font-mono uppercase tracking-tighter text-zinc-500 whitespace-nowrap opacity-0 md:opacity-100">
                 {planet.label}
               </span>
             </div>

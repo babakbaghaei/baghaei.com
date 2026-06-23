@@ -175,7 +175,7 @@ export default function AdminProjectsPage() {
                   <div className="flex-1 space-y-2 text-right">
                     <div className="flex items-center gap-3">
                       <h3 className="text-xl font-bold font-display">{project.title}</h3>
-                      <span className={`text-[10px] px-3 py-1 rounded-full font-black tracking-wider ${project.isLocked ? 'bg-secondary text-muted-foreground' : 'bg-primary text-primary-foreground'}`}>
+                      <span className={`text-xs px-3 py-1 rounded-full font-black tracking-wider ${project.isLocked ? 'bg-secondary text-muted-foreground' : 'bg-primary text-primary-foreground'}`}>
                         {project.isLocked ? 'پیش‌نویس' : 'منتشر شده'}
                       </span>
                     </div>

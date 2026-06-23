@@ -26,7 +26,7 @@ export const FooterGroup: React.FC<FooterGroupProps> = ({
 
  return (
   <div className={`space-y-10 ${alignClasses}`}>
-   <h3 className="text-[10px] font-black text-muted-foreground uppercase">
+   <h3 className="text-xs font-black text-muted-foreground uppercase">
     {title}
    </h3>
    <div className="flex flex-col gap-6 text-xl font-bold font-display text-foreground">

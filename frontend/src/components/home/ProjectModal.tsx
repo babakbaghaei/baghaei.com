@@ -291,7 +291,7 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
         <X className="w-5 h-5" />
        </button>
        {/* Latin id — the one place mono + tracking is correct */}
-       <span className="font-mono text-[10px] tracking-[0.3em] text-muted-foreground/60 select-none">
+       <span className="font-mono text-xs tracking-[0.3em] text-muted-foreground/60 select-none">
         {projectId}
        </span>
       </div>
@@ -378,7 +378,7 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
             {display.imagesLocked && (
              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-background/40 backdrop-blur-2xl text-muted-foreground" role="img" aria-label="تصاویر محرمانه">
               <Lock className="w-6 h-6" />
-              <span className="text-[11px] md:text-xs font-display font-bold">تصاویر این پروژه محرمانه است</span>
+              <span className="text-xs md:text-xs font-display font-bold">تصاویر این پروژه محرمانه است</span>
              </div>
             )}
            </div>
@@ -451,7 +451,7 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
             {display.tech.map((t, i) => (
              <span
               key={i}
-              className="px-3.5 py-2 rounded-xl bg-secondary border border-border text-[11px] font-bold text-foreground flex items-center gap-2"
+              className="px-3.5 py-2 rounded-xl bg-secondary border border-border text-xs font-bold text-foreground flex items-center gap-2"
              >
               <TechIcon name={t} />
               {t}

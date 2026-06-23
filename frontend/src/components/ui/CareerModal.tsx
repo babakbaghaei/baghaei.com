@@ -65,7 +65,7 @@ export const CareerModal: React.FC<CareerModalProps> = ({ job, onClose }) => {
        {/* Job Details */}
        <div className="space-y-10 text-right">
         <div className="space-y-4">
-         <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest font-display">{job.type}</div>
+         <div className="text-xs font-black text-muted-foreground uppercase tracking-widest font-display">{job.type}</div>
          <h2 className="text-4xl font-bold font-display text-foreground leading-tight">{job.title}</h2>
         </div>
 

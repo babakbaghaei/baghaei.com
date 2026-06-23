@@ -131,7 +131,7 @@ export default async function ProjectCaseStudy(props: { params: Promise<{ slug: 
                     className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-background/40 backdrop-blur-2xl text-muted-foreground"
                   >
                     <Lock className="w-6 h-6" />
-                    <span className="text-[11px] md:text-xs font-display font-bold">تصاویر این پروژه محرمانه است</span>
+                    <span className="text-xs md:text-xs font-display font-bold">تصاویر این پروژه محرمانه است</span>
                   </div>
                 )}
               </div>
@@ -145,7 +145,7 @@ export default async function ProjectCaseStudy(props: { params: Promise<{ slug: 
             {project.metrics.map((m, i) => (
               <div key={i} className="rounded-2xl border border-border bg-card/40 p-5 text-center">
                 <div className="text-2xl md:text-3xl font-black font-display mb-1" style={{ color: accent }}>{m.value}</div>
-                <div className="text-[11px] text-muted-foreground font-display">{m.label}</div>
+                <div className="text-xs text-muted-foreground font-display">{m.label}</div>
               </div>
             ))}
           </section>

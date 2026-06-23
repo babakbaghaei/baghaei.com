@@ -65,7 +65,7 @@ function SquareToolCard({ tool }: { tool: Tool }) {
             <h3 className="font-display text-sm md:text-base font-black leading-snug text-foreground">
               {tool.title}
             </h3>
-            <p className="mt-1 line-clamp-2 font-sans text-[11px] md:text-xs leading-relaxed text-muted-foreground">
+            <p className="mt-1 line-clamp-2 font-sans text-xs md:text-xs leading-relaxed text-muted-foreground">
               {tool.desc}
             </p>
           </div>
@@ -207,7 +207,7 @@ export default function Projects() {
    {/* Divider between flagship projects and the most-used tools */}
    <div className="shrink-0 self-stretch flex flex-col items-center justify-center gap-4 px-fib-5 md:px-fib-8">
     <div className="w-px flex-1 bg-gradient-to-b from-transparent via-border to-transparent" />
-    <span className="text-[10px] font-display font-bold uppercase tracking-widest text-muted-foreground/60 [writing-mode:vertical-rl] rotate-180">ابزارها</span>
+    <span className="text-xs font-display font-bold uppercase tracking-widest text-muted-foreground/60 [writing-mode:vertical-rl] rotate-180">ابزارها</span>
     <div className="w-px flex-1 bg-gradient-to-b from-transparent via-border to-transparent" />
    </div>
 

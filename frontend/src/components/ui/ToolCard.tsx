@@ -79,7 +79,7 @@ export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
             <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
           </div>
           {isSoon ? (
-            <span className="rounded-full bg-muted/60 px-2 py-0.5 text-[10px] font-bold font-display text-muted-foreground">
+            <span className="rounded-full bg-muted/60 px-2 py-0.5 text-xs font-bold font-display text-muted-foreground">
               به‌زودی
             </span>
           ) : (

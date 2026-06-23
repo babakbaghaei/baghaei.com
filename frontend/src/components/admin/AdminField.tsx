@@ -3,7 +3,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 
-const labelClass = 'text-[10px] uppercase text-muted-foreground font-black mb-2 block px-1';
+const labelClass = 'text-xs uppercase text-muted-foreground font-black mb-2 block px-1';
 const fieldClass =
   'w-full bg-foreground/5 border border-border rounded-xl p-4 text-foreground outline-none transition-colors focus:border-foreground';
 

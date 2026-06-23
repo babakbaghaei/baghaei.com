@@ -65,14 +65,14 @@ export default function EngineeringVisual() {
         <motion.span 
           animate={{ opacity: [0.2, 0.6, 0.2] }}
           transition={{ duration: 3, repeat: Infinity }}
-          className="absolute top-1/4 left-10 text-[10px] font-mono text-zinc-500 uppercase tracking-widest"
+          className="absolute top-1/4 left-10 text-xs font-mono text-zinc-500 uppercase tracking-widest"
         >
           Logic_Core
         </motion.span>
         <motion.span 
           animate={{ opacity: [0.2, 0.6, 0.2] }}
           transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-          className="absolute bottom-1/4 right-10 text-[10px] font-mono text-zinc-500 uppercase tracking-widest"
+          className="absolute bottom-1/4 right-10 text-xs font-mono text-zinc-500 uppercase tracking-widest"
         >
           Security_Mesh
         </motion.span>

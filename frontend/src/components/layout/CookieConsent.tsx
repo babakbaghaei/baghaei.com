@@ -84,7 +84,7 @@ export default function CookieConsent() {
        {isExpanded && (
         <motion.div id="cookie-preferences" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="space-y-3 pt-2 border-t border-border">
          <div className="flex items-center justify-between p-3 bg-secondary rounded-2xl border border-border">
-          <div className="text-[10px] font-bold text-foreground font-display">کوکی‌های ضروری (غیرقابل تغییر)</div>
+          <div className="text-xs font-bold text-foreground font-display">کوکی‌های ضروری (غیرقابل تغییر)</div>
           <div aria-hidden="true" className="w-5 h-5 rounded-md bg-muted-foreground/70 flex items-center justify-center text-background">
            <Check className="w-3.5 h-3.5" strokeWidth={3} />
           </div>
@@ -97,7 +97,7 @@ export default function CookieConsent() {
           onClick={() => setPreferences(p => ({ ...p, analytical: !p.analytical }))}
           className="w-full flex items-center justify-between p-3 bg-secondary rounded-2xl border border-border hover:bg-muted transition-colors"
          >
-          <div id="cookie-analytical-label" className="text-[10px] font-bold text-foreground font-display">تحلیل ترافیک و رفتار</div>
+          <div id="cookie-analytical-label" className="text-xs font-bold text-foreground font-display">تحلیل ترافیک و رفتار</div>
           <div aria-hidden="true" className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${preferences.analytical ? 'bg-primary text-primary-foreground' : 'bg-muted border border-border text-transparent'}`}>
            <Check className="w-3.5 h-3.5" strokeWidth={3} />
           </div>
@@ -110,7 +110,7 @@ export default function CookieConsent() {
           onClick={() => setPreferences(p => ({ ...p, functional: !p.functional }))}
           className="w-full flex items-center justify-between p-3 bg-secondary rounded-2xl border border-border hover:bg-muted transition-colors"
          >
-          <div id="cookie-functional-label" className="text-[10px] font-bold text-foreground font-display">شخصی‌سازی و عملکرد</div>
+          <div id="cookie-functional-label" className="text-xs font-bold text-foreground font-display">شخصی‌سازی و عملکرد</div>
           <div aria-hidden="true" className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${preferences.functional ? 'bg-primary text-primary-foreground' : 'bg-muted border border-border text-transparent'}`}>
            <Check className="w-3.5 h-3.5" strokeWidth={3} />
           </div>
@@ -129,7 +129,7 @@ export default function CookieConsent() {
          onClick={() => setIsExpanded(!isExpanded)}
          aria-expanded={isExpanded}
          aria-controls="cookie-preferences"
-         className="w-full py-3 text-muted-foreground font-bold font-display text-[10px] flex items-center justify-center gap-2 hover:text-foreground transition-colors"
+         className="w-full py-3 text-muted-foreground font-bold font-display text-xs flex items-center justify-center gap-2 hover:text-foreground transition-colors"
         >
          {isExpanded ? 'بستن تنظیمات' : 'شخصی‌سازی گزینه‌ها'}
          {isExpanded ? <ChevronUp aria-hidden="true" className="w-3 h-3" /> : <ChevronDown aria-hidden="true" className="w-3 h-3" />}

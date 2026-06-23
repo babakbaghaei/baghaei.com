@@ -322,7 +322,7 @@ export default function MohlatGhanuni() {
                 {deadline.shifted && (
                   <Notice accent={ACCENT}>روز پایانی مصادف با جمعه بود و به شنبه (نخستین روز کاری) منتقل شد.</Notice>
                 )}
-                <p className="text-[11px] text-muted-foreground/70 font-display leading-relaxed">
+                <p className="text-xs text-muted-foreground/70 font-display leading-relaxed">
                   {deadline.def.note}
                 </p>
                 <ShareButton accent={ACCENT} copied={copied} onClick={onShareDeadline} />

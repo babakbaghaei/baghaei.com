@@ -48,7 +48,7 @@ export default async function ServicesAdmin() {
             <Card key={service.id} className="p-6">
               <h3 className="text-xl font-bold font-display">{service.title}</h3>
               <p className="text-muted-foreground text-sm mt-1 max-w-xl">{service.description}</p>
-              <p className="mt-3 text-[11px] text-muted-foreground/60 font-display">
+              <p className="mt-3 text-xs text-muted-foreground/60 font-display">
                 ترتیب نمایش: {toPersianDigits(service.order)}
               </p>
             </Card>

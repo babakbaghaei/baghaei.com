@@ -110,7 +110,7 @@ const ProjectContent = ({ project, horizontal }: { project: Project, horizontal:
     <div className="flex flex-col h-full w-full text-right" dir="rtl" style={{ transformStyle: "preserve-3d" }}>
       <div className="space-y-3 flex-1 min-h-0 overflow-visible" style={{ transformStyle: "preserve-3d" }}>
         <div className="flex items-center justify-start" style={{ transform: "translateZ(30px)" }}>
-          <span className="text-[10px] font-normal uppercase font-display bg-white/5 px-3 py-1 rounded-full border border-white/5 text-muted-foreground">
+          <span className="text-xs font-normal uppercase font-display bg-white/5 px-3 py-1 rounded-full border border-white/5 text-muted-foreground">
             {project.role}
           </span>
         </div>
@@ -136,7 +136,7 @@ const ProjectContent = ({ project, horizontal }: { project: Project, horizontal:
           style={{ transform: "translateZ(50px)" }}
         >
           {project.tech.slice(0, 4).map((t, i) => (
-            <span key={i} className="rounded-full bg-white/5 border border-white/5 font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 pe-1.5 ps-2.5 py-1 text-[9px]">
+            <span key={i} className="rounded-full bg-white/5 border border-white/5 font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 pe-1.5 ps-2.5 py-1 text-xs">
               <TechIcon name={t} />
               {t}
             </span>

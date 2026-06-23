@@ -37,7 +37,7 @@ export const StatItem: React.FC<StatItemProps> = ({ label, value, className = ""
    /[^\d\.\%\+\s]/.test(value.replace(/[۰-۹]/g, '0')) ? value : <Counter value={value} />
   )}
   </motion.div>
-  <div className="text-[10px] text-foreground/60 font-black uppercase tracking-wider group-hover:text-foreground transition-colors">
+  <div className="text-xs text-foreground/60 font-black uppercase tracking-wider group-hover:text-foreground transition-colors">
   {label}
   </div>
  </div>

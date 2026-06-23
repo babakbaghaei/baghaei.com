@@ -331,7 +331,7 @@ export default function SpinWin() {
 
       {/* Global Brand Footer */}
       <div className="mt-32 text-center pb-20 opacity-20 hover:opacity-100 transition-opacity cursor-default">
-        <div className="text-[10px] font-black tracking-[0.5em] text-muted-foreground uppercase">
+        <div className="text-xs font-black tracking-[0.5em] text-muted-foreground uppercase">
           BAGHAEI TECHNOLOGY GROUP
         </div>
       </div>

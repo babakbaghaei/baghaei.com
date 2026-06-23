@@ -35,7 +35,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
     className="group space-y-8 h-full flex flex-col"
     glowColor="var(--glass-fill)"
    >
-    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-display">
+    <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-display">
      {job.type}
     </div>
     <h3 className="text-3xl font-bold font-display text-foreground">

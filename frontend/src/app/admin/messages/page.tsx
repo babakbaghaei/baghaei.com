@@ -100,7 +100,7 @@ export default function AdminMessages() {
                       {!msg.isRead && <span aria-hidden="true" className="w-2 h-2 rounded-full bg-primary shrink-0" />}
                       <h3 className="font-bold font-display text-lg">{msg.name}</h3>
                     </div>
-                    <time className="text-[11px] text-muted-foreground font-display shrink-0">
+                    <time className="text-xs text-muted-foreground font-display shrink-0">
                       {new Date(msg.createdAt).toLocaleString('fa-IR')}
                     </time>
                   </div>

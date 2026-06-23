@@ -97,7 +97,7 @@ export default function AdminDashboard() {
                   <div className="w-2 h-2 rounded-full bg-primary mt-2" />
                   <div>
                     <p className="text-sm font-display text-foreground opacity-80">{activity.title}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase mt-1">
+                    <p className="text-xs text-muted-foreground uppercase mt-1">
                       {new Date(activity.time).toLocaleTimeString('fa-IR')}
                     </p>
                   </div>
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
             <h3 className="text-xl font-bold font-display mb-8">وضعیت سیستم</h3>
             <div className="space-y-8">
               <div className="space-y-2">
-                <div className="flex justify-between text-[10px] font-black uppercase text-muted-foreground">
+                <div className="flex justify-between text-xs font-black uppercase text-muted-foreground">
                   <span>Server Load</span>
                   <span>{toPersianDigits(String(stats?.systemStatus?.serverLoad || 0))}٪</span>
                 </div>
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="flex justify-between text-[10px] font-black uppercase text-muted-foreground">
+                <div className="flex justify-between text-xs font-black uppercase text-muted-foreground">
                   <span>API Uptime</span>
                   <span>{toPersianDigits(String(stats?.systemStatus?.uptime || 0))}٪</span>
                 </div>
