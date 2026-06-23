@@ -121,10 +121,10 @@ Replace the `submitContactForm` backend block (lines 50-65), removing the `conso
 
 In root `.env` line 18, strip the `/api/v1` and add an internal URL line:
 ```
-NEXT_PUBLIC_API_URL=http://46.249.99.158:8000
+NEXT_PUBLIC_API_URL=https://api.baghaei.com
 API_INTERNAL_URL=http://backend:8000
 ```
-(`NEXT_PUBLIC_API_URL` is the browser-reachable backend origin — Phase 7 switches it to `https://api.baghaei.com`. Confirm the current public host with the user if unsure.)
+(`NEXT_PUBLIC_API_URL` is the browser-reachable backend origin, confirmed by the user. It is consumed as a **build arg** — `docker-compose.yml` passes it under the frontend `build.args`, so it is baked into the browser bundle at image-build time; a rebuild is required for changes to take effect. `API_INTERNAL_URL` is read at runtime by the server action only.)
 
 In root `.env.example` line 17:
 ```
@@ -138,6 +138,37 @@ In `docker-compose.yml`, under the frontend service `environment:` block (alongs
 ```yaml
         API_INTERNAL_URL: ${API_INTERNAL_URL:-http://backend:8000}
 ```
+
+- [ ] **Step 6b: Route api.baghaei.com → backend (nginx) + allow the page origin (CORS)**
+
+The browser now calls a cross-origin host (`https://api.baghaei.com`), so nginx must answer for that hostname and the backend must allow the page origin.
+
+In `nginx.conf`, add a second `server` block after the existing `baghaei.com` server block closes (the `}` on line 83), still inside `http {}`:
+```nginx
+    # api.baghaei.com → backend (Cloudflare terminates TLS, forwards to origin :80)
+    server {
+        listen 80;
+        server_name api.baghaei.com;
+
+        location / {
+            proxy_pass http://backend;
+            proxy_http_version 1.1;
+            proxy_set_header Connection ""; # Required for Keep-Alive
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+```
+In `backend/src/security/security.service.ts`, add `'https://www.baghaei.com'` to the CORS `origin` array (right after `'https://baghaei.com',`) so the www host is also allowed (the apex is already present):
+```ts
+        'https://baghaei.com',
+        'https://www.baghaei.com',
+```
+The page origin `https://baghaei.com` is already allow-listed, so the cross-origin call to `api.baghaei.com` passes CORS. `api.baghaei.com` itself is the target, not a caller — it does NOT belong in the list.
+
+> **User action (out of band, cannot be scripted here):** create a Cloudflare DNS record `A  api  →  185.204.170.101` (proxied / orange-cloud). `api.baghaei.com` will not resolve and production forms will fail until it exists. Record this in the task report so it surfaces to the user.
 
 - [ ] **Step 7: Build to confirm types compile**
 
@@ -170,8 +201,8 @@ Expected: PASS. (If the success-copy selector differs, fix the assertion to matc
 - [ ] **Step 10: Commit**
 
 ```bash
-git add frontend/src/lib/apiBase.ts frontend/src/lib/api.ts frontend/src/app/actions.ts frontend/tests/contact-submit.spec.ts .env .env.example docker-compose.yml
-git commit -m "fix(api): bug-proof backend URL (no double /api/v1) + internal origin for server actions"
+git add frontend/src/lib/apiBase.ts frontend/src/lib/api.ts frontend/src/app/actions.ts frontend/tests/contact-submit.spec.ts .env .env.example docker-compose.yml nginx.conf backend/src/security/security.service.ts
+git commit -m "fix(api): bug-proof backend URL + api.baghaei.com origin (nginx route + CORS)"
 ```
 
 ---
