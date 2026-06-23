@@ -246,19 +246,21 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       starsRef.current?.forEach(s => {
         const xPos = s.x % width;
         // Deeper parallax travel for a stronger sense of depth on scroll.
-        const yPos = (s.y + sp * 1600 * s.parallax) % height;
+        const yPos = (s.y + sp * 1800 * s.parallax) % height;
         const twinkle = prefersReducedMotion
           ? 1
           : 0.7 + Math.sin((now * 0.002 * s.twinkle) + s.x) * 0.3;
         // Scroll "wakes" the field: a capped brightness lift while moving.
         const alpha = Math.min(
-          s.opacity * twinkle * themeOpacityFactor * (1 + speed * 0.6),
-          0.55
+          s.opacity * twinkle * themeOpacityFactor * (1 + speed * 0.5),
+          0.5
         );
 
-        // Trail length scales with scroll speed and the star's parallax depth;
-        // at rest streak→0 and we fall back to the calm, readable dot.
-        const streak = speed * s.parallax * 260;
+        // Trail length scales with scroll speed and the star's parallax depth,
+        // but is HARD-capped so even a fast fling makes short tasteful trails —
+        // never a screen-filling "rain". At rest streak→0 and we fall back to
+        // the calm, readable dot.
+        const streak = Math.min(speed * s.parallax * 320, 24);
         if (streak > 1.2) {
           ctx.strokeStyle = `rgba(${starColor}, ${alpha})`;
           ctx.lineWidth = s.size;
