@@ -11,6 +11,7 @@ import { Box, ArrowUpLeft } from 'lucide-react';
 import { PROJECTS_DATA } from '@/lib/data/projects';
 import { TOOLS, type Tool } from '@/lib/data/tools';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
+import { parallaxBus } from '@/lib/utils/parallaxBus';
 
 // Selected High-Impact Projects for the Top Slider — sourced from the single
 // PROJECTS_DATA store (by slug, in display order) so descriptions/metrics never
@@ -100,6 +101,20 @@ function PinnedRow({ children }: { children: React.ReactNode }) {
  // Read the measured overflow from a ref inside the transform so the mapping
  // always uses the latest width without re-instantiating the motion value.
  const x = useTransform(scrollYProgress, (v) => v * RTL_SIGN * overflowRef.current);
+
+ // Publish horizontal pin progress to the star field so the background travels
+ // sideways with the cards (and freezes its vertical drift) while pinned.
+ useEffect(() => {
+  const unsub = scrollYProgress.on('change', (v) => {
+   parallaxBus.hx = v;
+   parallaxBus.pinActive = v > 0.001 && v < 0.999;
+  });
+  return () => {
+   unsub();
+   parallaxBus.pinActive = false;
+   parallaxBus.hx = 0;
+  };
+ }, [scrollYProgress]);
 
  useLayoutEffect(() => {
   const measure = () => {

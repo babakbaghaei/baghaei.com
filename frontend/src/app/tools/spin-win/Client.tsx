@@ -42,7 +42,7 @@ const OptionChip = memo(({
       className={`group flex items-center gap-3 px-5 py-3 rounded-2xl transition-all duration-300 border ${
         isEditing 
           ? 'bg-primary/5 border-primary shadow-lg ring-4 ring-primary/5' 
-          : 'bg-card border-border hover:border-primary/40 shadow-sm'
+          : 'bg-card/40 backdrop-blur-md border-border hover:border-primary/40 shadow-sm'
       }`}
     >
       {isEditing ? (
@@ -198,7 +198,7 @@ export default function SpinWin() {
       return (
         <main className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 flex flex-col items-center py-12 px-6 md:py-24 relative overflow-x-hidden">
           
-          <div className="w-full max-w-4xl relative z-10 flex flex-col items-center space-y-20">
+          <div className="w-full max-w-4xl relative z-10 flex flex-col items-center space-y-12 md:space-y-16">
             {/* breadcrumb */}
             <Link
               href="/tools"
@@ -210,7 +210,7 @@ export default function SpinWin() {
 
             {/* Header - Ultra Minimal */}
             <div className="text-center space-y-4">
-              <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight">چرخونه تصمیم</h1>
+              <h1 className="text-[clamp(2.25rem,6vw,4.5rem)] font-black font-display tracking-tight">چرخونه تصمیم</h1>
               <p className="text-muted-foreground font-medium text-lg">گزینه‌ها را بنویسید، برنده را سرنوشت تعیین می‌کند.</p>
             </div>
       
@@ -221,7 +221,7 @@ export default function SpinWin() {
                 <div className="w-1.5 h-10 bg-primary rounded-full shadow-xl" />
               </div>
       
-              <div className="p-3 rounded-full border-2 border-border shadow-[0_0_100px_rgba(0,0,0,0.05)] bg-card">
+              <div className="p-3 rounded-full border-2 border-border shadow-[0_0_100px_rgba(0,0,0,0.05)] bg-card/40 backdrop-blur-xl backdrop-saturate-150">
                 <motion.canvas
                   ref={canvasRef}
                   width={550}

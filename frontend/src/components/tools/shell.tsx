@@ -112,7 +112,7 @@ export function ToolShell({
             <Icon className="w-7 h-7" strokeWidth={1.75} />
           </div>
           <div>
-            <h1 className="text-2xl md:text-4xl font-black font-display tracking-tight">{title}</h1>
+            <h1 className="text-[clamp(1.5rem,5vw,2.25rem)] font-black font-display tracking-tight leading-tight">{title}</h1>
             <p className="text-muted-foreground text-xs md:text-sm font-medium mt-1">{subtitle}</p>
           </div>
         </div>
@@ -185,7 +185,7 @@ export function Panel({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className={`bg-card border border-border rounded-[2rem] p-6 md:p-9 ${className}`}
+      className={`bg-card/40 backdrop-blur-xl backdrop-saturate-150 border border-border rounded-[2rem] p-5 md:p-9 shadow-xl ${className}`}
     >
       {children}
     </motion.div>
@@ -210,12 +210,12 @@ export function VerdictPanel({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="lg:sticky lg:top-24 rounded-[2rem] border overflow-hidden scroll-mt-24"
+      className="lg:sticky lg:top-24 rounded-[2rem] border overflow-hidden scroll-mt-24 bg-card/30 backdrop-blur-xl backdrop-saturate-150 shadow-xl"
       style={{ borderColor: `rgba(${accent}, 0.25)` }}
     >
       <div
-        className="p-6 md:p-9"
-        style={{ background: `linear-gradient(160deg, rgba(${accent}, 0.10), transparent 60%)` }}
+        className="p-5 md:p-9"
+        style={{ background: `linear-gradient(160deg, rgba(${accent}, 0.12), transparent 60%)` }}
       >
         {children}
       </div>
@@ -377,7 +377,7 @@ function MoneyInput({
         <button
           onClick={onClear}
           aria-label="پاک کردن"
-          className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-muted text-muted-foreground transition-all"
+          className="absolute right-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-all"
         >
           <X className="w-4 h-4" />
         </button>
@@ -405,7 +405,7 @@ export function Select({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={ariaLabel}
-        className="w-full bg-background border-2 border-border rounded-xl py-2.5 pr-3 pl-8 font-display text-sm focus:border-primary outline-none transition-all text-foreground appearance-none cursor-pointer text-center"
+        className="w-full bg-background border-2 border-border rounded-xl py-3 pr-3 pl-8 font-display text-sm focus:border-primary outline-none transition-all text-foreground appearance-none cursor-pointer text-center min-h-11"
       >
         {children}
       </select>
@@ -479,15 +479,15 @@ export function Stepper({
         <button
           onClick={() => set(value - 1)}
           aria-label="کاهش"
-          className="w-8 h-8 rounded-lg bg-background border border-border text-foreground font-black hover:border-primary transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-xl bg-background border border-border text-foreground text-lg font-black hover:border-primary active:scale-95 transition-all"
         >
           −
         </button>
-        <span className="w-8 text-center font-display font-black tabular-nums">{faNum(value)}</span>
+        <span className="w-9 text-center font-display font-black tabular-nums">{faNum(value)}</span>
         <button
           onClick={() => set(value + 1)}
           aria-label="افزایش"
-          className="w-8 h-8 rounded-lg bg-background border border-border text-foreground font-black hover:border-primary transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-xl bg-background border border-border text-foreground text-lg font-black hover:border-primary active:scale-95 transition-all"
         >
           +
         </button>

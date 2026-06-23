@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
+import { parallaxBus } from '@/lib/utils/parallaxBus';
 
 interface PlanetData {
   id: string;
@@ -165,6 +166,13 @@ const SECTION_LABELS: Record<string, string> = {
 // eight years of simulated motion.
 const SCROLL_TIME_SPAN_MS = 8 * 365.25 * 86400000;
 
+// Parallax travel (px) the star field drifts across a full vertical page scroll
+// or a full pass through the pinned-projects (horizontal) section.
+const V_TRAVEL = 1000;
+const H_TRAVEL = 1400;
+// Positive modulo so accumulated (possibly negative) offsets wrap cleanly.
+const wrapMod = (v: number, m: number) => ((v % m) + m) % m;
+
 export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: { scrollProgress: number, observeVisibility?: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { resolvedTheme } = useTheme();
@@ -178,6 +186,11 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
   // ref so it never restarts the rAF loop. Drives streak length + brightness.
   const velRef = useRef(0);
   const prevScrollRef = useRef(scrollProgress);
+  // Axis-separated parallax: horizontal advances only while the projects pin is
+  // active, vertical only otherwise. Delta-accumulated so the switch never jumps.
+  const prevHxRef = useRef(0);
+  const hAccumRef = useRef(0);
+  const vAccumRef = useRef(0);
 
   if (!starsRef.current) {
     // Responsive density: thin the field on small screens so it never becomes
@@ -235,27 +248,37 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       const starColor = isDark ? '255, 255, 255' : '0, 0, 0';
       // Black stars on a white page read as noise, so dim them heavily in light mode.
       const themeOpacityFactor = isDark ? 1 : 0.3;
+      // Axis-correct parallax. Vertical page scroll drifts stars vertically,
+      // EXCEPT inside the home pinned-projects section, where the page's vertical
+      // scroll is visually horizontal — there the field drifts horizontally with
+      // the cards and its vertical drift is held. Delta accumulation keeps both
+      // axes continuous, so the field never jumps when the axis flips.
       const sp = scrollRef.current;
       const now = Date.now();
+      const pinActive = parallaxBus.pinActive;
 
-      // Smooth the scroll velocity toward the latest per-frame delta. At rest
-      // this decays to ~0 (calm dots); during a scroll it spikes (streaks),
-      // giving the solartoscale "travel through space" reactivity.
-      let rawVel = sp - prevScrollRef.current;
+      let dV = sp - prevScrollRef.current;
       prevScrollRef.current = sp;
-      // A real scroll frame nudges progress by a tiny amount. A large jump means
-      // the page height changed under us (route change / layout shift), not an
-      // actual scroll — zero it so the field never streaks/stretches "without
-      // scrolling" when navigating between pages.
-      if (Math.abs(rawVel) > 0.15) rawVel = 0;
-      velRef.current = velRef.current + (rawVel - velRef.current) * 0.15;
-      const speed = Math.min(Math.abs(velRef.current) * 60, 1); // 0..1 normalised
+      if (Math.abs(dV) > 0.15) dV = 0; // ignore route-change / layout teleports
+
+      let dH = parallaxBus.hx - prevHxRef.current;
+      prevHxRef.current = parallaxBus.hx;
+      if (Math.abs(dH) > 0.5) dH = 0;
+
+      if (pinActive) hAccumRef.current += dH * H_TRAVEL;
+      else vAccumRef.current += dV * V_TRAVEL;
+      const hAccum = hAccumRef.current;
+      const vAccum = vAccumRef.current;
+
+      // Streak length follows the velocity on the ACTIVE axis only.
+      const axisDelta = pinActive ? dH * H_TRAVEL : dV * V_TRAVEL;
+      velRef.current = velRef.current + (axisDelta - velRef.current) * 0.15;
+      const speed = Math.min(Math.abs(velRef.current) * 0.05, 1); // 0..1 normalised
       const dir = velRef.current >= 0 ? 1 : -1;
 
       starsRef.current?.forEach(s => {
-        const xPos = s.x % width;
-        // Deeper parallax travel for a stronger sense of depth on scroll.
-        const yPos = (s.y + sp * 1000 * s.parallax) % height;
+        const xPos = wrapMod(s.x + hAccum * s.parallax, width);
+        const yPos = wrapMod(s.y + vAccum * s.parallax, height);
         const twinkle = prefersReducedMotion
           ? 1
           : 0.7 + Math.sin((now * 0.002 * s.twinkle) + s.x) * 0.3;
@@ -275,7 +298,8 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
           ctx.lineWidth = s.size;
           ctx.beginPath();
           ctx.moveTo(xPos, yPos);
-          ctx.lineTo(xPos, yPos - dir * streak);
+          if (pinActive) ctx.lineTo(xPos - dir * streak, yPos);
+          else ctx.lineTo(xPos, yPos - dir * streak);
           ctx.stroke();
         } else {
           ctx.fillStyle = `rgba(${starColor}, ${alpha})`;

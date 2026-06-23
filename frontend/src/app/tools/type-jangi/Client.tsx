@@ -52,7 +52,7 @@ const AUTO_INSERT_SET = new Set(['\u200C', '،', '.', '!', '؟', '؛', ':', '(',
 const HUD = memo(({ wpm, accuracy }: { wpm: number, accuracy: number }) => (
   <div className="flex justify-between items-end mb-16 px-4" dir="rtl">
     <div className="flex flex-col gap-2 text-right">
-      <h1 className="text-4xl font-black font-display text-foreground text-right">سرعت‌سنج تایپ</h1>
+      <h1 className="text-[clamp(1.75rem,5vw,2.5rem)] font-black font-display text-foreground text-right">سرعت‌سنج تایپ</h1>
       <div className="text-xs font-bold text-muted-foreground uppercase text-right">تست سرعت و دقت تایپ فارسی</div>
     </div>
     <div className="flex gap-10">
