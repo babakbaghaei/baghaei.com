@@ -174,6 +174,10 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
   // frame and was the main cause of jank / the tab locking up).
   const scrollRef = useRef(scrollProgress);
   scrollRef.current = scrollProgress;
+  // Smoothed scroll velocity (per-frame delta of scrollProgress). Lives in a
+  // ref so it never restarts the rAF loop. Drives streak length + brightness.
+  const velRef = useRef(0);
+  const prevScrollRef = useRef(scrollProgress);
 
   if (!starsRef.current) {
     // Responsive density: thin the field on small screens so it never becomes
@@ -229,17 +233,45 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       const themeOpacityFactor = isDark ? 1 : 0.3;
       const sp = scrollRef.current;
       const now = Date.now();
+
+      // Smooth the scroll velocity toward the latest per-frame delta. At rest
+      // this decays to ~0 (calm dots); during a scroll it spikes (streaks),
+      // giving the solartoscale "travel through space" reactivity.
+      const rawVel = sp - prevScrollRef.current;
+      prevScrollRef.current = sp;
+      velRef.current = velRef.current + (rawVel - velRef.current) * 0.15;
+      const speed = Math.min(Math.abs(velRef.current) * 60, 1); // 0..1 normalised
+      const dir = velRef.current >= 0 ? 1 : -1;
+
       starsRef.current?.forEach(s => {
         const xPos = s.x % width;
-        const yPos = (s.y + sp * 1000 * s.parallax) % height;
+        // Deeper parallax travel for a stronger sense of depth on scroll.
+        const yPos = (s.y + sp * 1600 * s.parallax) % height;
         const twinkle = prefersReducedMotion
           ? 1
           : 0.7 + Math.sin((now * 0.002 * s.twinkle) + s.x) * 0.3;
+        // Scroll "wakes" the field: a capped brightness lift while moving.
+        const alpha = Math.min(
+          s.opacity * twinkle * themeOpacityFactor * (1 + speed * 0.6),
+          0.55
+        );
 
-        ctx.fillStyle = `rgba(${starColor}, ${s.opacity * twinkle * themeOpacityFactor})`;
-        ctx.beginPath();
-        ctx.arc(xPos, yPos, s.size, 0, Math.PI * 2);
-        ctx.fill();
+        // Trail length scales with scroll speed and the star's parallax depth;
+        // at rest streak→0 and we fall back to the calm, readable dot.
+        const streak = speed * s.parallax * 260;
+        if (streak > 1.2) {
+          ctx.strokeStyle = `rgba(${starColor}, ${alpha})`;
+          ctx.lineWidth = s.size;
+          ctx.beginPath();
+          ctx.moveTo(xPos, yPos);
+          ctx.lineTo(xPos, yPos - dir * streak);
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = `rgba(${starColor}, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(xPos, yPos, s.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
       });
     };
 
