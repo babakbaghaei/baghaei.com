@@ -16,10 +16,12 @@ const DATA_FILE = join(__dirname, '..', 'src', 'lib', 'data', 'projects.ts');
 function referencedAssetPaths(): string[] {
   const src = readFileSync(DATA_FILE, 'utf8');
   const re = /'(\/assets\/projects\/[^']+)'/g;
-  const out = new Set<string>();
+  const out: string[] = [];
   let m: RegExpExecArray | null;
-  while ((m = re.exec(src)) !== null) out.add(m[1]);
-  return [...out];
+  while ((m = re.exec(src)) !== null) {
+    if (!out.includes(m[1])) out.push(m[1]);
+  }
+  return out;
 }
 
 const ASSETS = referencedAssetPaths();
