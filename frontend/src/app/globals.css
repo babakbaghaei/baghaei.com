@@ -119,7 +119,7 @@ select optgroup {
 
 /* Fluid Typography Scale */
 html {
-  font-size: clamp(14px, 1.1vw, 18px);
+  font-size: clamp(15px, 0.2vw + 14px, 16.5px);
   scroll-behavior: auto !important;
   background-color: hsl(var(--background));
   /* Stop Safari (esp. iOS) from auto-inflating text, which makes card content
