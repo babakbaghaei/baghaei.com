@@ -148,7 +148,6 @@ export default function Navbar() {
        className="flex h-9 items-center gap-2 rounded-full px-2.5 text-muted-foreground outline-none transition-colors hover:text-foreground hover:bg-secondary focus-visible:ring-2 focus-visible:ring-primary/50"
       >
        <Search aria-hidden="true" className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />
-       <kbd className="hidden lg:inline-block rounded border border-border px-1.5 py-0.5 text-[10px] font-mono leading-none text-muted-foreground">⌘K</kbd>
       </button>
       <ThemeToggle />
       <div className="h-6 w-px bg-border" />
