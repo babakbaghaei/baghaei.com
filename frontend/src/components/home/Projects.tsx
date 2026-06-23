@@ -65,7 +65,7 @@ function SquareToolCard({ tool }: { tool: Tool }) {
             <h3 className="font-display text-sm md:text-base font-black leading-snug text-foreground">
               {tool.title}
             </h3>
-            <p className="mt-1 line-clamp-2 font-sans text-xs md:text-xs leading-relaxed text-muted-foreground">
+            <p className="mt-1 line-clamp-2 font-sans text-xs leading-relaxed text-muted-foreground">
               {tool.desc}
             </p>
           </div>

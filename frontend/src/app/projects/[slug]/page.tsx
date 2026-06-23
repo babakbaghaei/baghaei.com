@@ -131,7 +131,7 @@ export default async function ProjectCaseStudy(props: { params: Promise<{ slug: 
                     className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-background/40 backdrop-blur-2xl text-muted-foreground"
                   >
                     <Lock className="w-6 h-6" />
-                    <span className="text-xs md:text-xs font-display font-bold">تصاویر این پروژه محرمانه است</span>
+                    <span className="text-xs font-display font-bold">تصاویر این پروژه محرمانه است</span>
                   </div>
                 )}
               </div>
