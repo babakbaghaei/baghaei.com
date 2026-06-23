@@ -14,6 +14,7 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ContactModule } from './contact/contact.module';
+import { CareersModule } from './careers/careers.module';
 import { AuthModule } from './auth/auth.module';
 import { OpenTelemetryModule } from './observability/opentelemetry.module';
 import { SecurityModule } from './security/security.module';
@@ -79,6 +80,7 @@ import { UploadModule } from './upload/upload.module';
     SentryModule.forRoot(),
     ProjectsModule,
     ContactModule,
+    CareersModule,
     UploadModule,
     AuthModule,
     OpenTelemetryModule,
