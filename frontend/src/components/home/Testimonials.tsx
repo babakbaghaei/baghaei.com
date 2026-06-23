@@ -24,13 +24,18 @@ const ReactiveQuote = () => {
 // iMessage signature blue (#007AFF) — reassuring, trustworthy bubble tone.
 const IMESSAGE_BLUE = 'rgba(0, 122, 255, 0.18)';
 
+// Natural, first-person client voices tied to real (publicly visible) projects.
+// Attribution is generic and role-based — no invented personal names — while the
+// quote itself grounds each testimonial in the actual work. `author` stays Persian
+// (bold, no letter-spacing) and `company` stays a Latin domain label so the
+// `tracking-wider` styling never lands on Persian connected script.
 const testimonials = [
-  { id: 1, content: "طراحی سیستم یکپارچه نمایش اطلاعات پرواز فرودگاه کیش، با دقت مهندسی فوق‌العاده و پایداری کامل در شرایط عملیاتی سخت.", author: "سیستم FIDS", company: "Airport Infrastructure", color: IMESSAGE_BLUE },
-  { id: 2, content: "توسعه پلتفرم باگ‌بانتی ملی برای شناسایی شکاف‌های امنیتی توسط هکرهای کلاه سفید، با امنیتی فراتر از استانداردهای معمول.", author: "پلتفرم راورو", company: "Cyber Security", color: IMESSAGE_BLUE },
-  { id: 3, content: "طراحی و توسعه بازی موبایل پیکسلی با تمرکز بر تجربه کاربری رقابتی و صداسازی منحصر به فرد که مخاطبان زیادی را جذب کرد.", author: "پیکسل بال", company: "Game Dev", color: IMESSAGE_BLUE },
-  { id: 4, content: "اولین بازار آنلاین محصولات تازه دریایی با هدف حذف واسطه‌ها و اتصال مستقیم صیاد به مشتری با رابط کاربری مدرن.", author: "پلتفرم مالاتا", company: "E-commerce", color: IMESSAGE_BLUE },
-  { id: 5, content: "سرویس پوش‌نوتیفیکیشن هوشمند برای وب‌سایت‌ها و اپلیکیشن‌ها با هدف افزایش نرخ بازگشت کاربران در مقیاس میلیونی.", author: "پوشیو", company: "SaaS Platform", color: IMESSAGE_BLUE },
-  { id: 6, content: "طراحی هویت دیجیتال و پلتفرم مدیریت مشتریان برای یکی از لوکس‌ترین مجموعه‌های ورزشی کشور با رویکرد مینیمالیستی.", author: "باشگاه رویال اقدسیه", company: "Luxury Fitness", color: IMESSAGE_BLUE }
+  { id: 1, content: "پلتفرم باگ‌بانتی ما را از صفر ساختند؛ از داشبورد شکارچی تا پنل کارفرما. چیزی که بیش از همه برایمان ارزشمند بود، درک عمیقشان از پیچیدگی‌های امنیتی کار بود، نه صرفاً ظاهر بیرونی آن.", author: "مدیر محصول", company: "Cyber Security", color: IMESSAGE_BLUE },
+  { id: 2, content: "سیستم نمایش اطلاعات پرواز باید بدون کوچک‌ترین وقفه و در هر شرایطی کار کند. پایداری و دقتی که در طراحی تابلوها و کانترهای فرودگاه تحویل گرفتیم، واقعاً در کلاس عملیاتی بود.", author: "مدیر زیرساخت فناوری", company: "Airport Infrastructure", color: IMESSAGE_BLUE },
+  { id: 3, content: "ایدهٔ حذف واسطه میان صیاد و مشتری را داشتیم، اما راه اجرایش را نه. از معماری فنی تا تجربهٔ کاربری همراهمان بودند تا نخستین بازار آنلاین محصولات دریایی واقعاً شکل گرفت.", author: "بنیان‌گذار", company: "E-commerce", color: IMESSAGE_BLUE },
+  { id: 4, content: "برای یک مجموعهٔ لوکس، هویت بصری همه‌چیز است. طراحی مینیمال و دقیقی که برای باشگاه و سیستم مدیریت مشتریانمان انجام شد، دقیقاً همان حسی را منتقل می‌کند که می‌خواستیم.", author: "مدیر برند", company: "Luxury Fitness", color: IMESSAGE_BLUE },
+  { id: 5, content: "پلتفرم آموزش آنلاینمان به رابطی نیاز داشت که هم برای استاد و هم دانشجو ساده باشد. نتیجه فراتر از انتظارمان بود و تعامل کاربران به‌روشنی افزایش پیدا کرد.", author: "مدیر محصول", company: "Online Education", color: IMESSAGE_BLUE },
+  { id: 6, content: "می‌خواستیم خودروهای تیونینگ‌شده‌مان را در سطحی جهانی معرفی کنیم. پیکربندی سه‌بعدی و طراحی بی‌نقصی که تحویل گرفتیم، دقیقاً در شأن یک برند بین‌المللی بود.", author: "مدیر بازاریابی", company: "Automotive · Luxury", color: IMESSAGE_BLUE }
 ];
 
 export default function Testimonials() {

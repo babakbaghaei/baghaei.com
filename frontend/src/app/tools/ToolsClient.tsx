@@ -94,8 +94,10 @@ export default function ToolsIndex() {
             />
           </div>
 
-          {/* category chips */}
-          <div className="flex flex-wrap gap-2">
+          {/* category chips — a single horizontally-scrollable strip on mobile
+              (edge-to-edge, no wrap so the row stays one-handed swipeable), then
+              a normal wrapping cluster from lg up. */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-6 px-6 lg:mx-0 lg:px-0 lg:flex-wrap snap-x">
             {tabs.map((tab) => {
               const isActive = active === tab;
               const color = tab === 'همه' ? null : getCategoryMeta(tab).color;
@@ -103,7 +105,7 @@ export default function ToolsIndex() {
                 <button
                   key={tab}
                   onClick={() => setActive(tab)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black font-display transition-all border min-h-11 ${
+                  className={`inline-flex shrink-0 snap-start items-center gap-2 px-4 py-2 rounded-xl text-xs font-black font-display transition-all border min-h-11 ${
                     isActive
                       ? color
                         ? 'text-white border-transparent'

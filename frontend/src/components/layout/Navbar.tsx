@@ -1,24 +1,28 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Logo from './Logo';
 import { AnimatePresence, motion } from 'framer-motion';
 import { NavItem } from '../ui/NavItem';
-import { Menu, ChevronDown, Layout, Globe, Briefcase, Sparkles, Plane, Car, ArrowLeft, Search } from 'lucide-react';
+import { Menu, ChevronDown, Layout, Globe, Sparkles, Dumbbell, Gamepad2, Cpu, Shield, Smartphone, Palette, ArrowLeft, Search } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { TOOLS, TOOL_CATEGORIES, getCategoryMeta } from '@/lib/data/tools';
+import { PROJECTS_DATA } from '@/lib/data/projects';
 import { Button } from '../ui/Button';
 import { navLinks } from '@/lib/nav';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
-const featuredProjects = [
-  { id: 'ravaro', name: 'پلتفرم راورو', desc: 'بزرگترین پلتفرم باگ‌بانتی و امنیت سایبری در مقیاس ملی.', icon: Globe },
-  { id: 'malata', name: 'پلتفرم مالاتا', desc: 'بازار آنلاین مستقیم محصولات دریایی و صیادی.', icon: Briefcase },
-  { id: 'fids', name: 'FIDS فرودگاه کیش', desc: 'سیستم نمایش اطلاعات پرواز و رابط کانترهای فرودگاه بین‌المللی کیش.', icon: Plane },
-  { id: 'kevany', name: 'تیونینگ کیوانی', desc: 'پلتفرم پیکربندی خودروهای فوق‌لوکس برای برند جهانی Kevany.', icon: Car },
-  { id: 'royal', name: 'رویال اقدسیه', desc: 'هویت دیجیتال و مدیریت یکی از لوکس‌ترین باشگاه‌های کشور.', icon: Layout },
-];
+// Lucide fallbacks for the corner mark when a project has no brand-logo asset —
+// mirrors ProjectCard's ICON_MAP so the dropdown and the cards stay in sync.
+const PROJECT_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
+  Globe, Dumbbell, Gamepad2, Cpu, Shield, Smartphone, Palette, Layout,
+};
+
+// Data-driven products menu: the real catalog (visible projects only), so the
+// dropdown can never drift from the cards again. First six fill the 2-col grid.
+const featuredProjects = PROJECTS_DATA.filter((p) => !p.hidden).slice(0, 6);
 
 export default function Navbar() {
  const [scrolled, setScrolled] = useState(false);
@@ -215,21 +219,28 @@ export default function Navbar() {
              </div>
              {/* projects grid */}
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-               {featuredProjects.map((project) => (
-                 <button
-                   key={project.id}
-                   onClick={() => { setOpenMenu(null); scrollTo('projects'); }}
-                   className="p-4 rounded-2xl bg-secondary/30 border border-transparent hover:bg-secondary hover:border-border transition-all cursor-pointer group flex items-start gap-3.5 text-right"
-                 >
-                   <div className="w-10 h-10 rounded-xl bg-muted/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                     <project.icon className="w-5 h-5 text-foreground" />
-                   </div>
-                   <div>
-                     <div className="font-bold text-sm text-foreground mb-1 group-hover:text-primary transition-colors">{project.name}</div>
-                     <div className="text-xs text-foreground/70 leading-relaxed line-clamp-2">{project.desc}</div>
-                   </div>
-                 </button>
-               ))}
+               {featuredProjects.map((project) => {
+                 const FallbackIcon = (project.icon && PROJECT_ICON[project.icon]) || Layout;
+                 return (
+                   <button
+                     key={project.slug ?? project.id}
+                     onClick={() => { setOpenMenu(null); scrollTo('projects'); }}
+                     className="p-4 rounded-2xl bg-secondary/30 border border-transparent hover:bg-secondary hover:border-border transition-all cursor-pointer group flex items-start gap-3.5 text-right"
+                   >
+                     <div className="w-10 h-10 rounded-xl bg-muted/10 flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-110 transition-transform">
+                       {project.logo ? (
+                         <Image src={project.logo} alt="" aria-hidden width={24} height={24} className="w-6 h-6 object-contain" />
+                       ) : (
+                         <FallbackIcon className="w-5 h-5 text-foreground" />
+                       )}
+                     </div>
+                     <div>
+                       <div className="font-bold text-sm text-foreground mb-1 group-hover:text-primary transition-colors">{project.title}</div>
+                       <div className="text-xs text-foreground/70 leading-relaxed line-clamp-2">{project.desc}</div>
+                     </div>
+                   </button>
+                 );
+               })}
              </div>
            </div>
          ) : (
@@ -260,7 +271,7 @@ export default function Navbar() {
                {TOOL_CATEGORIES.map((cat) => {
                  const meta = getCategoryMeta(cat);
                  const CatIcon = meta.icon;
-                 const items = TOOLS.filter((t) => t.category === cat && t.status !== 'soon').slice(0, 4);
+                 const items = TOOLS.filter((t) => t.category === cat && t.status !== 'soon');
                  if (items.length === 0) return null;
                  return (
                    <div key={cat} className="space-y-3">
