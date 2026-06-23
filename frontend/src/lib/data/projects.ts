@@ -44,7 +44,7 @@ export const PROJECTS_DATA: Project[] = [
    borderColor: 'rgba(153, 27, 27, 0.8)',
    isLocked: false,
    icon: 'Globe',
-   images: ['/assets/projects/kevany-tuning/01.jpg', '/assets/projects/kevany-tuning/02.jpg', '/assets/projects/kevany-tuning/03.jpg'],
+   images: ['/assets/projects/kevany-tuning/01.jpg', '/assets/projects/kevany-tuning/02.jpg'],
    tech: ['WebGL', 'Three.js', 'React', 'Next.js']
   },
   {
