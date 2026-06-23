@@ -105,7 +105,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, links, onClose, 
       <button
        onClick={onClose}
        aria-label="بستن منو"
-       className="absolute top-10 left-8 flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group z-10"
+       className="absolute top-10 left-8 flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group z-10 min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
       >
        <span className="text-xs font-black uppercase tracking-widest font-display">برگشت</span>
        <div className="p-2 rounded-full border border-border group-hover:border-foreground/30">

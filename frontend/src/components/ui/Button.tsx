@@ -28,8 +28,8 @@ export const Button: React.FC<ButtonProps> = ({
  const baseStyles = "relative flex items-center justify-center gap-3 rounded-full font-display transition-[transform,background-color,border-color,color,box-shadow] duration-300 active:scale-95 disabled:opacity-70 overflow-hidden group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background";
  
  const sizeStyles = {
-  default: "px-8 py-3 text-sm",
-  sm: "px-4 py-2 text-xs",
+  default: "px-8 py-3 text-sm min-h-[44px]",
+  sm: "px-4 py-2 text-xs min-h-[44px]",
   lg: "px-10 py-4 text-base",
   icon: "w-10 h-10 p-0"
  };

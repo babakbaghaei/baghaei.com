@@ -56,7 +56,8 @@ export default function ProjectsGrid() {
          type="button"
          onClick={() => setActiveCategory(cat)}
          aria-pressed={isActive}
-         className={`rounded-full border px-4 py-1.5 text-xs font-display transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+         data-test="project-filter"
+         className={`rounded-full border px-4 py-1.5 text-xs font-display transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 min-h-[44px] ${
           isActive
            ? 'border-primary/50 bg-primary/10 text-primary'
            : 'border-border bg-card/40 text-muted-foreground hover:text-foreground hover:border-primary/30'
