@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function AllProjectsPage() {
  return (
-  <main className="min-h-screen bg-background">
+  <main className="min-h-screen">
    <Navbar />
    <ProjectsGrid />
    <Footer />

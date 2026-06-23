@@ -97,7 +97,7 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground relative overflow-hidden flex flex-col">
+    <main className="min-h-screen text-foreground relative overflow-hidden flex flex-col">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
