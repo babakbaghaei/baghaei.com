@@ -15,4 +15,4 @@ npm-debug.log*
 /generated/prisma
 /prisma/*.db
 /prisma/*.db-journal
-/prisma/migrations/
+# NOTE: prisma/migrations/ MUST be tracked — `prisma migrate deploy` (CI + container entrypoint) needs the files.

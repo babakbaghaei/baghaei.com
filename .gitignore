@@ -31,6 +31,8 @@ backups/
 *.sql
 *.sql.gz
 *.backup
+# ...but Prisma migration SQL MUST be tracked (overrides *.sql above; needed by `migrate deploy`)
+!backend/prisma/migrations/**
 
 # IDEs & OS
 .DS_Store

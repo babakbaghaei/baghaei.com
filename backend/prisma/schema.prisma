@@ -51,6 +51,21 @@ model ContactMessage {
   @@index([isRead, createdAt])
 }
 
+model JobApplication {
+  id           Int      @id @default(autoincrement())
+  position     String
+  name         String
+  email        String
+  phone        String?
+  portfolioUrl String?
+  message      String?
+  isRead       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([isRead, createdAt])
+}
+
 model Service {
   id          Int      @id @default(autoincrement())
   order       Int      @default(0)
