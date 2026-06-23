@@ -97,39 +97,64 @@ jobs:
       - name: Run Lighthouse CI
         run: cd frontend && npx --yes @lhci/cli@0.14.x autorun || true
 
-  docker-verification:
-    name: Container Build Verify
+  build-and-push:
+    name: Build & Push Images to GHCR
     needs: [quality-assurance, backend-testing, frontend-testing]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Backend Image
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build on CI's ample RAM (vs the 1GB VPS that swapped for ~1h) and push
+      # to GHCR with registry-backed layer cache, so the VPS only needs to pull.
+      - name: Build & Push Backend
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           file: ./backend/Dockerfile
-          push: false
-          tags: baghaei-backend:latest
+          push: true
+          tags: |
+            ghcr.io/babakbaghaei/baghaei-backend:latest
+            ghcr.io/babakbaghaei/baghaei-backend:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/babakbaghaei/baghaei-backend:buildcache
+          cache-to: type=registry,ref=ghcr.io/babakbaghaei/baghaei-backend:buildcache,mode=max
 
-      - name: Build Frontend Image
+      - name: Build & Push Frontend
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
-          push: false
-          tags: baghaei-frontend:latest
+          push: true
+          # NEXT_PUBLIC_API_URL is baked into the browser bundle at build time,
+          # so it must be supplied here (a restart on the VPS cannot change it).
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api.baghaei.com
+          tags: |
+            ghcr.io/babakbaghaei/baghaei-frontend:latest
+            ghcr.io/babakbaghaei/baghaei-frontend:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/babakbaghaei/baghaei-frontend:buildcache
+          cache-to: type=registry,ref=ghcr.io/babakbaghaei/baghaei-frontend:buildcache,mode=max
 
   deploy:
     name: Deploy to Server
-    needs: [docker-verification]
+    needs: [build-and-push]
     runs-on: ubuntu-latest
     # Disabled: deployment is handled by a server-side systemd timer that polls
-    # git every minute and rebuilds on change (see /var/www/baghaei.com/auto-deploy.sh).
-    # This avoids coupling deploys to CI test outcomes and works without GH secrets.
+    # git every minute and PULLS the images CI just pushed (see
+    # deploy/auto-deploy.sh). Kept here, wired to build-and-push, so it can be
+    # flipped on (if: github.ref == 'refs/heads/main') once SSH secrets exist.
     if: false
     steps:
       - name: SSH and Deploy
@@ -140,8 +165,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/baghaei.com
-            git pull origin main
-            docker compose down
-            docker compose up -d --build
-            docker image prune -f
-            docker exec baghaei-backend npx prisma migrate deploy
+            REPO_DIR=/var/www/baghaei.com ./deploy/auto-deploy.sh
