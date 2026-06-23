@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { apiV1Url } from '@/lib/apiBase'
 
 export interface ServiceDTO {
  id: number
@@ -27,9 +28,9 @@ const STATIC_SERVICES: ServiceDTO[] = [
  * hour. Falls back to the static list on any error so the section never breaks.
  */
 export async function getServices(): Promise<ServiceDTO[]> {
- const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
+ const backendBase = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL
  try {
-  const res = await fetch(`${backendUrl}/api/v1/services`, {
+  const res = await fetch(apiV1Url('/services', backendBase), {
    next: { revalidate: 3600 },
   })
   if (!res.ok) return STATIC_SERVICES
@@ -47,12 +48,12 @@ export async function submitContactForm(formData: FormData) {
  const message = formData.get('message')
  const company = formData.get('company') // Honeypot — real users never fill this
 
- // Use the internal server URL for backend communication
- const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
- console.log('Submitting to:', `${backendUrl}/api/v1/contact`);
+ // Server action runs in the frontend container: prefer the internal backend
+ // address, falling back to the public one for local dev.
+ const backendBase = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL;
 
  try {
-  const response = await fetch(`${backendUrl}/api/v1/contact`, {
+  const response = await fetch(apiV1Url('/contact', backendBase), {
    method: 'POST',
    headers: { 'Content-Type': 'application/json' },
    body: JSON.stringify({

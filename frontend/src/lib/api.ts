@@ -1,5 +1,7 @@
 'use client';
 
+import { normalizeApiOrigin } from './apiBase';
+
 const getAuthHeader = (): Record<string, string> => {
  if (typeof window === 'undefined') return {};
  try {
@@ -11,7 +13,7 @@ const getAuthHeader = (): Record<string, string> => {
  }
 };
 
-const BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '') + '/api/v1';
+const BASE_URL = normalizeApiOrigin(process.env.NEXT_PUBLIC_API_URL) + '/api/v1';
 
 // Default timeout so a slow/hung backend never freezes the UI indefinitely.
 const DEFAULT_TIMEOUT_MS = 15000;

@@ -82,6 +82,7 @@ export class SecurityService {
     const corsOptions = {
       origin: [
         'https://baghaei.com',
+        'https://www.baghaei.com',
         'https://admin.baghaei.com',
         'https://blog.baghaei.com',
         'https://projects.baghaei.com',
