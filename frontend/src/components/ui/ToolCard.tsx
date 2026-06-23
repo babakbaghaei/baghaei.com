@@ -42,7 +42,7 @@ export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
       ref={ref}
       onMouseMove={isSoon ? undefined : onMove}
       onMouseLeave={isSoon ? undefined : onLeave}
-      className="group/card relative h-full min-h-[168px] overflow-hidden rounded-3xl border border-border bg-card/40 p-6 transition-[transform,border-color,background-color] duration-300 ease-out will-change-transform hover:border-foreground/15 hover:bg-card/70"
+      className="group/card relative h-full min-h-[168px] overflow-hidden rounded-3xl border border-border bg-card/40 p-6 shadow-xl backdrop-blur-xl backdrop-saturate-150 transition-[transform,border-color,background-color] duration-300 ease-out will-change-transform hover:border-foreground/15 hover:bg-card/60"
       style={{
         transform:
           'perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))',

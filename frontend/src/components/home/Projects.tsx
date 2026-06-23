@@ -198,7 +198,7 @@ export default function Projects() {
  const horizontalItems = (
   <>
    {SELECTED_PROJECTS.map((p) => (
-    <div key={p.id} data-project-frame className="w-[280px] md:w-[320px] min-h-[360px] md:min-h-[380px] shrink-0 relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
+    <div key={p.id} data-project-frame className="w-[280px] md:w-[320px] h-[360px] md:h-[380px] shrink-0 relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
      <ProjectCard project={p} onClick={(e) => openProject(p, e)} />
     </div>
    ))}
@@ -213,7 +213,7 @@ export default function Projects() {
    {/* Most-used tools continuing the same horizontal scroll — two square tiles
        per column so a pair fits the exact height of one project card. */}
    {TOOL_COLUMNS.map((col, ci) => (
-    <div key={ci} className="w-[210px] md:w-[240px] min-h-[360px] md:min-h-[380px] shrink-0 flex flex-col">
+    <div key={ci} className="w-[210px] md:w-[240px] h-[360px] md:h-[380px] shrink-0 flex flex-col">
      {col.map((tool) => (
       <div key={tool.slug} className="flex-1 min-h-0">
        <SquareToolCard tool={tool} />

@@ -152,9 +152,10 @@ export const ProjectCard: React.FC<{ project: Project, onClick: (e: React.MouseE
     <Card
       glowColor={isActive ? project.borderColor : project.color}
       roundedClass="rounded-[3rem]"
-      className={`${horizontal ? "p-0" : "p-2 md:p-4"} ${isActive ? "ring-1 ring-white/10" : ""}`}
+      className={`${horizontal ? "p-0" : "p-2 md:p-3"} ${isActive ? "ring-1 ring-white/10" : ""}`}
       isHoverable={true}
       colorOnHoverOnly={!isActive}
+      contentClassName={horizontal ? "p-0" : "p-6 md:p-7"}
     >
       <div
         onClick={onClick}

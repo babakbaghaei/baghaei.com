@@ -92,9 +92,9 @@ export default function ProjectsGrid() {
       </Card>
      </div>
     ) : (
-     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-16 mt-20 justify-items-center">
+     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-12 mt-20 justify-items-center">
       {filteredProjects.map((project) => (
-       <div key={project.id} data-project-frame className="w-full max-w-[360px] min-h-[360px] md:min-h-[380px]">
+       <div key={project.id} data-project-frame className="w-full max-w-[360px] h-[380px]">
         <ProjectCard
          project={project}
          onClick={(e) => openProject(project, e)}

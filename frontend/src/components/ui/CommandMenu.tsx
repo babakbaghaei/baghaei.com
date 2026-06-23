@@ -34,11 +34,30 @@ const NAV_COMMAND_META: Record<string, { icon: LucideIcon; go: (r: ReturnType<ty
   about: { icon: Info, go: (r) => r.push('/about') },
 };
 
+// How the palette is summoned differs per platform: ⌘K on macOS, Ctrl+K on
+// Windows/Linux, and a tap (no keyboard) on touch devices. We resolve this on
+// the client so the footer hint and shortcuts are always truthful.
+type Platform = 'mac' | 'windows' | 'touch';
+
+function detectPlatform(): Platform {
+  if (typeof navigator === 'undefined') return 'windows';
+  const ua = navigator.userAgent || '';
+  const isTouch =
+    (typeof window !== 'undefined' && 'ontouchstart' in window && /Android|iPhone|iPad|iPod|Mobile/i.test(ua)) ||
+    (navigator.maxTouchPoints > 1 && /iPad|Macintosh/i.test(ua) && 'ontouchend' in document);
+  if (isTouch) return 'touch';
+  const platform = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform || navigator.platform || '';
+  if (/Mac|iPhone|iPod|iPad/i.test(platform) || /Mac OS X/i.test(ua)) return 'mac';
+  return 'windows';
+}
+
 export function CommandMenu() {
   const router = useRouter();
   const { play } = useSound();
   const [open, setOpen] = React.useState(false);
   const [posts, setPosts] = React.useState<BlogSearchResult[]>([]);
+  const [platform, setPlatform] = React.useState<Platform>('windows');
+  React.useEffect(() => setPlatform(detectPlatform()), []);
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const restoreFocusRef = React.useRef<HTMLElement | null>(null);
@@ -137,7 +156,7 @@ export function CommandMenu() {
       aria-modal="true"
       aria-label="جستجوی سریع"
       tabIndex={-1}
-      className="fixed inset-0 z-[9990] flex items-start justify-center pt-[20vh] px-4 backdrop-blur-sm bg-black/50 outline-none"
+      className="fixed inset-0 z-[9990] flex items-start justify-center px-4 pt-[max(env(safe-area-inset-top),1rem)] sm:pt-[16vh] backdrop-blur-sm bg-black/50 outline-none"
     >
       <button
         type="button"
@@ -146,8 +165,8 @@ export function CommandMenu() {
         onClick={() => setOpen(false)}
       />
 
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-xl border border-border bg-popover/90 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
-        <Command className="w-full">
+      <div className="relative flex max-h-[80dvh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-border bg-popover/90 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+        <Command className="flex w-full min-h-0 flex-1 flex-col">
           <div className="flex items-center border-b border-border px-4" cmdk-input-wrapper="">
             <Search className="me-2 h-5 w-5 shrink-0 text-muted-foreground" />
             <Command.Input
@@ -158,7 +177,7 @@ export function CommandMenu() {
             />
           </div>
 
-          <Command.List className="max-h-[60vh] overflow-y-auto p-2 scrollbar-hide">
+          <Command.List className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2 scrollbar-hide [-webkit-overflow-scrolling:touch]">
             <Command.Empty className="py-6 text-center text-sm text-muted-foreground font-display">
               نتیجه‌ای یافت نشد.
             </Command.Empty>
@@ -207,9 +226,26 @@ export function CommandMenu() {
             )}
           </Command.List>
 
-          <div className="border-t border-border px-4 py-2 text-xs text-muted-foreground flex justify-between font-mono">
-            <span>ESC to close</span>
-            <span>Cmd+K</span>
+          <div className="shrink-0 border-t border-border px-4 py-2.5 text-[11px] text-muted-foreground flex justify-between items-center font-display" dir="rtl">
+            {platform === 'touch' ? (
+              <>
+                <span>برای بستن، بیرون از کادر را لمس کنید</span>
+                <span className="text-muted-foreground/70">جستجوی سریع</span>
+              </>
+            ) : (
+              <>
+                <span className="flex items-center gap-1.5">
+                  <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">Esc</kbd>
+                  برای بستن
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">
+                    {platform === 'mac' ? '⌘' : 'Ctrl'} K
+                  </kbd>
+                  برای جستجو
+                </span>
+              </>
+            )}
           </div>
         </Command>
       </div>

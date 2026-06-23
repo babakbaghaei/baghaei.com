@@ -184,7 +184,11 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
     // textured noise behind Persian copy. Falls back to a mid count during SSR
     // (the server render paints no canvas, so the value is only a placeholder).
     const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
-    const starCount = vw < 768 ? 450 : vw < 1280 ? 800 : 1100;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    // Constant areal density instead of magic per-breakpoint counts: ~1 star per
+    // 2000px² of viewport, clamped so phones never go sparse and 4K never turns
+    // to noise. Density now reads consistent on every display.
+    const starCount = Math.max(280, Math.min(Math.round((vw * vh) / 2000), 1000));
     starsRef.current = [...Array(starCount)].map(() => ({
       x: Math.random() * 5000,
       y: Math.random() * 5000,
@@ -237,8 +241,13 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       // Smooth the scroll velocity toward the latest per-frame delta. At rest
       // this decays to ~0 (calm dots); during a scroll it spikes (streaks),
       // giving the solartoscale "travel through space" reactivity.
-      const rawVel = sp - prevScrollRef.current;
+      let rawVel = sp - prevScrollRef.current;
       prevScrollRef.current = sp;
+      // A real scroll frame nudges progress by a tiny amount. A large jump means
+      // the page height changed under us (route change / layout shift), not an
+      // actual scroll — zero it so the field never streaks/stretches "without
+      // scrolling" when navigating between pages.
+      if (Math.abs(rawVel) > 0.15) rawVel = 0;
       velRef.current = velRef.current + (rawVel - velRef.current) * 0.15;
       const speed = Math.min(Math.abs(velRef.current) * 60, 1); // 0..1 normalised
       const dir = velRef.current >= 0 ? 1 : -1;
@@ -246,7 +255,7 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       starsRef.current?.forEach(s => {
         const xPos = s.x % width;
         // Deeper parallax travel for a stronger sense of depth on scroll.
-        const yPos = (s.y + sp * 1800 * s.parallax) % height;
+        const yPos = (s.y + sp * 1000 * s.parallax) % height;
         const twinkle = prefersReducedMotion
           ? 1
           : 0.7 + Math.sin((now * 0.002 * s.twinkle) + s.x) * 0.3;
@@ -334,7 +343,30 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
     };
   }, [resolvedTheme, observeVisibility]);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />;
+  // Procedural Milky Way (no image): a soft luminous band with a brighter
+  // galactic bulge and a darker central dust rift, built purely from CSS
+  // gradients + blur. It only reads on the dark canvas, so light mode omits it.
+  const showMilkyWay = resolvedTheme !== 'light';
+  return (
+    <>
+      {showMilkyWay && (
+        <div aria-hidden className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div
+            className="absolute left-1/2 top-1/2 h-[170%] w-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-[24deg]"
+            style={{
+              background:
+                'radial-gradient(46% 26% at 50% 50%, rgba(198,203,255,0.13), transparent 72%),' +
+                'linear-gradient(to right, transparent 15%, rgba(150,166,255,0.045) 35%, rgba(228,230,255,0.11) 50%, rgba(150,166,255,0.045) 65%, transparent 85%),' +
+                'linear-gradient(to right, transparent 45%, rgba(6,5,18,0.34) 50%, transparent 55%)',
+              filter: 'blur(14px)',
+              opacity: 0.55,
+            }}
+          />
+        </div>
+      )}
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
+    </>
+  );
 };
 
 const PlanetBody = ({ planet, eclipseData, moonRotate = 0, moonEclipse }: { planet: PlanetData, eclipseData: EclipseData | null, moonRotate?: number, moonEclipse?: { isSolar: boolean, isLunar: boolean } }) => {
@@ -390,14 +422,14 @@ const PlanetBody = ({ planet, eclipseData, moonRotate = 0, moonEclipse }: { plan
 
    {eclipseData && (
      <div className="absolute inset-0 rounded-full overflow-hidden z-30 pointer-events-none" style={{ opacity: eclipseData.opacity }}>
-        <div 
-          className="absolute bg-black/95 rounded-full blur-[3px]"
-          style={{ 
-            width: `${eclipseData.size * 120}%`,
-            height: `${eclipseData.size * 120}%`,
-            left: '50%', top: '100%', 
+        <div
+          className="absolute bg-black/90 rounded-full blur-[2px]"
+          style={{
+            width: `${eclipseData.size * 100}%`,
+            height: `${eclipseData.size * 100}%`,
+            left: '50%', top: '100%',
             transform: `translate(-50%, -70%) translateX(${eclipseData.offset * 80}%)`,
-            boxShadow: '0 0 15px 5px rgba(0,0,0,0.7)'
+            boxShadow: '0 0 10px 3px rgba(0,0,0,0.6)'
           }}
         />
      </div>
@@ -468,10 +500,14 @@ const Planet = ({ planet, date, allPlanets }: { planet: PlanetData, date: Date, 
     if (Math.abs(diff) < threshold) {
         const shadowSizeRatio = (p.diameter / p.au) / (planet.diameter / planet.au);
         const offset = diff / outerAngRadius;
-        const opacity = Math.max(0, 1 - Math.abs(diff) / threshold);
-        
+        // Planet-on-planet occultations are astronomically near-invisible, so
+        // keep the hint subtle (cap opacity) and proportional (clamp the
+        // relative angular size) instead of a dramatic, inaccurate black blob.
+        const opacity = Math.max(0, 1 - Math.abs(diff) / threshold) * 0.55;
+        const size = Math.min(shadowSizeRatio, 1.3);
+
         if (!bestEclipse || opacity > bestEclipse.opacity) {
-            bestEclipse = { size: shadowSizeRatio, offset, opacity };
+            bestEclipse = { size, offset, opacity };
         }
     }
  }

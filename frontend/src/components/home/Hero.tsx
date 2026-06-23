@@ -152,8 +152,20 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
             </motion.div>
           </motion.div>
 
-          <div className="order-2 h-[280px] sm:h-[360px] lg:h-[500px] w-full relative">
-            <GlobalUniverse />
+          {/* Experiment (item 6): frame the solar-system hero inside a glass
+              card — the "framed visual" trend (à la Cloudflare). overflow-hidden
+              contains the orbit sprawl into a neat telescope-like view. Fully
+              reversible — it's just this wrapper around the existing universe. */}
+          <div className="order-2 h-[320px] sm:h-[400px] lg:h-[520px] w-full relative">
+            <div className="relative h-full w-full overflow-hidden rounded-[2rem] border border-border/70 bg-card/20 backdrop-blur-[2px] shadow-2xl">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-[2rem]"
+                style={{ background: 'radial-gradient(120% 80% at 50% 0%, rgba(255,255,255,0.06), transparent 60%)' }}
+              />
+              <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent" />
+              <GlobalUniverse />
+            </div>
           </div>
         </div>
 

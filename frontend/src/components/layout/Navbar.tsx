@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { NavItem } from '../ui/NavItem';
 import { Menu, ChevronDown, Layout, Globe, Sparkles, Dumbbell, Gamepad2, Cpu, Shield, Smartphone, Palette, ArrowLeft, Search } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { AccessibilityMenu } from './AccessibilityMenu';
 import { TOOLS, TOOL_CATEGORIES, getCategoryMeta } from '@/lib/data/tools';
 import { PROJECTS_DATA } from '@/lib/data/projects';
 import { Button } from '../ui/Button';
@@ -84,12 +85,12 @@ export default function Navbar() {
     if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpenMenu(null);
    }}
    onKeyDown={(e) => { if (e.key === 'Escape') setOpenMenu(null); }}
-   className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isSolid ? 'py-4' : 'py-8'} ${
+   className={`fixed top-0 inset-x-0 z-50 border-b transition-all duration-500 ${isSolid ? 'py-4' : 'py-8'} ${
     openMenu
-     ? 'bg-background border-b border-border shadow-sm'
+     ? 'bg-background border-border shadow-sm'
      : isSolid
-     ? 'bg-background/80 backdrop-blur-md border-b border-border shadow-sm'
-     : 'bg-transparent'
+     ? 'bg-background/80 backdrop-blur-md border-border shadow-sm'
+     : 'bg-transparent border-transparent'
    }`}
   >
    <div className="max-w-7xl mx-auto px-6 lg:px-16 flex items-center justify-between">
@@ -154,6 +155,7 @@ export default function Navbar() {
        <Search aria-hidden="true" className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />
       </button>
       <ThemeToggle />
+      <AccessibilityMenu />
       <div className="h-6 w-px bg-border" />
      </div>
 
@@ -166,7 +168,8 @@ export default function Navbar() {
      </Button>
     </div>
 
-    <div className="md:hidden flex items-center gap-4 relative z-[210]">
+    <div className="md:hidden flex items-center gap-2 relative z-[210]">
+     <AccessibilityMenu />
      <ThemeToggle />
      <button
       onClick={() => {

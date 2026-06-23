@@ -6,7 +6,7 @@
  * جلوگیری از تکرار قالب در هر صفحه.
  */
 
-import React, { useState, useCallback, useSyncExternalStore, useId, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useSyncExternalStore, useId } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -26,7 +26,6 @@ import {
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils/format';
 import { numToPersian } from '@/lib/utils/num-to-persian';
-import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 
 /* ───────────── helpers ───────────── */
 
@@ -202,38 +201,12 @@ export function VerdictPanel({
   children: React.ReactNode;
   delay?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduced = usePrefersReducedMotion();
-  // قابلیت کشف نتیجه روی موبایل: پنل نتیجه فقط lg:sticky است، پس کاربر موبایل
-  // پس از وارد کردن مقادیر باید پایین برود تا نتیجه را ببیند. وقتی محتوای پنل
-  // برای نخستین‌بار از حالت خالی فراتر می‌رود (نتیجه ظاهر می‌شود)، یک‌بار و فقط
-  // در صفحه‌های کوچک، پنل را با حرکت ملایم به دید می‌آوریم.
-  const scrolledRef = useRef(false);
-  const baseHeightRef = useRef(0);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof ResizeObserver === 'undefined') return;
-    const isSmall = () =>
-      typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
-    const ro = new ResizeObserver(() => {
-      const h = el.offsetHeight;
-      if (baseHeightRef.current === 0) {
-        baseHeightRef.current = h;
-        return;
-      }
-      // یک جهش معنادار ارتفاع = ظهور نتیجه (نسبت به حالت خالی).
-      if (!scrolledRef.current && h > baseHeightRef.current + 40 && isSmall()) {
-        scrolledRef.current = true;
-        el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
-      }
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [reduced]);
-
+  // عمداً بدون scrollIntoView خودکار: روی موبایل پنل نتیجه درست زیر ورودی‌ها
+  // می‌نشیند و کاربر به‌طور طبیعی به آن می‌رسد. نسخهٔ قبلی با هر تغییر ارتفاع
+  // (هر رقمی که تایپ می‌شد پنل را بزرگ‌تر می‌کرد) صفحه را به نتیجه می‌پراند و
+  // نمی‌گذاشت کاربر به تایپ ادامه دهد — رفتاری آزاردهنده روی لمسی. حذف شد.
   return (
     <motion.div
-      ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}

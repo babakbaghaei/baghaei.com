@@ -1,15 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { Moon, Sun, Monitor, Check } from "lucide-react"
+import { Moon, Sun, Check } from "lucide-react"
 import { useTheme } from "next-themes"
 import { AnimatePresence, motion } from "framer-motion"
 import { useSound } from "@/lib/utils/sounds"
 
+// Manual light/dark only — no "system" option (per design: the toggle is a
+// deliberate choice between the sun and the moon, not an OS mirror).
 const OPTIONS = [
   { value: "light", label: "روشن", icon: Sun },
   { value: "dark", label: "تیره", icon: Moon },
-  { value: "system", label: "سیستم", icon: Monitor },
 ] as const
 
 export function ThemeToggle() {

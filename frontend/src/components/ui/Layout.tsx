@@ -33,7 +33,7 @@ export const Heading: React.FC<HeadingProps> = ({
     viewport={{ once: true }}
     className="h-[2px] bg-foreground"
    />
-   <h2 className="text-5xl md:text-8xl font-bold font-display text-foreground leading-none uppercase">
+   <h2 className="text-[clamp(2.75rem,7vw,6rem)] font-bold font-display text-foreground leading-none uppercase">
     {children}
     {subtitle && (
      <>

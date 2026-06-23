@@ -1,20 +1,31 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { subscribeA11y, getForcedReduceMotion } from './a11y-prefs';
 
 const QUERY = '(prefers-reduced-motion: reduce)';
 
 function subscribe(callback: () => void) {
-  if (typeof window === 'undefined' || !window.matchMedia) return () => {};
+  // Track BOTH the OS media query and the user's in-app accessibility override,
+  // so toggling "کاهش حرکت" in the menu re-renders every JS render gate too.
+  const unsubA11y = subscribeA11y(callback);
+  if (typeof window === 'undefined' || !window.matchMedia) return unsubA11y;
   const mq = window.matchMedia(QUERY);
   mq.addEventListener('change', callback);
-  return () => mq.removeEventListener('change', callback);
+  return () => {
+    mq.removeEventListener('change', callback);
+    unsubA11y();
+  };
 }
 
 function getSnapshot() {
-  return typeof window !== 'undefined' && !!window.matchMedia
-    ? window.matchMedia(QUERY).matches
-    : false;
+  const os =
+    typeof window !== 'undefined' && !!window.matchMedia
+      ? window.matchMedia(QUERY).matches
+      : false;
+  // The in-app toggle can only force reduction ON; it never overrides an OS
+  // "reduce" back to full motion (the conservative, expected direction).
+  return os || getForcedReduceMotion();
 }
 
 // Server snapshot is always false so SSR/first hydration render matches; React
