@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload, CheckCircle2 } from 'lucide-react';
+import { X, CheckCircle2 } from 'lucide-react';
 import { Button } from './Button';
 
 interface CareerModalProps {
@@ -11,7 +11,31 @@ interface CareerModalProps {
 }
 
 export const CareerModal: React.FC<CareerModalProps> = ({ job, onClose }) => {
+ const [form, setForm] = React.useState({ name: '', email: '', phone: '', portfolioUrl: '', message: '' });
+ const [status, setStatus] = React.useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+
  if (!job) return null;
+
+ const submit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!form.name.trim() || !form.email.trim()) { setStatus('error'); return; }
+  setStatus('sending');
+  try {
+   const { api } = await import('@/lib/api');
+   const payload: Record<string, string> = {
+    position: job.title,
+    name: form.name,
+    email: form.email,
+   };
+   if (form.phone.trim()) payload.phone = form.phone.trim();
+   if (form.portfolioUrl.trim()) payload.portfolioUrl = form.portfolioUrl.trim();
+   if (form.message.trim()) payload.message = form.message.trim();
+   await api.post('/careers', payload);
+   setStatus('done');
+  } catch {
+   setStatus('error');
+  }
+ };
 
  return (
   <AnimatePresence>
@@ -75,25 +99,51 @@ export const CareerModal: React.FC<CareerModalProps> = ({ job, onClose }) => {
        {/* Application Form */}
        <div className="space-y-10 bg-foreground/5 p-8 md:p-12 rounded-[2.5rem] border border-border">
         <h3 className="text-xl font-bold font-display text-foreground text-right">ثبت درخواست همکاری</h3>
-        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-         <input
-          type="text"
-          placeholder="نام و نام خانوادگی"
-          className="w-full bg-transparent border-b border-border py-4 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
-         />
-         <input
-          type="email"
-          placeholder="آدرس ایمیل"
-          className="w-full bg-transparent border-b border-border py-4 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
-         />
-
-         <div className="border-2 border-dashed border-border p-10 rounded-3xl text-center hover:border-foreground/30 transition-colors cursor-pointer group">
-          <Upload className="w-8 h-8 mx-auto mb-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-          <p className="text-muted-foreground text-xs font-display">رزومه خود را آپلود کنید (PDF)</p>
+        {status === 'done' ? (
+         <div className="flex flex-col items-center gap-4 py-10 text-center">
+          <CheckCircle2 className="w-12 h-12 text-primary" />
+          <p className="font-display text-foreground">درخواست شما ثبت شد. به‌زودی با شما تماس می‌گیریم.</p>
          </div>
-         
-         <Button className="w-full py-5">ارسال درخواست</Button>
-        </form>
+        ) : (
+         <form className="space-y-6" onSubmit={submit}>
+          <input
+           type="text" required value={form.name}
+           onChange={(e) => setForm({ ...form, name: e.target.value })}
+           placeholder="نام و نام خانوادگی"
+           className="w-full bg-transparent border-b border-border py-4 min-h-11 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
+          />
+          <input
+           type="email" required value={form.email}
+           onChange={(e) => setForm({ ...form, email: e.target.value })}
+           placeholder="آدرس ایمیل"
+           className="w-full bg-transparent border-b border-border py-4 min-h-11 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
+          />
+          <input
+           type="tel" value={form.phone}
+           onChange={(e) => setForm({ ...form, phone: e.target.value })}
+           placeholder="شماره تماس (اختیاری)"
+           className="w-full bg-transparent border-b border-border py-4 min-h-11 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
+          />
+          <input
+           type="url" value={form.portfolioUrl}
+           onChange={(e) => setForm({ ...form, portfolioUrl: e.target.value })}
+           placeholder="لینک رزومه یا نمونه‌کار (Google Drive، LinkedIn، …)"
+           className="w-full bg-transparent border-b border-border py-4 min-h-11 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
+          />
+          <textarea
+           value={form.message} rows={3}
+           onChange={(e) => setForm({ ...form, message: e.target.value })}
+           placeholder="توضیح کوتاه (اختیاری)"
+           className="w-full bg-transparent border-b border-border py-4 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right resize-none"
+          />
+          {status === 'error' && (
+           <p className="text-rose-500 text-sm font-display">لطفاً نام و ایمیل معتبر وارد کنید و دوباره تلاش کنید.</p>
+          )}
+          <Button type="submit" className="w-full py-5" disabled={status === 'sending'}>
+           {status === 'sending' ? 'در حال ارسال…' : 'ارسال درخواست'}
+          </Button>
+         </form>
+        )}
        </div>
       </div>
      </div>
