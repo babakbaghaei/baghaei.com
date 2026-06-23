@@ -103,11 +103,13 @@ export default function ToolsIndex() {
                 <button
                   key={tab}
                   onClick={() => setActive(tab)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black font-display transition-all border ${
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black font-display transition-all border min-h-11 ${
                     isActive
-                      ? 'text-white border-transparent'
+                      ? color
+                        ? 'text-white border-transparent'
+                        : 'bg-primary text-primary-foreground border-primary'
                       : 'bg-card text-muted-foreground border-border hover:text-foreground hover:border-foreground/30'
-                  } ${tab === 'همه' && isActive ? 'bg-primary border-primary' : ''}`}
+                  }`}
                   style={
                     color && isActive
                       ? { backgroundColor: `rgb(${color})` }
