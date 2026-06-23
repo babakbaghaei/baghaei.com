@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/admin/EmptyState';
 import { toPersianDigits } from '@/lib/utils/format';
+import { apiV1Url } from '@/lib/apiBase';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,11 +19,11 @@ interface Service {
 
 // This is a Server Component
 export default async function ServicesAdmin() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
-  
+  const serverBase = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL;
+
   let services: Service[] = [];
   try {
-    const res = await fetch(`${apiUrl}/api/v1/services`, { cache: 'no-store' });
+    const res = await fetch(apiV1Url('/services', serverBase), { cache: 'no-store' });
     if (res.ok) {
       services = await res.json() as Service[];
     }

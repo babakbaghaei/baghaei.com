@@ -14,6 +14,8 @@ export const CareerModal: React.FC<CareerModalProps> = ({ job, onClose }) => {
  const [form, setForm] = React.useState({ name: '', email: '', phone: '', portfolioUrl: '', message: '' });
  const [status, setStatus] = React.useState<'idle' | 'sending' | 'done' | 'error'>('idle');
 
+ React.useEffect(() => { setForm({ name: '', email: '', phone: '', portfolioUrl: '', message: '' }); setStatus('idle'); }, [job]);
+
  if (!job) return null;
 
  const submit = async (e: React.FormEvent) => {
@@ -107,31 +109,31 @@ export const CareerModal: React.FC<CareerModalProps> = ({ job, onClose }) => {
         ) : (
          <form className="space-y-6" onSubmit={submit}>
           <input
-           type="text" required value={form.name}
+           type="text" name="name" required value={form.name}
            onChange={(e) => setForm({ ...form, name: e.target.value })}
            placeholder="نام و نام خانوادگی"
            className="w-full bg-transparent border-b border-border py-4 min-h-11 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
           />
           <input
-           type="email" required value={form.email}
+           type="email" name="email" required value={form.email}
            onChange={(e) => setForm({ ...form, email: e.target.value })}
            placeholder="آدرس ایمیل"
            className="w-full bg-transparent border-b border-border py-4 min-h-11 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
           />
           <input
-           type="tel" value={form.phone}
+           type="tel" name="phone" value={form.phone}
            onChange={(e) => setForm({ ...form, phone: e.target.value })}
            placeholder="شماره تماس (اختیاری)"
            className="w-full bg-transparent border-b border-border py-4 min-h-11 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
           />
           <input
-           type="url" value={form.portfolioUrl}
+           type="url" name="portfolioUrl" value={form.portfolioUrl}
            onChange={(e) => setForm({ ...form, portfolioUrl: e.target.value })}
            placeholder="لینک رزومه یا نمونه‌کار (Google Drive، LinkedIn، …)"
            className="w-full bg-transparent border-b border-border py-4 min-h-11 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right"
           />
           <textarea
-           value={form.message} rows={3}
+           name="message" value={form.message} rows={3}
            onChange={(e) => setForm({ ...form, message: e.target.value })}
            placeholder="توضیح کوتاه (اختیاری)"
            className="w-full bg-transparent border-b border-border py-4 text-foreground focus:outline-none focus:border-foreground transition-colors font-display text-right resize-none"

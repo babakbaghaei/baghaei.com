@@ -2,15 +2,16 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { apiV1Url } from '@/lib/apiBase';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+const serverBase = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL;
 
 export async function loginAction(formData: FormData) {
   const email = formData.get('email');
   const password = formData.get('password');
 
   try {
-    const res = await fetch(`${API_URL}/api/v1/auth/login`, {
+    const res = await fetch(apiV1Url('/auth/login', serverBase), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),

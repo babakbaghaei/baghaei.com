@@ -3,8 +3,9 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
+import { apiV1Url } from '@/lib/apiBase';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+const serverBase = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL;
 
 async function getAuthToken() {
   const cookieStore = await cookies();
@@ -25,7 +26,7 @@ export async function createService(formData: FormData) {
   }
   
   try {
-    const res = await fetch(`${API_URL}/api/v1/services`, {
+    const res = await fetch(apiV1Url('/services', serverBase), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +66,7 @@ export async function deleteService(id: number) {
   if (!token) return;
 
   try {
-    await fetch(`${API_URL}/api/v1/services/${id}`, {
+    await fetch(apiV1Url(`/services/${id}`, serverBase), {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`

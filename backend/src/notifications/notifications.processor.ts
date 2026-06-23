@@ -16,6 +16,8 @@ export class NotificationsProcessor extends WorkerHost {
     switch (job.name) {
       case 'contact-message':
         return this.handleContactMessage(job.data);
+      case 'job-application':
+        return this.handleJobApplication(job.data);
       default:
         this.logger.warn(`Unknown job name: ${job.name}`);
     }
@@ -55,6 +57,50 @@ export class NotificationsProcessor extends WorkerHost {
     // message — Telegram already delivered/queued — so we log and continue.
     try {
       await this.emailService.sendContactNotification(data);
+    } catch (error) {
+      this.logger.error('Failed to send email notification', error);
+    }
+
+    return { sent: true };
+  }
+
+  private async handleJobApplication(data: any) {
+    this.logger.log(
+      `Processing job application from: ${data.name} for position: ${data.position}`,
+    );
+
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+
+    if (token && chatId) {
+      try {
+        const portfolioLine = data.portfolioUrl
+          ? `\n🔗 نمونه‌کار: ${data.portfolioUrl}`
+          : '';
+        const text = `💼 *درخواست همکاری جدید*\n\n👤 نام: ${data.name}\n🎯 موقعیت: ${data.position}\n📧 ایمیل: ${data.email || 'ندارد'}\n📱 تلفن: ${data.phone || 'ندارد'}${portfolioLine}\n\n📝 توضیحات:\n${data.message || '—'}`;
+        await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
+          chat_id: chatId,
+          text: text,
+          parse_mode: 'Markdown',
+        });
+        this.logger.log('Telegram notification sent successfully.');
+      } catch (error) {
+        this.logger.error('Failed to send Telegram notification', error);
+        throw error;
+      }
+    } else {
+      this.logger.warn(
+        'Telegram credentials not found, skipping notification.',
+      );
+    }
+
+    try {
+      await this.emailService.sendContactNotification({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        message: `[موقعیت: ${data.position}]${data.portfolioUrl ? ` | نمونه‌کار: ${data.portfolioUrl}` : ''}\n\n${data.message || ''}`,
+      });
     } catch (error) {
       this.logger.error('Failed to send email notification', error);
     }
