@@ -34,6 +34,8 @@ export interface Tool {
   /** رنگ لهجه به‌صورت «r, g, b» تا در rgba استفاده شود. */
   accent: string;
   status?: ToolStatus;
+  /** متن قفل اختصاصی برای ابزارهای «به‌زودی» (مثلاً «در انتظار تأیید بانک مرکزی»). */
+  lockNote?: string;
   /** در صفحهٔ اصلی به‌عنوان منتخب نمایش داده شود. */
   featured?: boolean;
 }
@@ -46,8 +48,8 @@ export const TOOLS: Tool[] = [
     category: 'حقوقی',
     icon: Scale,
     accent: '245, 158, 11',
-    status: 'new',
-    featured: true,
+    status: 'soon',
+    lockNote: 'در انتظار تأیید بانک مرکزی',
   },
   {
     slug: 'diyeh',
@@ -131,8 +133,8 @@ export const TOOLS: Tool[] = [
     category: 'مالی',
     icon: Gift,
     accent: '217, 119, 6',
-    status: 'new',
-    featured: true,
+    status: 'soon',
+    lockNote: 'در انتظار اعلام قانون کار',
   },
   {
     slug: 'type-jangi',

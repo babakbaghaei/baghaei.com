@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowUpLeft } from 'lucide-react';
+import { ArrowUpLeft, Lock } from 'lucide-react';
 import { Card } from './Card';
 import { getCategoryMeta, type Tool } from '@/lib/data/tools';
 
@@ -48,8 +48,9 @@ export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
             <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
           </div>
           {isSoon ? (
-            <span className="rounded-full bg-muted/60 px-2 py-0.5 text-xs font-bold font-display text-muted-foreground">
-              به‌زودی
+            <span className="inline-flex max-w-[60%] items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-[11px] font-bold font-display leading-tight text-muted-foreground text-right">
+              <Lock className="h-3 w-3 shrink-0" aria-hidden />
+              {tool.lockNote ?? 'به‌زودی'}
             </span>
           ) : (
             <ArrowUpLeft
