@@ -168,7 +168,7 @@ export const TOOLS: Tool[] = [
     slug: 'spin-win',
     title: 'چرخونه تصمیم',
     desc: 'ابزاری مدرن برای قرعه‌کشی، انتخاب تصادفی و حل تردیدهای روزمره.',
-    category: 'کمکی',
+    category: 'سرگرمی',
     icon: Dices,
     accent: '139, 92, 246',
     featured: false,
@@ -177,7 +177,7 @@ export const TOOLS: Tool[] = [
     slug: 'mohasebe-darsad',
     title: 'محاسبه‌گر درصد',
     desc: 'محاسبهٔ سریع انواع درصد: درصدی از یک عدد، تغییر درصدی و نسبت دو عدد به هم.',
-    category: 'کمکی',
+    category: 'مبدل و محاسبه',
     icon: Percent,
     accent: '139, 92, 246',
     status: 'new',
@@ -187,7 +187,7 @@ export const TOOLS: Tool[] = [
     slug: 'adad-be-horoof',
     title: 'مبدل عدد به حروف',
     desc: 'تبدیل مبلغ عددی به حروف فارسی برای نوشتن چک، قرارداد و اسناد مالی.',
-    category: 'کمکی',
+    category: 'متن و محتوا',
     icon: Type,
     accent: '99, 102, 241',
     status: 'new',
@@ -196,7 +196,7 @@ export const TOOLS: Tool[] = [
     slug: 'shomaresh-kalamat',
     title: 'شمارنده کلمات',
     desc: 'شمارش لحظه‌ای کلمات، کاراکترها، خطوط و تخمین زمان مطالعهٔ متن فارسی.',
-    category: 'کمکی',
+    category: 'متن و محتوا',
     icon: FileText,
     accent: '139, 92, 246',
     status: 'new',
@@ -205,7 +205,7 @@ export const TOOLS: Tool[] = [
     slug: 'tabdil-vahed',
     title: 'مبدل واحدها',
     desc: 'تبدیل سریع واحدهای طول، وزن، مساحت و دما با ضرایب استاندارد.',
-    category: 'کمکی',
+    category: 'مبدل و محاسبه',
     icon: ArrowRightLeft,
     accent: '139, 92, 246',
     status: 'new',
@@ -227,7 +227,8 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
   املاک: { color: '13, 148, 136', icon: Building2 }, // teal
   مالی: { color: '217, 119, 6', icon: Wallet }, // amber
   سرگرمی: { color: '244, 63, 94', icon: Gamepad2 }, // rose
-  کمکی: { color: '139, 92, 246', icon: Wrench }, // violet
+  'متن و محتوا': { color: '139, 92, 246', icon: FileText }, // violet
+  'مبدل و محاسبه': { color: '99, 102, 241', icon: ArrowRightLeft }, // indigo-blue
 };
 
 const FALLBACK_META: CategoryMeta = { color: '120, 120, 130', icon: Wrench };

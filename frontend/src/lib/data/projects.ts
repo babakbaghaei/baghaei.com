@@ -1,4 +1,16 @@
 import { Project } from '@/components/ui/ProjectCard';
+import {
+  Shield,
+  Server,
+  ShoppingCart,
+  GraduationCap,
+  Gamepad2,
+  Cpu,
+  Palette,
+  Sparkles,
+  Wrench,
+  type LucideIcon,
+} from 'lucide-react';
 
 export const PROJECTS_DATA: Project[] = [
   {
@@ -21,7 +33,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 1,
    slug: 'kish-airport-fids',
    title: 'FIDS و Counter فرودگاه کیش',
-   category: 'زیرساخت فرودگاهی',
+   category: 'زیرساخت و SaaS',
    role: 'طراح ارشد رابط کاربری',
    desc: 'طراحی سیستم‌های FIDS و رابط کاربری کانترهای فرودگاه بین‌المللی کیش با استانداردهای نوین بصری.',
    metrics: [{ label: 'دقت نمایش', value: '۹۹.۹٪' }, { label: 'ترافیک روزانه', value: '۲۰K+' }],
@@ -38,7 +50,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 9,
    slug: 'kevany-tuning',
    title: 'تیونینگ کیوانی',
-   category: 'خودرو / لوکس',
+   category: 'برند و طراحی',
    role: 'طراح رابط کاربری',
    desc: 'طراحی پلتفرم اختصاصی و سیستم پیکربندی خودروهای فوق‌لوکس تیونینگ شده با استانداردهای جهانی برای برند جهانی Kevany.',
    metrics: [{ label: 'خودرو اختصاصی', value: '۱۰۰+' }, { label: 'بازدید جهانی', value: '۱M+' }],
@@ -55,7 +67,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 10,
    slug: 'koolak-platform',
    title: 'پلتفرم کولک',
-   category: 'زیرساخت / SaaS',
+   category: 'زیرساخت و SaaS',
    role: 'معمار ارشد سیستم و بنیان‌گذار',
    desc: 'توسعه زیرساخت‌های مقیاس‌پذیر و راهکارهای نوین ابری برای کسب‌وکارهای در حال رشد با تمرکز بر پایداری.',
    metrics: [{ label: 'پایداری', value: '۹۹.۹٪' }, { label: 'تکنولوژی', value: 'Cloud-Native' }],
@@ -72,7 +84,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 11,
    slug: 'online-backgammon',
    title: 'بازی آنلاین تخت نرد',
-   category: 'سرگرمی / Game',
+   category: 'بازی و سرگرمی',
    role: 'توسعه‌دهنده بازی و طراح مکانیک',
    desc: 'طراحی و پیاده‌سازی بازی کلاسیک تخت نرد با فیزیک واقعی، هوش مصنوعی پیشرفته و قابلیت بازی آنلاین بلادرنگ.',
    metrics: [{ label: 'تأخیر', value: '<۵۰ms' }, { label: 'مدل فیزیک', value: 'Custom' }],
@@ -87,7 +99,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 12,
    slug: 'spotlight-tourleader',
    title: 'اسپات لایت (تـورلیدر)',
-   category: 'گردشگری / هوشمند',
+   category: 'پلتفرم هوشمند',
    role: 'طراح راهکار و معمار نرم‌افزار',
    desc: 'پلتفرم مدیریت هوشمند تورهای گردشگری با قابلیت ردیابی لحظه‌ای، مدیریت لیدرها و تجربه تورهای تعاملی.',
    metrics: [{ label: 'دقت ردیابی', value: 'بالا' }, { label: 'کاربری', value: 'هوشمند' }],
@@ -102,7 +114,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 14,
    slug: 'owj-life-coach',
    title: 'لایف کوچ اوج',
-   category: 'سلامت / مربیگری',
+   category: 'پلتفرم هوشمند',
    role: 'معمار نرم‌افزار و توسعه‌دهنده',
    desc: 'پلتفرم اختصاصی اتصال مربیان حرفه‌ای به مراجعین با ابزارهای داخلی مدیریت جلسات و تحلیل پیشرفت.',
    metrics: [{ label: 'رضایت', value: '۹۸٪' }, { label: 'جلسات', value: '۵K+' }],
@@ -116,7 +128,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 13,
    slug: 'roshd-project',
    title: 'پروژه رشد',
-   category: 'توسعه فردی / EdTech',
+   category: 'آموزش',
    role: 'مدیر فنی و طراح محصول',
    desc: 'سیستم جامع مدیریت یادگیری و رهگیری شاخص‌های رشد فردی و سازمانی با رویکرد داده‌محور.',
    metrics: [{ label: 'نرخ رشد', value: '۳۰٪+' }, { label: 'کاربران', value: 'Enterprise' }],
@@ -130,7 +142,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 4,
    slug: 'pixel-ball',
    title: 'پیکسل بال',
-   category: 'سرگرمی و بازی',
+   category: 'بازی و سرگرمی',
    role: 'طراح بازی و صداساز',
    desc: 'طراحی و توسعه بازی موبایل پیکسلی با تمرکز بر تجربه کاربری رقابتی و صداسازی منحصر به فرد.',
    metrics: [{ label: 'نصب فعال', value: '۱۰۰۰' }, { label: 'امتیاز کاربر', value: '۴.۷' }],
@@ -161,7 +173,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 8,
    slug: 'dardodel-bot',
    title: 'دردودل بات',
-   category: 'هوش مصنوعی / Social',
+   category: 'هوش مصنوعی',
    role: 'بنیان‌گذار و توسعه‌دهنده',
    desc: 'پلتفرم هوشمند گفتگو و همدلی ناشناس با محوریت هوش مصنوعی برای ایجاد ارتباطات انسانی عمیق‌تر.',
    metrics: [{ label: 'کاربر فعال', value: '۱۰۰۰' }, { label: 'پیام روزانه', value: '۱۰۰' }],
@@ -174,7 +186,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 3,
    slug: 'darso-platform',
    title: 'پلتفرم درسو',
-   category: 'آموزش آنلاین',
+   category: 'آموزش',
    role: 'طراح ارشد رابط کاربری',
    desc: 'طراحی پلتفرم مدرن آموزش از راه دور با تمرکز بر تجربه کاربری بصری و تعامل دانشجو-استاد.',
    metrics: [{ label: 'دانشجو فعال', value: '۵۰K+' }, { label: 'دوره آموزشی', value: '۲۰۰+' }],
@@ -190,7 +202,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 6,
    slug: 'pushio',
    title: 'پوشیو',
-   category: 'ارتباطات / SaaS',
+   category: 'زیرساخت و SaaS',
    role: 'طراح ارشد رابط کاربری',
    desc: 'سرویس پوش‌نوتیفیکیشن هوشمند برای وب‌سایت‌ها و اپلیکیشن‌ها با هدف افزایش نرخ بازگشت کاربران در مقیاس میلیونی.',
    metrics: [{ label: 'ارسال موفق', value: '۱۰M+' }, { label: 'کسب‌وکار فعال', value: '۲۰۰+' }],
@@ -206,7 +218,7 @@ export const PROJECTS_DATA: Project[] = [
    id: 7,
    slug: 'royal-aghdasieh-club',
    title: 'باشگاه رویال اقدسیه',
-   category: 'هویت بصری / برندینگ',
+   category: 'برند و طراحی',
    role: 'طراح ارشد رابط کاربری',
    desc: 'طراحی هویت دیجیتال و پلتفرم مدیریت مشتریان برای یکی از لوکس‌ترین مجموعه‌های ورزشی کشور.',
    metrics: [{ label: 'افزایش عضویت', value: '۴۵٪' }, { label: 'رضایت لوکس', value: '۹۸٪' }],
@@ -220,3 +232,26 @@ export const PROJECTS_DATA: Project[] = [
    tech: ['Branding', 'UI/UX', 'Next.js', 'Prisma']
   }
 ];
+
+/** متادیتای دستهٔ پروژه‌ها: رنگ «r, g, b» و آیکن نماینده — هم‌سبک با ابزارها. */
+export interface ProjectCategoryMeta {
+  color: string;
+  icon: LucideIcon;
+}
+
+export const PROJECT_CATEGORY_META: Record<string, ProjectCategoryMeta> = {
+  'امنیت سایبری': { color: '245, 158, 11', icon: Shield },
+  'زیرساخت و SaaS': { color: '34, 197, 94', icon: Server },
+  'تجارت الکترونیک': { color: '14, 165, 233', icon: ShoppingCart },
+  'آموزش': { color: '124, 58, 237', icon: GraduationCap },
+  'بازی و سرگرمی': { color: '120, 113, 40', icon: Gamepad2 },
+  'هوش مصنوعی': { color: '168, 85, 247', icon: Cpu },
+  'برند و طراحی': { color: '225, 29, 72', icon: Palette },
+  'پلتفرم هوشمند': { color: '20, 130, 90', icon: Sparkles },
+};
+
+const PROJECT_FALLBACK_META: ProjectCategoryMeta = { color: '120, 120, 130', icon: Wrench };
+
+/** متادیتای دستهٔ پروژه را با مقدار پیش‌فرض امن برمی‌گرداند. */
+export const getProjectCategoryMeta = (category: string): ProjectCategoryMeta =>
+  PROJECT_CATEGORY_META[category] ?? PROJECT_FALLBACK_META;

@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Lock } from 'lucide-react';
 import { Section, Heading } from '@/components/ui/Layout';
 import { ProjectCard } from '@/components/ui/ProjectCard';
-import { PROJECTS_DATA } from '@/lib/data/projects';
+import { PROJECTS_DATA, getProjectCategoryMeta } from '@/lib/data/projects';
 import ProjectModal from '@/components/home/ProjectModal';
 import { Project } from '@/components/ui/ProjectCard';
 import { Card } from '@/components/ui/Card';
@@ -50,6 +50,7 @@ export default function ProjectsGrid() {
      <div className="mt-12 flex flex-wrap justify-center gap-2.5" dir="rtl" role="group" aria-label="فیلتر دسته‌بندی">
       {categories.map((cat) => {
        const isActive = cat === activeCategory;
+       const color = cat === ALL_FILTER ? null : getProjectCategoryMeta(cat).color;
        return (
         <button
          key={cat}
@@ -57,12 +58,22 @@ export default function ProjectsGrid() {
          onClick={() => setActiveCategory(cat)}
          aria-pressed={isActive}
          data-test="project-filter"
-         className={`rounded-full border px-4 py-1.5 text-xs font-display transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 min-h-[44px] ${
+         className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-display transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 min-h-[44px] ${
           isActive
-           ? 'border-primary/50 bg-primary/10 text-primary'
+           ? color
+             ? 'text-white border-transparent'
+             : 'border-primary/50 bg-primary/10 text-primary'
            : 'border-border bg-card/40 text-muted-foreground hover:text-foreground hover:border-primary/30'
          }`}
+         style={color && isActive ? { backgroundColor: `rgb(${color})` } : undefined}
         >
+         {color && (
+          <span
+           className="h-1.5 w-1.5 rounded-full"
+           style={{ backgroundColor: isActive ? '#fff' : `rgb(${color})` }}
+           aria-hidden
+          />
+         )}
          {cat}
         </button>
        );
