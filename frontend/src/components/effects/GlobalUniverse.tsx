@@ -636,10 +636,12 @@ const PlanetBody = ({ planet, size, sunDirDeg, moonRotate = 0, moonEclipse, spin
   const lx = 50 + 40 * c, ly = 50 + 40 * s;
   const nx = 50 - 46 * c, ny = 50 - 46 * s;
   const hasAtmo = planet.id === 'earth' || planet.id === 'venus' || planet.id === 'neptune' || planet.id === 'uranus';
-  // Real Earth–Moon geometry: the Moon is 0.272× Earth's diameter and orbits at
-  // ~30.1 Earth-diameters (384,400 km / 12,756 km) from Earth's centre. The orbit
-  // box is twice that radius (the dot sits at its top edge = one radius out).
-  const moonOrbit = size * 60.3;
+  // Moon: real SIZE ratio (0.272× Earth's diameter). Its real DISTANCE (30.1
+  // Earth-diameters) can't be shown to scale — Earth is drawn ~19× oversized vs
+  // its true AU orbit, so a to-scale Moon would sit beyond the Sun. So, as every
+  // orrery does, the Moon hugs Earth (orbit box ≈ 2.6× Earth) — clearly Earth's
+  // moon, far nearer than the Sun. (radius = box/2; the dot sits at the top edge.)
+  const moonOrbit = size * 2.6;
   const moonDot = Math.max(1.5, size * 0.272);
   return (
     <div className="relative rounded-full" style={{ width: size, height: size }}>

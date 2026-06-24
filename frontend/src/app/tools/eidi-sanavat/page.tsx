@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
-import Client from './Client';
+import ToolLockedScreen from '@/components/tools/ToolLockedScreen';
 
+// NOTE: قفل موقت — این ابزار تا اعلام نهایی قانون کار/حداقل دستمزد غیرفعال است.
+// ماشین‌حساب در ./Client.tsx دست‌نخورده باقی مانده؛ برای فعال‌سازی دوباره کافی است
+// به جای ToolLockedScreen دوباره <Client /> رندر شود و status ابزار از 'soon' خارج شود.
 export const metadata: Metadata = {
   title: 'عیدی و سنوات',
   description:
@@ -9,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <Client />;
+  return <ToolLockedScreen slug="eidi-sanavat" />;
 }

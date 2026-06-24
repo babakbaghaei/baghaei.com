@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
-import Client from './Client';
+import ToolLockedScreen from '@/components/tools/ToolLockedScreen';
 
+// NOTE: قفل موقت — این ابزار تا تأیید نرخ رسمی بانک مرکزی غیرفعال است. ماشین‌حساب
+// در ./Client.tsx دست‌نخورده باقی مانده؛ برای فعال‌سازی دوباره کافی است به جای
+// ToolLockedScreen دوباره <Client /> رندر شود و status ابزار از 'soon' خارج شود.
 export const metadata: Metadata = {
   title: 'خسارت تأخیر تأدیه',
   description:
@@ -9,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <Client />;
+  return <ToolLockedScreen slug="khesarat-takhir" />;
 }
