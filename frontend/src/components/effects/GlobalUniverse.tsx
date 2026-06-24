@@ -429,19 +429,18 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
     <>
       {showMilkyWay && (
         <div aria-hidden className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          {/* Procedural galaxy band, four stacked layers for real depth (no
-              image): broad faint arms, a warm→cool core band, an offset
-              galactic bulge, and a dark central dust rift. The draw loop drives
-              its slow parallax via milkyRef's transform. */}
+          {/* Procedural galaxy glow — purely soft radial nebulosity (no hard
+              rectangle edges, no dark dust-rift line) so it reads as faint
+              ambient depth behind content rather than a visible "box with a
+              line through it". The draw loop drives its slow parallax via
+              milkyRef's transform. */}
           <div
             ref={milkyRef}
-            className="absolute left-1/2 top-1/2 h-[180%] w-[140%] will-change-transform"
+            className="absolute left-1/2 top-1/2 h-[200%] w-[150%] will-change-transform"
             style={{ transform: 'translate(-50%, -50%) rotate(-24deg)' }}
           >
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent 8%, rgba(150,166,255,0.05) 30%, rgba(170,150,255,0.07) 50%, rgba(150,166,255,0.05) 70%, transparent 92%)', filter: 'blur(26px)' }} />
-            <div className="absolute left-1/2 top-1/2 h-[44%] w-[80%] -translate-x-1/2 -translate-y-1/2" style={{ background: 'linear-gradient(to right, transparent 12%, rgba(255,225,180,0.06) 40%, rgba(220,225,255,0.13) 50%, rgba(190,205,255,0.06) 60%, transparent 88%)', filter: 'blur(16px)' }} />
-            <div className="absolute left-[42%] top-1/2 h-[34%] w-[26%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: 'radial-gradient(circle, rgba(255,236,200,0.16), rgba(210,200,255,0.06) 55%, transparent 75%)', filter: 'blur(14px)' }} />
-            <div className="absolute left-1/2 top-1/2 h-[60%] w-[6%] -translate-x-1/2 -translate-y-1/2" style={{ background: 'linear-gradient(to right, transparent, rgba(4,3,14,0.55) 50%, transparent)', filter: 'blur(6px)' }} />
+            <div className="absolute left-1/2 top-1/2 h-[55%] w-full -translate-x-1/2 -translate-y-1/2" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(170,182,255,0.06), transparent 70%)', filter: 'blur(48px)' }} />
+            <div className="absolute left-[44%] top-1/2 h-[42%] w-[42%] -translate-x-1/2 -translate-y-1/2" style={{ background: 'radial-gradient(circle, rgba(255,232,200,0.07), transparent 66%)', filter: 'blur(40px)' }} />
           </div>
         </div>
       )}
@@ -493,17 +492,23 @@ const PlanetBody = ({ planet, moonRotate = 0, moonEclipse }: { planet: PlanetDat
    style={{ width: finalSize, height: finalSize, zIndex: 20 }}
    className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 group/planet active:scale-95 transition-transform rounded-full ${isClickable ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black' : ''}`}
   >
-   <div className="w-full h-full rounded-full relative overflow-hidden shadow-2xl pointer-events-none" style={{ background: planet.texture }}>
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.3)_0%,transparent_60%)]" />
-   </div>
-
-   <div 
-    className="absolute inset-0 rounded-full pointer-events-none"
-    style={{ 
-      background: `linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 40%, transparent 70%)`,
-      zIndex: 25
-    }} 
+   {/* Real Sun lighting. The Sun sits at the orbit centre, and because it's the
+       orbit RING that rotates, that centre is ALWAYS toward the bottom of each
+       planet's local frame — so every planet is lit from below, day-side down,
+       night-side up, regardless of where it is on its orbit. */}
+   {/* Warm sunlight rim spilling out behind the sun-facing edge ("رده نوری"). */}
+   <div
+    className="absolute -inset-[28%] rounded-full pointer-events-none"
+    style={{ background: 'radial-gradient(circle at 50% 82%, rgba(255,238,210,0.55), transparent 60%)', filter: 'blur(3px)', zIndex: 0 }}
    />
+   <div className="w-full h-full rounded-full relative overflow-hidden shadow-2xl pointer-events-none" style={{ background: planet.texture, zIndex: 10 }}>
+    {/* day-side specular toward the Sun (bottom) */}
+    <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 84%, rgba(255,255,255,0.42) 0%, transparent 52%)' }} />
+    {/* night-side terminator falling away from the Sun (top) */}
+    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, transparent 26%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.84) 100%)' }} />
+    {/* bright sunlit limb on the bottom edge */}
+    <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 -1.5px 2.5px -0.5px rgba(255,247,230,0.55)' }} />
+   </div>
 
    {planet.id === 'earth' && moonEclipse?.isSolar && (
      <div className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center">
@@ -601,18 +606,12 @@ const Planet = ({ planet, date }: { planet: PlanetData, date: Date }) => {
 export default function GlobalUniverse({ renderBackground = false, scrollProgress: externalProgress }: { renderBackground?: boolean, scrollProgress?: number }) {
  const { scrollYProgress } = useScroll();
  const [progress, setProgress] = useState(0);
- const lastSetRef = useRef(0);
  const prefersReducedMotion = usePrefersReducedMotion();
 
+ // Update on every scroll change so the orbits turn smoothly with the scroll.
+ // (An earlier delta-throttle here made slow scrolling step/freeze the planets.)
  useEffect(() => {
-    return scrollYProgress.on('change', (v) => {
-      // Throttle the React re-render: planets + parallax only need ~1px
-      // granularity, so skip sub-threshold deltas instead of re-rendering the
-      // whole solar system 60×/s. Endpoints always commit.
-      if (v !== 0 && v !== 1 && Math.abs(v - lastSetRef.current) < 0.0015) return;
-      lastSetRef.current = v;
-      setProgress(v);
-    });
+    return scrollYProgress.on('change', (v) => setProgress(v));
  }, [scrollYProgress]);
 
  const activeProgress = externalProgress !== undefined ? externalProgress : progress;
@@ -647,12 +646,12 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
  // advances simulated time, so the planets/moon hold a single static position
  // (the declarative motion.div rotations are already neutralised by the root
  // <MotionConfig reducedMotion="user">, this stops the value itself moving).
- // Cubic ease on the scroll→time mapping: the first third of the scroll drifts
- // slowly (contemplative), then the orbits accelerate toward the projects
- // section — a crescendo instead of a flat, mechanical sweep.
- const easedProgress = activeProgress * activeProgress * activeProgress;
+ // Linear scroll→time mapping: the hero only occupies a small slice of total
+ // page scroll, so any easing curve (e.g. cubic) collapses that slice to almost
+ // no motion and the orbits look frozen. Linear keeps them visibly turning as
+ // you scroll through the hero.
  const date = now
-   ? new Date(now.getTime() + (prefersReducedMotion ? 0 : easedProgress * SCROLL_TIME_SPAN_MS))
+   ? new Date(now.getTime() + (prefersReducedMotion ? 0 : activeProgress * SCROLL_TIME_SPAN_MS))
    : null;
 
  return (
