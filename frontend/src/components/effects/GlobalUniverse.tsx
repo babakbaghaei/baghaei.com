@@ -3,7 +3,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { usePathname } from 'next/navigation';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 import { parallaxBus } from '@/lib/utils/parallaxBus';
 
@@ -90,16 +89,17 @@ const EARTH_DIAMETER_KM = 12756;
 // Sizes: real diameter ratio, gently compressed so the giants dominate without
 // swallowing the frame and the inner worlds stay clickable. Multiplied by the
 // responsive factor `k` at render so the whole system scales with the viewport.
-const SIZE_EXP = 0.82;   // 1 = true diameter ratios; <1 tames the giants
-const SIZE_BASE = 15;    // Earth's on-screen diameter (px) at full scale
-const SIZE_FLOOR = 9;    // smallest visual/click target (px)
+const SIZE_EXP = 0.90;   // 1 = true diameter ratios; ~0.9 lets the giants truly dominate
+const SIZE_BASE = 13;    // Earth's on-screen diameter (px) at full scale
+const SIZE_FLOOR = 8;    // smallest visual size (px); the hit area is padded separately
+const HIT_MIN = 26;      // minimum clickable target (px) for the tiny inner worlds
 
 // Distances along the diagonal from the corner Sun, as a fraction of the frame
-// diagonal. Real AU compressed by a power law so Mercury clears the Sun's glow
-// and Neptune reaches the far corner.
-const DIST_EXP = 0.58;   // 1 = true linear AU; <1 pulls the outer giants inward
-const DIST_NEAR = 0.20;  // Mercury's distance from the Sun (fraction of diagonal)
-const DIST_FAR = 0.97;   // Neptune's distance (fraction of diagonal)
+// diagonal. Real AU compressed by a power law: the four inner worlds cluster
+// near the Sun and the giants spread far out — the real proportional layout.
+const DIST_EXP = 0.60;   // 1 = true linear AU; <1 pulls the outer giants inward
+const DIST_NEAR = 0.15;  // Mercury's distance from the Sun (fraction of diagonal)
+const DIST_FAR = 0.99;   // Neptune's distance (fraction of diagonal)
 
 // The Sun: a huge corner light. Its center sits just off the top-left corner.
 const SUN_SIZE = 440;    // Sun core diameter (px) at full scale
@@ -107,9 +107,17 @@ const SUN_CX = -0.05;    // Sun center X as a fraction of frame width  (off-fram
 const SUN_CY = -0.09;    // Sun center Y as a fraction of frame height (off-frame)
 
 // The diagonal the planets fan along, measured from +x (right) toward +y (down).
-const FAN_ANGLE_DEG = 40;   // base diagonal direction toward the bottom-right
-const FAN_SPREAD_DEG = 9;   // static per-planet spread so they don't sit on one line
-const FAN_SWAY_DEG = 6;     // live longitude sways each planet ± this (keeps it alive)
+const FAN_ANGLE_DEG = 42;   // base diagonal direction toward the bottom-right
+const FAN_SPREAD_DEG = 8;   // static per-planet spread so they don't sit on one line
+const FAN_SWAY_DEG = 6;     // live longitude offsets each planet's resting angle ±this
+const ORBIT_SWAY_DEG = 7;   // slow orbital oscillation amplitude around the resting angle
+
+// Axial spin period (s) per planet — giants whirl fast, the inner worlds turn
+// slow, matching the real qualitative ordering. The surface scrolls under the
+// fixed terminator, so the lit side never moves while the planet visibly turns.
+const SPIN_SECONDS: Record<string, number> = {
+  mercury: 58, venus: 64, earth: 26, mars: 26, jupiter: 14, saturn: 15, uranus: 22, neptune: 20,
+};
 
 /**
  * Live ephemeris — real planetary positions.
@@ -224,8 +232,6 @@ const wrapMod = (v: number, m: number) => ((v % m) + m) % m;
 
 // ── Constellations ──────────────────────────────────────────────────────────
 // Real naked-eye asterisms, coordinates normalised 0..1 inside their own box.
-// Every route shows a DIFFERENT couple of these (steady bright stars joined by
-// faint lines), so the night sky is never the same on two pages.
 interface Asterism { fa: string; stars: [number, number][]; lines: [number, number][]; }
 const ASTERISMS: Asterism[] = [
   { fa: 'دب اکبر', stars: [[0.00, 0.16], [0.18, 0.28], [0.37, 0.37], [0.55, 0.45], [0.60, 0.72], [0.84, 0.75], [0.82, 0.48]], lines: [[0, 1], [1, 2], [2, 3], [3, 6], [6, 5], [5, 4], [4, 3]] },
@@ -237,10 +243,17 @@ const ASTERISMS: Asterism[] = [
   { fa: 'اسد', stars: [[0.10, 0.80], [0.16, 0.55], [0.22, 0.36], [0.34, 0.28], [0.52, 0.40], [0.92, 0.52], [0.66, 0.60]], lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 6], [6, 5], [5, 4]] },
   { fa: 'صلیب جنوبی', stars: [[0.50, 0.00], [0.50, 1.00], [0.06, 0.46], [0.94, 0.56]], lines: [[0, 1], [2, 3]] },
 ];
-// Screen anchors (fractions) the constellations snap to — spread around, away
-// from the dead centre where the hero headline sits.
-const ANCHORS: [number, number][] = [[0.16, 0.24], [0.30, 0.72], [0.78, 0.28], [0.68, 0.80], [0.12, 0.56], [0.86, 0.60], [0.44, 0.16]];
-const hashStr = (s: string) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+// FIXED site-wide placement: the SAME asterisms sit at the SAME principled
+// anchors on every route — the sky no longer regenerates as you navigate. Each
+// is spread around the frame and kept clear of the dead centre where headlines
+// sit. (ax, ay) are viewport fractions; `scale` sizes the asterism's own box.
+const PLACED_CONSTELLATIONS: { ast: Asterism; ax: number; ay: number; scale: number }[] = [
+  { ast: ASTERISMS[0], ax: 0.07, ay: 0.11, scale: 0.22 }, // دب اکبر — top-leading
+  { ast: ASTERISMS[2], ax: 0.75, ay: 0.09, scale: 0.17 }, // ذات‌الکرسی — top-trailing
+  { ast: ASTERISMS[1], ax: 0.83, ay: 0.44, scale: 0.20 }, // جبار — mid-trailing
+  { ast: ASTERISMS[4], ax: 0.09, ay: 0.67, scale: 0.20 }, // عقرب — lower-leading
+  { ast: ASTERISMS[6], ax: 0.66, ay: 0.80, scale: 0.20 }, // اسد — lower-trailing
+];
 
 export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: { scrollProgress: number, observeVisibility?: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -261,9 +274,7 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
   const prevHxRef = useRef(0);
   const hAccumRef = useRef(0);
   const vAccumRef = useRef(0);
-  // Per-route constellations + an idle "shooting star".
-  const pathname = usePathname();
-  const placedRef = useRef<{ ast: Asterism, ax: number, ay: number, scale: number }[]>([]);
+  // Idle "shooting star" bookkeeping (constellations are fixed site-wide).
   const meteorRef = useRef<{ x: number, y: number, vx: number, vy: number, life: number, maxLife: number } | null>(null);
   const lastActivityRef = useRef(0);
   const lastMeteorRef = useRef(0);
@@ -308,21 +319,6 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       };
     });
   }
-
-  // Choose this route's constellations. Different pathname → different hash →
-  // different asterisms + anchors, with no repeat within a single page.
-  useEffect(() => {
-    const path = pathname || '/';
-    const count = 2 + (hashStr(path) % 2); // 2 or 3 per page
-    const orderA = ASTERISMS.map((_, i) => i).sort((a, b) => hashStr(path + 'a' + a) - hashStr(path + 'a' + b));
-    const orderN = ANCHORS.map((_, i) => i).sort((a, b) => hashStr(path + 'n' + a) - hashStr(path + 'n' + b));
-    placedRef.current = orderA.slice(0, count).map((idx, i) => ({
-      ast: ASTERISMS[idx],
-      ax: ANCHORS[orderN[i % ANCHORS.length]][0],
-      ay: ANCHORS[orderN[i % ANCHORS.length]][1],
-      scale: 0.15 + (hashStr(path + 's' + i) % 7) / 100,
-    }));
-  }, [pathname]);
 
   // Track user activity so the shooting star only appears after a short idle.
   useEffect(() => {
@@ -458,8 +454,8 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       // Constellations: just the steady BRIGHT stars in the asterism shape — no
       // connecting lines — so the real patterns (Big Dipper, Orion, …) read like
       // an actual sky. Drift with the field at a shallow parallax; dark only.
-      if (isDark && placedRef.current.length) {
-        for (const p of placedRef.current) {
+      if (isDark) {
+        for (const p of PLACED_CONSTELLATIONS) {
           const base = Math.min(width, height) * p.scale;
           const ox = p.ax * width + hAccum * 0.05;
           const oy = p.ay * height + vAccum * 0.05;
@@ -603,35 +599,45 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
 // top→bottom: detail layers first, base sphere colour last.
 const SURFACE: Record<string, string> = {
   mercury:
-    'radial-gradient(circle at 62% 60%, rgba(0,0,0,0.34) 0 5%, transparent 6%),' +
-    'radial-gradient(circle at 40% 72%, rgba(0,0,0,0.28) 0 4%, transparent 5%),' +
-    'radial-gradient(circle at 70% 34%, rgba(255,255,255,0.10) 0 4%, transparent 5%),' +
-    'radial-gradient(circle at 34% 32%, #c2c2c2, #6f6f6f 55%, #3a3a3a 100%)',
+    'radial-gradient(circle at 62% 60%, rgba(0,0,0,0.42) 0 4%, rgba(0,0,0,0.18) 5%, transparent 8%),' +   // craters
+    'radial-gradient(circle at 40% 72%, rgba(0,0,0,0.34) 0 3%, transparent 6%),' +
+    'radial-gradient(circle at 28% 44%, rgba(0,0,0,0.3) 0 3%, transparent 5%),' +
+    'radial-gradient(circle at 74% 38%, rgba(255,255,255,0.14) 0 3%, transparent 5%),' +                  // ray
+    'repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0 8%, transparent 8% 16%),' +                      // rotation cue
+    'radial-gradient(circle at 34% 32%, #c6c6c6, #707070 55%, #393939 100%)',
   venus:
-    'repeating-linear-gradient(26deg, rgba(255,255,255,0.07) 0 7px, transparent 7px 17px),' +
-    'radial-gradient(circle at 36% 30%, #f4dca4, #d8ad5f 58%, #9b7331 100%)',
+    'repeating-linear-gradient(112deg, rgba(255,255,255,0.10) 0 6px, transparent 6px 15px),' +            // swirled clouds
+    'radial-gradient(ellipse 32% 18% at 40% 34%, rgba(255,242,205,0.32) 0 60%, transparent 76%),' +
+    'radial-gradient(circle at 36% 30%, #f6e2ac, #d8ad5f 58%, #9b7331 100%)',
   earth:
-    'radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0 7%, transparent 12%),' +
-    'radial-gradient(circle at 30% 64%, rgba(40,120,70,0.92) 0 12%, transparent 19%),' +
-    'radial-gradient(circle at 60% 44%, rgba(36,130,80,0.9) 0 14%, transparent 21%),' +
-    'radial-gradient(circle at 48% 80%, rgba(235,235,245,0.6) 0 9%, transparent 15%),' +
-    'radial-gradient(circle at 33% 30%, #6fb7ea, #2a6fb2 55%, #123769 100%)',
+    'radial-gradient(ellipse 22% 15% at 31% 60%, rgba(34,120,60,0.95) 0 58%, transparent 72%),' +         // landmass
+    'radial-gradient(ellipse 17% 21% at 63% 41%, rgba(40,132,72,0.92) 0 56%, transparent 72%),' +         // landmass
+    'radial-gradient(ellipse 10% 8% at 71% 73%, rgba(40,124,68,0.85) 0 58%, transparent 74%),' +          // island
+    'radial-gradient(circle at 50% 11%, rgba(255,255,255,0.72) 0 7%, transparent 12%),' +                 // ice cap
+    'radial-gradient(ellipse 20% 6% at 44% 80%, rgba(255,255,255,0.5) 0 48%, transparent 76%),' +         // cloud band
+    'radial-gradient(ellipse 15% 5% at 66% 26%, rgba(255,255,255,0.45) 0 48%, transparent 78%),' +        // cloud
+    'radial-gradient(circle at 33% 30%, #5aa6e6, #2470b4 55%, #123a6b 100%)',                             // ocean
   mars:
-    'radial-gradient(circle at 50% 13%, rgba(255,255,255,0.78) 0 8%, transparent 11%),' +
-    'radial-gradient(circle at 52% 90%, rgba(255,255,255,0.6) 0 6%, transparent 10%),' +
-    'radial-gradient(circle at 64% 55%, rgba(0,0,0,0.26) 0 11%, transparent 17%),' +
-    'radial-gradient(circle at 34% 30%, #e28a5b, #b6552d 55%, #6d2c16 100%)',
+    'radial-gradient(circle at 50% 11%, rgba(255,255,255,0.85) 0 6%, rgba(255,255,255,0.3) 9%, transparent 13%),' + // N polar cap
+    'radial-gradient(circle at 50% 92%, rgba(255,255,255,0.7) 0 5%, transparent 9%),' +                   // S polar cap
+    'radial-gradient(ellipse 18% 13% at 63% 55%, rgba(80,30,15,0.45) 0 60%, transparent 74%),' +          // maria
+    'radial-gradient(ellipse 12% 9% at 33% 62%, rgba(92,40,20,0.4) 0 58%, transparent 74%),' +
+    'radial-gradient(circle at 71% 34%, rgba(0,0,0,0.28) 0 3%, transparent 5%),' +                        // crater
+    'repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0 9%, transparent 9% 18%),' +                      // rotation cue
+    'radial-gradient(circle at 34% 30%, #e8915f, #b9572e 55%, #6d2c16 100%)',
   jupiter:
-    'radial-gradient(ellipse 16% 11% at 66% 63%, #c1492f, #7c2d1c 70%, transparent 73%),' +
-    'repeating-linear-gradient(0deg, #d9b48f 0 6%, #c0966e 6% 10%, #e7cdab 10% 15%, #b8895f 15% 20%, #ddbd95 20% 25%)',
+    'radial-gradient(ellipse 17% 12% at 64% 62%, #d4502f 0 58%, #8c3320 72%, transparent 78%),' +         // Great Red Spot
+    'repeating-linear-gradient(7deg, rgba(255,255,255,0.05) 0 1.4%, transparent 1.4% 3%),' +              // fine turbulence
+    'repeating-linear-gradient(0deg, #e3c39a 0 5%, #c79a6e 5% 9%, #ecd6b4 9% 13%, #b9885d 13% 17%, #dcbd95 17% 21%, #a9764f 21% 25%, #e7cda6 25% 30%)', // belts/zones
   saturn:
-    'repeating-linear-gradient(0deg, #d8c081 0 7%, #c2a766 7% 12%, #e6d4a0 12% 18%, #cdb87f 18% 24%)',
+    'repeating-linear-gradient(0deg, #e7d6a6 0 6%, #cdb47e 6% 11%, #f0e3bd 11% 16%, #d4bd86 16% 21%, #c0a468 21% 26%, #e2cf9a 26% 31%)',
   uranus:
-    'repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 9%, transparent 9% 19%),' +
-    'radial-gradient(circle at 38% 34%, #cbf1ef, #8fd0d4 60%, #5aa3aa 100%)',
+    'repeating-linear-gradient(94deg, rgba(255,255,255,0.05) 0 10%, transparent 10% 22%),' +              // faint banding (tilted)
+    'radial-gradient(circle at 40% 36%, #d6f3f0, #92d2d6 58%, #5aa3aa 100%)',
   neptune:
-    'radial-gradient(ellipse 13% 9% at 60% 66%, rgba(255,255,255,0.22), transparent 70%),' +
-    'repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 11%, transparent 11% 22%),' +
+    'radial-gradient(ellipse 15% 11% at 58% 64%, rgba(8,16,52,0.62) 0 58%, transparent 74%),' +           // Great Dark Spot
+    'radial-gradient(ellipse 20% 6% at 40% 40%, rgba(255,255,255,0.2) 0 48%, transparent 78%),' +          // cloud streak
+    'repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 9%, transparent 9% 20%),' +
     'radial-gradient(circle at 38% 32%, #6f8bff, #2f4fc9 58%, #142468 100%)',
 };
 
@@ -657,7 +663,7 @@ interface Frame { W: number; H: number; k: number; }
 // A lit sphere illuminated from screen-direction `sunDirDeg` (degrees, measured
 // from +x toward +y/down, pointing AT the Sun). Reused by the fan and the
 // focused view; `spin` scrolls the surface bands in the big focused view.
-const PlanetBody = ({ planet, size, sunDirDeg, moonRotate = 0, moonEclipse, spin = false }: { planet: PlanetData; size: number; sunDirDeg: number; moonRotate?: number; moonEclipse?: { isSolar: boolean; isLunar: boolean }; spin?: boolean }) => {
+const PlanetBody = ({ planet, size, sunDirDeg, moonRotate = 0, moonEclipse, spin = false, spinSeconds = 30 }: { planet: PlanetData; size: number; sunDirDeg: number; moonRotate?: number; moonEclipse?: { isSolar: boolean; isLunar: boolean }; spin?: boolean; spinSeconds?: number }) => {
   const c = Math.cos(sunDirDeg * DEG);
   const s = Math.sin(sunDirDeg * DEG);
   // Lit highlight toward the Sun; night shadow grows from the anti-solar point
@@ -673,7 +679,7 @@ const PlanetBody = ({ planet, size, sunDirDeg, moonRotate = 0, moonEclipse, spin
         className="absolute inset-0 overflow-hidden rounded-full shadow-2xl"
         style={{ background: SURFACE[planet.id] || planet.texture, backgroundSize: spin ? '220% 100%' : 'cover' }}
         animate={spin ? { backgroundPositionX: ['0%', '-220%'] } : undefined}
-        transition={spin ? { duration: 30, repeat: Infinity, ease: 'linear' } : undefined}
+        transition={spin ? { duration: spinSeconds, repeat: Infinity, ease: 'linear' } : undefined}
       >
         {/* day-side specular toward the Sun */}
         <div className="absolute inset-0" style={{ background: `radial-gradient(circle at ${lx}% ${ly}%, rgba(255,248,232,0.5) 0%, transparent 46%)` }} />
@@ -713,42 +719,62 @@ const PlanetBody = ({ planet, size, sunDirDeg, moonRotate = 0, moonEclipse, spin
   );
 };
 
-const Planet = ({ planet, date, frame, onFocus }: { planet: PlanetData; date: Date; frame: Frame; onFocus: (p: PlanetData) => void }) => {
+// One planet on a rotating "arm" pivoting at the corner Sun. The arm carries the
+// planet at its real-ratio distance; a static resting angle (fed by the live
+// longitude) plus a slow oscillation makes the whole system visibly turn —
+// "هرکدوم دور خودش می‌چرخه + آروم جلو می‌ره". Because the Sun is the pivot, the
+// planet is always lit from the inner (local 180°) end and casts its dusty
+// shadow cone outward (local 0°), so lighting never needs recomputing.
+const Planet = ({ planet, date, frame, onFocus, reduced }: { planet: PlanetData; date: Date; frame: Frame; onFocus: (p: PlanetData) => void; reduced: boolean }) => {
   const size = Math.max(SIZE_FLOOR, Math.pow(planet.diameter / EARTH_DIAMETER_KM, SIZE_EXP) * SIZE_BASE) * frame.k;
   const diag = Math.hypot(frame.W, frame.H);
-  // Real-ratio distance along the diagonal (Mercury→Neptune mapped to NEAR→FAR).
+  // Real-ratio distance along the diagonal: inner worlds cluster near the Sun,
+  // giants fan far out (Mercury→Neptune mapped to NEAR→FAR).
   const rFrac = DIST_NEAR + ((Math.pow(planet.au, DIST_EXP) - AU_MIN_POW) / (AU_MAX_POW - AU_MIN_POW)) * (DIST_FAR - DIST_NEAR);
   const r = rFrac * diag;
   const idx = PLANET_ORDER.indexOf(planet.id);
   const spread = (idx / (PLANET_ORDER.length - 1) - 0.5) * 2 * FAN_SPREAD_DEG;
-  // Live longitude keeps the fan breathing (scroll fast-forwards it).
-  const sway = Math.sin(planetLongitude(planet.id, date) * DEG) * FAN_SWAY_DEG;
-  const theta = (FAN_ANGLE_DEG + spread + sway) * DEG;
-  const sx = SUN_CX * frame.W, sy = SUN_CY * frame.H;
-  const x = sx + r * Math.cos(theta);
-  const y = sy + r * Math.sin(theta);
-  // Direction from this planet toward the Sun (drives lighting + shadow cone).
-  const sunDirDeg = (Math.atan2(sy - y, sx - x) * 180) / Math.PI;
-  const antiDeg = sunDirDeg + 180;
+  // Resting arm angle: base diagonal + static spread + a live-longitude offset
+  // (the real ephemeris still drives the layout). STATIC transform, so the
+  // per-minute clock tick can't restart the spin/orbit animations below.
+  const restAngle = FAN_ANGLE_DEG + spread + Math.sin(planetLongitude(planet.id, date) * DEG) * FAN_SWAY_DEG;
+
+  const sx = SUN_CX * frame.W, sy = SUN_CY * frame.H; // pivot = Sun centre
 
   const m = planet.id === 'earth' ? earthMoon(date) : null;
   const moonEclipse = { isSolar: m?.isSolar ?? false, isLunar: m?.isLunar ?? false };
 
   const coneLen = Math.min(size * 11, diag * 0.34);
   const coneH = Math.max(size * 1.25, 12);
+  const hit = Math.max(size, HIT_MIN); // padded so tiny inner worlds stay clickable
+  // Inner planets sway faster (Kepler); the per-planet duration also desyncs the fan.
+  const orbitDur = 24 + Math.pow(planet.au, 0.7) * 32;
 
   return (
-    <div className="absolute" style={{ left: x, top: y, transform: 'translate(-50%, -50%)' }}>
-      {/* Dusty shadow cone cast away from the Sun (the "dark line behind the
-          obstacle in a dusty night"): a sharp-ish near edge fading into the haze. */}
-      <div aria-hidden className="absolute pointer-events-none"
-        style={{ left: '50%', top: '50%', width: coneLen, height: coneH, transform: `translateY(-50%) rotate(${antiDeg}deg)`, transformOrigin: '0% 50%', background: 'linear-gradient(90deg, rgba(2,4,12,0.62) 0%, rgba(2,4,12,0.5) 13%, rgba(2,4,12,0.22) 44%, transparent 82%)', borderRadius: '50%', filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(90deg, #000 0%, #000 7%, transparent 95%)', maskImage: 'linear-gradient(90deg, #000 0%, #000 7%, transparent 95%)', zIndex: 1 }}
-      />
-      <button type="button" onClick={() => onFocus(planet)} aria-label={`نمایش اطلاعات ${planet.name}`}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-auto cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-        style={{ width: size, height: size, zIndex: 2 }}>
-        <PlanetBody planet={planet} size={size} sunDirDeg={sunDirDeg} moonRotate={m?.moonRotate ?? 0} moonEclipse={moonEclipse} />
-      </button>
+    <div className="absolute" style={{ left: sx, top: sy, width: 0, height: 0, zIndex: 2 }}>
+      {/* Static resting angle (fed by the live longitude). */}
+      <div style={{ transformOrigin: '0px 0px', transform: `rotate(${restAngle}deg)` }}>
+        {/* Slow orbital oscillation around the resting angle. */}
+        <motion.div
+          className="will-change-transform"
+          style={{ transformOrigin: '0px 0px' }}
+          animate={reduced ? { rotate: 0 } : { rotate: [-ORBIT_SWAY_DEG, ORBIT_SWAY_DEG, -ORBIT_SWAY_DEG] }}
+          transition={reduced ? undefined : { duration: orbitDur, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          {/* Planet at distance r along the arm's local +x. */}
+          <div className="absolute" style={{ left: r, top: 0 }}>
+            {/* Dusty shadow cone cast outward (anti-solar = local +x). */}
+            <div aria-hidden className="absolute pointer-events-none"
+              style={{ left: '50%', top: '50%', width: coneLen, height: coneH, transform: 'translateY(-50%)', transformOrigin: '0% 50%', background: 'linear-gradient(90deg, rgba(2,4,12,0.62) 0%, rgba(2,4,12,0.5) 13%, rgba(2,4,12,0.22) 44%, transparent 82%)', borderRadius: '50%', filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(90deg, #000 0%, #000 7%, transparent 95%)', maskImage: 'linear-gradient(90deg, #000 0%, #000 7%, transparent 95%)', zIndex: 1 }}
+            />
+            <button type="button" onClick={() => onFocus(planet)} aria-label={`نمایش اطلاعات ${planet.name}`}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center rounded-full pointer-events-auto cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              style={{ width: hit, height: hit, zIndex: 2 }}>
+              <PlanetBody planet={planet} size={size} sunDirDeg={180} moonRotate={m?.moonRotate ?? 0} moonEclipse={moonEclipse} spin={!reduced} spinSeconds={SPIN_SECONDS[planet.id] ?? 30} />
+            </button>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };
@@ -810,7 +836,7 @@ const PlanetFocus = ({ planet, date, onClose, reduced }: { planet: PlanetData | 
           onClick={onClose}
           role="dialog" aria-modal="true" aria-label={`اطلاعات ${planet.name}`}
         >
-          <div className="absolute inset-0 bg-black/75 backdrop-blur-md" />
+          <div className="absolute inset-0 bg-black/82 backdrop-blur-lg" />
           <motion.div
             className="relative z-10 mx-4 flex max-w-3xl flex-col items-center gap-8 md:flex-row md:gap-14"
             initial={reduced ? false : { scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={reduced ? undefined : { scale: 0.9, opacity: 0 }}
@@ -823,10 +849,10 @@ const PlanetFocus = ({ planet, date, onClose, reduced }: { planet: PlanetData | 
               transition={reduced ? undefined : { duration: 6, repeat: Infinity, ease: 'easeInOut' }}
               style={{ width: big, height: big }}
             >
-              <PlanetBody planet={planet} size={big} sunDirDeg={221} moonRotate={m?.moonRotate ?? 0} moonEclipse={{ isSolar: m?.isSolar ?? false, isLunar: m?.isLunar ?? false }} spin={!reduced} />
+              <PlanetBody planet={planet} size={big} sunDirDeg={221} moonRotate={m?.moonRotate ?? 0} moonEclipse={{ isSolar: m?.isSolar ?? false, isLunar: m?.isLunar ?? false }} spin={!reduced} spinSeconds={Math.max(14, (SPIN_SECONDS[planet.id] ?? 30) * 0.6)} />
             </motion.div>
 
-            <div dir="rtl" className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/5 p-7 text-right backdrop-blur-xl">
+            <div dir="rtl" className="w-full max-w-sm rounded-3xl border border-white/12 bg-[#0a0d16]/85 p-7 text-right shadow-2xl backdrop-blur-2xl">
               <div className="mb-5 flex items-baseline justify-between gap-3">
                 <h3 className="font-display text-3xl font-black text-white">{planet.name}</h3>
                 <span className="font-display text-sm text-white/50">{planet.enName}</span>
@@ -930,7 +956,7 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
     <>
      <SunCorner frame={frame} reduced={prefersReducedMotion} />
      {date && PLANETS_DATA.map((planet) => (
-      <Planet key={planet.id} planet={planet} date={date} frame={frame} onFocus={setFocused} />
+      <Planet key={planet.id} planet={planet} date={date} frame={frame} onFocus={setFocused} reduced={prefersReducedMotion} />
      ))}
     </>
    )}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 import Magnetic from '@/components/effects/Magnetic';
 import GlobalUniverse from '@/components/effects/GlobalUniverseLazy';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
@@ -82,7 +83,16 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
   return (
       <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center bg-transparent overflow-hidden pt-32 pb-20 lg:pt-28">
       <div className="max-w-7xl mx-auto px-6 lg:px-16 w-full flex flex-col relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 mb-8">
+        {/* Hero panel — the headline + live solar system sit inside one large
+            glass card (Cloudflare-style framed hero) that frosts the starfield
+            behind it. Calm: no 3D tilt, just the signature glass + border. */}
+        <Card
+          isHoverable={false}
+          roundedClass="rounded-[1.75rem] sm:rounded-[2.25rem] lg:rounded-[3rem]"
+          className="mb-8"
+          contentClassName="p-6 sm:p-9 lg:p-14"
+        >
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-12">
           <motion.div
             className="order-1 space-y-6 flex flex-col items-start text-right"
             initial="hidden"
@@ -156,6 +166,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
             <GlobalUniverse />
           </div>
         </div>
+        </Card>
 
         <div className="w-full h-px bg-border my-8" />
         {children}
