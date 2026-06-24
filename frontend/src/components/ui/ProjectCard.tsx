@@ -85,6 +85,18 @@ const BrandMark = ({ project }: { project: Project }) => {
   );
 };
 
+// The project colours are stored as rgba() (color ≈ 0.3α body, borderColor ≈
+// 0.8α accent). For a FULLY-coloured card we need the solid hue, so pull the rgb
+// triplet out and derive a darker shade for the deep bottom of the panel.
+const rgbTriplet = (c: string) => {
+  const m = c.match(/rgba?\(([^)]+)\)/);
+  if (!m) return '110, 110, 120';
+  const p = m[1].split(',').map((s) => parseFloat(s));
+  return `${p[0]}, ${p[1]}, ${p[2]}`;
+};
+const shade = (triplet: string, f: number) =>
+  triplet.split(',').map((s) => Math.round(parseFloat(s) * f)).join(', ');
+
 const ProjectContent = ({ project }: { project: Project }) => {
   // The shared card tilt drives a glass reflection that sweeps across the panel
   // as the card pivots — the site's signature sheen, kept alive on the colour.
@@ -95,16 +107,19 @@ const ProjectContent = ({ project }: { project: Project }) => {
   });
   const sheen = useMotionTemplate`linear-gradient(${sheenAngle}deg, rgba(255,255,255,0.16) 0%, transparent 55%)`;
 
-  // The project's assigned colour IS the card background now — a deep glass panel
-  // lit from the top-leading corner by its own colour. `color` (~0.3α) is the
-  // body wash; `borderColor` (~0.8α) the brighter corner glow.
-  const panelBg = `radial-gradient(125% 100% at 82% -12%, ${project.borderColor} 0%, transparent 56%), linear-gradient(155deg, ${project.color} 0%, transparent 68%)`;
+  // The project's assigned colour IS the card — FULLY coloured, no black base.
+  // A bright lit corner (solid accent) melts into the deep brand body, darkening
+  // toward the bottom-leading edge where the title sits so white copy stays crisp.
+  const base = rgbTriplet(project.color);
+  const bright = rgbTriplet(project.borderColor);
+  const panelBg =
+    `radial-gradient(135% 115% at 82% -12%, rgba(${bright}, 0.92) 0%, rgba(${bright}, 0) 56%),` +
+    `linear-gradient(152deg, rgb(${base}) 0%, rgb(${shade(base, 0.5)}) 100%)`;
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-[1.6rem]" style={{ transformStyle: "preserve-3d" }}>
-      {/* Colour background (the assigned project colour). */}
-      <div className="absolute inset-0 bg-[#080a11]" />
-      <div className="absolute inset-0 transition-opacity duration-500 opacity-90 group-hover/card:opacity-100" style={{ background: panelBg }} />
+    <div className="relative h-full w-full overflow-hidden rounded-[2rem]" style={{ transformStyle: "preserve-3d" }}>
+      {/* Fully-coloured background — the assigned project colour, edge to edge. */}
+      <div className="absolute inset-0" style={{ background: panelBg }} />
 
       {/* Faint oversized brand watermark — gives the flat colour depth and texture.
           Floats slightly forward and drifts on hover for a parallax read. */}
@@ -197,11 +212,10 @@ export const ProjectCard: React.FC<{ project: Project, onClick: (e: React.MouseE
   return (
     <Card
       glowColor={project.borderColor}
-      roundedClass="rounded-[2.2rem]"
-      className={`p-2 ${isActive ? "ring-1 ring-white/10" : ""}`}
+      roundedClass="rounded-[2rem]"
+      className={isActive ? "ring-1 ring-white/15" : ""}
       isHoverable={true}
-      bgClassName="bg-[#080a11]/70"
-      contentClassName="p-1.5"
+      contentClassName="p-0"
     >
       <div
         onClick={onClick}
@@ -214,7 +228,7 @@ export const ProjectCard: React.FC<{ project: Project, onClick: (e: React.MouseE
         role="button"
         tabIndex={0}
         aria-label={`${project.title} — نمایش جزئیات پروژه`}
-        className="group/card h-full w-full cursor-pointer rounded-[1.6rem] outline-none focus-visible:ring-2 focus-visible:ring-foreground/60"
+        className="group/card h-full w-full cursor-pointer rounded-[2rem] outline-none focus-visible:ring-2 focus-visible:ring-foreground/60"
         style={{ transformStyle: "preserve-3d" }}
       >
         <ProjectContent project={project} />

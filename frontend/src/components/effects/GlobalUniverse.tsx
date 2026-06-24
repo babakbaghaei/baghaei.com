@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
@@ -89,28 +90,34 @@ const EARTH_DIAMETER_KM = 12756;
 // Sizes: real diameter ratio, gently compressed so the giants dominate without
 // swallowing the frame and the inner worlds stay clickable. Multiplied by the
 // responsive factor `k` at render so the whole system scales with the viewport.
-const SIZE_EXP = 0.90;   // 1 = true diameter ratios; ~0.9 lets the giants truly dominate
-const SIZE_BASE = 13;    // Earth's on-screen diameter (px) at full scale
-const SIZE_FLOOR = 8;    // smallest visual size (px); the hit area is padded separately
-const HIT_MIN = 26;      // minimum clickable target (px) for the tiny inner worlds
+const SIZE_EXP = 0.95;   // closer to true diameter ratios — the giants clearly dominate
+const SIZE_BASE = 11;    // Earth's on-screen diameter (px) at full scale
+const SIZE_FLOOR = 7;    // smallest visual size (px); the hit area is padded separately
+const HIT_MIN = 28;      // minimum clickable target (px) for the tiny inner worlds
 
 // Distances along the diagonal from the corner Sun, as a fraction of the frame
-// diagonal. Real AU compressed by a power law: the four inner worlds cluster
-// near the Sun and the giants spread far out — the real proportional layout.
-const DIST_EXP = 0.60;   // 1 = true linear AU; <1 pulls the outer giants inward
-const DIST_NEAR = 0.15;  // Mercury's distance from the Sun (fraction of diagonal)
-const DIST_FAR = 0.99;   // Neptune's distance (fraction of diagonal)
+// diagonal. Real AU compressed by a gentle power law: the four inner worlds
+// hug the Sun and the giants reach far out — close to the true proportions.
+const DIST_EXP = 0.72;   // 1 = true linear AU; nearer 1 = more realistic spread
+const DIST_NEAR = 0.12;  // Mercury's distance from the Sun (fraction of diagonal)
+const DIST_FAR = 0.94;   // Neptune's distance (fraction of diagonal)
 
-// The Sun: a huge corner light. Its center sits just off the top-left corner.
-const SUN_SIZE = 440;    // Sun core diameter (px) at full scale
-const SUN_CX = -0.05;    // Sun center X as a fraction of frame width  (off-frame)
-const SUN_CY = -0.09;    // Sun center Y as a fraction of frame height (off-frame)
+// The Sun: a corner light anchored at the TRUE top-leading corner of the hero
+// card (the universe is full-bleed now). Its core sits mostly off-frame so only
+// the blazing limb + halo enter — a real corner star, never a disc floating in
+// the middle of the frame, sliced by the container edge.
+const SUN_SIZE = 380;    // Sun core diameter (px) at full scale
+const SUN_CX = 0.015;    // Sun center X as a fraction of frame width  (at the corner)
+const SUN_CY = -0.02;    // Sun center Y as a fraction of frame height (just off-frame)
 
-// The diagonal the planets fan along, measured from +x (right) toward +y (down).
-const FAN_ANGLE_DEG = 42;   // base diagonal direction toward the bottom-right
-const FAN_SPREAD_DEG = 8;   // static per-planet spread so they don't sit on one line
-const FAN_SWAY_DEG = 6;     // live longitude offsets each planet's resting angle ±this
-const ORBIT_SWAY_DEG = 7;   // slow orbital oscillation amplitude around the resting angle
+// Planets ride arms that PIVOT AT THE SUN. The arm angle sweeps the visible
+// quadrant, driven by each planet's live (scroll-advanced) longitude, so the
+// whole system visibly REVOLVES around the corner Sun as you scroll — the inner
+// worlds fast, the giants slow (their real differential rates).
+const FAN_CENTER_DEG = 46;  // centre of the swing, toward the bottom-trailing diagonal
+const FAN_SPREAD_DEG = 7;   // static per-planet offset so the arms don't stack on one line
+const FAN_SWEEP_DEG = 34;   // half-amplitude of the orbital swing across the quadrant
+const ORBIT_IDLE_DEG = 3;   // tiny continuous sway so the system breathes even at rest
 
 // Axial spin period (s) per planet — giants whirl fast, the inner worlds turn
 // slow, matching the real qualitative ordering. The surface scrolls under the
@@ -734,10 +741,13 @@ const Planet = ({ planet, date, frame, onFocus, reduced }: { planet: PlanetData;
   const r = rFrac * diag;
   const idx = PLANET_ORDER.indexOf(planet.id);
   const spread = (idx / (PLANET_ORDER.length - 1) - 0.5) * 2 * FAN_SPREAD_DEG;
-  // Resting arm angle: base diagonal + static spread + a live-longitude offset
-  // (the real ephemeris still drives the layout). STATIC transform, so the
-  // per-minute clock tick can't restart the spin/orbit animations below.
-  const restAngle = FAN_ANGLE_DEG + spread + Math.sin(planetLongitude(planet.id, date) * DEG) * FAN_SWAY_DEG;
+  // Arm angle = swing centre + static spread + a FULL orbital swing driven by the
+  // live (scroll-advanced) longitude. As you scroll, time fast-forwards, the
+  // longitude advances, and each arm sweeps across the visible quadrant around
+  // the Sun pivot — inner worlds many times, giants barely: real differential
+  // revolution. STATIC transform, so the per-minute clock tick can't restart the
+  // spin / idle-sway animations nested below.
+  const restAngle = FAN_CENTER_DEG + spread + Math.sin(planetLongitude(planet.id, date) * DEG) * FAN_SWEEP_DEG;
 
   const sx = SUN_CX * frame.W, sy = SUN_CY * frame.H; // pivot = Sun centre
 
@@ -754,11 +764,12 @@ const Planet = ({ planet, date, frame, onFocus, reduced }: { planet: PlanetData;
     <div className="absolute" style={{ left: sx, top: sy, width: 0, height: 0, zIndex: 2 }}>
       {/* Static resting angle (fed by the live longitude). */}
       <div style={{ transformOrigin: '0px 0px', transform: `rotate(${restAngle}deg)` }}>
-        {/* Slow orbital oscillation around the resting angle. */}
+        {/* Tiny continuous idle sway so the system still breathes at rest (the big
+            revolution comes from the scroll-driven restAngle above). */}
         <motion.div
           className="will-change-transform"
           style={{ transformOrigin: '0px 0px' }}
-          animate={reduced ? { rotate: 0 } : { rotate: [-ORBIT_SWAY_DEG, ORBIT_SWAY_DEG, -ORBIT_SWAY_DEG] }}
+          animate={reduced ? { rotate: 0 } : { rotate: [-ORBIT_IDLE_DEG, ORBIT_IDLE_DEG, -ORBIT_IDLE_DEG] }}
           transition={reduced ? undefined : { duration: orbitDur, repeat: Infinity, ease: 'easeInOut' }}
         >
           {/* Planet at distance r along the arm's local +x. */}
@@ -960,7 +971,17 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
      ))}
     </>
    )}
-   <PlanetFocus planet={focused} date={date} onClose={() => setFocused(null)} reduced={prefersReducedMotion} />
+   {/* The focus "game" view is position:fixed, but the hero Card around us
+       establishes a containing block (perspective + 3D transform) and clips with
+       overflow-hidden — so a plain fixed child would be trapped inside the card.
+       Portal it to <body> so it truly covers the viewport. Gated on `now` so the
+       server and first client render agree (no hydration mismatch). */}
+   {now && typeof document !== 'undefined'
+     ? createPortal(
+         <PlanetFocus planet={focused} date={date} onClose={() => setFocused(null)} reduced={prefersReducedMotion} />,
+         document.body,
+       )
+     : null}
   </div>
  );
 }

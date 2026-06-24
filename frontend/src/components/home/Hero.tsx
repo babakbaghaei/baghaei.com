@@ -92,7 +92,17 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
           className="mb-8"
           contentClassName="p-6 sm:p-9 lg:p-14"
         >
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-12">
+        <div className="relative">
+        {/* Full-bleed live solar system: the Sun blazes from the card's
+            top-leading corner — clipped by the card's OWN rounded edge, so it
+            reads as light entering the frame, never a disc floating mid-panel
+            sliced by a straight container edge. Planets revolve across the whole
+            card behind the copy. Negative inset cancels the Card's padding so it
+            reaches the true card corners. */}
+        <div className="pointer-events-none absolute -inset-6 sm:-inset-9 lg:-inset-14 overflow-hidden rounded-[1.75rem] sm:rounded-[2.25rem] lg:rounded-[3rem]">
+          <GlobalUniverse />
+        </div>
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-12 min-h-[320px] sm:min-h-[420px] lg:min-h-[540px]">
           <motion.div
             className="order-1 space-y-6 flex flex-col items-start text-right"
             initial="hidden"
@@ -162,9 +172,10 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
             </motion.div>
           </motion.div>
 
-          <div className="order-2 h-[280px] sm:h-[360px] lg:h-[500px] w-full relative">
-            <GlobalUniverse />
-          </div>
+          {/* In RTL this trailing column is the LEFT side, where the corner Sun
+              sits. pointer-events-none so the planets behind it stay clickable. */}
+          <div className="order-2 hidden lg:block pointer-events-none" aria-hidden />
+        </div>
         </div>
         </Card>
 
