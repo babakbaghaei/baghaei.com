@@ -281,12 +281,16 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
           `translate(-50%, -50%) translate(${(-hAccum * 0.03).toFixed(1)}px, ${(-vAccum * 0.03).toFixed(1)}px) rotate(-24deg)`;
       }
 
-      // Scroll velocity (active axis) drives ONLY a subtle brightness lift — no
-      // streaking. The earlier elongation read as ugly vertical "rain" and was
-      // the exact thing the field is meant to avoid.
+      // Scroll velocity (active axis) drives a SUBTLE brightness lift + a short
+      // motion trail. The trail is tiny and hard-capped so a fast fling makes a
+      // gentle streak, never the screen-filling vertical "rain" the earlier
+      // version produced (that bug pinned speed→1 for every star, so every dot
+      // became a full line). This is the effect dialled WAY down, not removed.
       const axisDelta = pinActive ? dH * H_TRAVEL : dV * V_TRAVEL;
       velRef.current = velRef.current + (axisDelta - velRef.current) * 0.15;
-      const speed = Math.min(Math.abs(velRef.current) * 0.05, 1); // 0..1 normalised
+      const signedVel = velRef.current;
+      const speed = Math.min(Math.abs(signedVel) * 0.05, 1); // 0..1 normalised
+      const trailDir = signedVel >= 0 ? 1 : -1;
 
       starsRef.current?.forEach(s => {
         const xPos = wrapMod(s.x + hAccum * s.parallax, width);
@@ -300,15 +304,30 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
           0.5
         );
 
-        // Trail length scales with scroll speed and the star's parallax depth,
-        // but is HARD-capped so even a fast fling makes short tasteful trails —
-        // never a screen-filling "rain". At rest streak→0 and we fall back to
-        // the calm, readable dot.
-        // Calm dot — never a line. Scroll reactivity lives in `alpha` above.
-        ctx.fillStyle = `rgba(${starColor}, ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(xPos, yPos, s.size, 0, Math.PI * 2);
-        ctx.fill();
+        // Short trail along the ACTIVE scroll axis (horizontal while the pin is
+        // engaged, vertical otherwise). Scales with speed × the star's parallax
+        // depth so only near/fast stars elongate, hard-capped at 12px so even a
+        // regression can never bring the "rain" back. Below ~1.5px we draw the
+        // calm round dot. Under reduced motion: always a dot.
+        const trail = prefersReducedMotion
+          ? 0
+          : Math.min(speed * s.parallax * 70, 12);
+
+        if (trail > 1.5) {
+          ctx.strokeStyle = `rgba(${starColor}, ${alpha * 0.8})`;
+          ctx.lineWidth = s.size;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(xPos, yPos);
+          if (pinActive) ctx.lineTo(xPos - trailDir * trail, yPos);
+          else ctx.lineTo(xPos, yPos - trailDir * trail);
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = `rgba(${starColor}, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(xPos, yPos, s.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
       });
     };
 
