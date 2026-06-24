@@ -125,8 +125,11 @@ export default function Navbar() {
         <NavItem
          label={link.label}
          isActive={currentActive === link.id}
-         aria-haspopup={link.hasDropdown ? 'menu' : undefined}
+         // Disclosure pattern: the dropdown reveals a labelled region (not a
+         // menu/listbox/dialog), so aria-haspopup would be a lie. aria-expanded
+         // + aria-controls on the trigger is the correct contract for AT.
          aria-expanded={link.hasDropdown ? openMenu === link.id : undefined}
+         aria-controls={link.hasDropdown ? 'mega-menu-panel' : undefined}
          onClick={() => {
           if (link.id === 'tools') { router.push('/tools'); return; }
           if (link.id === 'about') { router.push('/about'); return; }
@@ -150,7 +153,7 @@ export default function Navbar() {
        type="button"
        onClick={() => window.dispatchEvent(new CustomEvent('command-menu:open'))}
        aria-label="جستجو"
-       className="flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full px-2.5 text-muted-foreground outline-none transition-colors hover:text-foreground hover:bg-secondary focus-visible:ring-2 focus-visible:ring-primary/50"
+       className="flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full px-2.5 text-muted-foreground outline-none transition-colors hover:text-foreground hover:bg-secondary focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
        <Search aria-hidden="true" className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />
       </button>
@@ -177,7 +180,7 @@ export default function Navbar() {
       }}
       aria-label="باز کردن منو"
       aria-haspopup="menu"
-      className="p-3 bg-primary text-primary-foreground rounded-full active:scale-90 transition-transform shadow-xl outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+      className="p-3 bg-primary text-primary-foreground rounded-full active:scale-90 transition-transform shadow-xl outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
      >
       <Menu aria-hidden="true" className="w-5 h-5" />
      </button>
@@ -187,6 +190,7 @@ export default function Navbar() {
     <AnimatePresence>
      {openMenu && (
       <motion.div
+       id="mega-menu-panel"
        role="region"
        aria-label={openMenu === 'projects' ? 'محصولات و پلتفرم‌ها' : 'جعبه ابزار'}
        initial={{ opacity: 0, y: -10 }}

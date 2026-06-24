@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useLenis } from 'lenis/react';
 import Link from 'next/link';
 import ProjectModal from './ProjectModal';
 import { Project, ProjectCard } from '../ui/ProjectCard';
@@ -43,7 +44,7 @@ function SquareToolCard({ tool }: { tool: Tool }) {
   return (
     <Link
       href={`/tools/${tool.slug}`}
-      className="block h-full w-full rounded-[1.75rem] outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+      className="block h-full w-full rounded-[1.75rem] outline-none focus-visible:ring-2 focus-visible:ring-foreground/60"
     >
       <Card
         glowColor={`rgba(${accent}, 0.22)`}
@@ -93,6 +94,31 @@ function PinnedRow({ children }: { children: React.ReactNode }) {
  const rowRef = useRef<HTMLDivElement>(null);
  const overflowRef = useRef(0);
  const [pinHeight, setPinHeight] = useState('100vh');
+ const lenis = useLenis();
+
+ // Keyboard reveal: a card/link tabbed-to while it is translated outside the
+ // viewport would otherwise receive an invisible focus (the row is moved by a
+ // transform, so the browser can't scroll it into view). Map the element's live
+ // horizontal offset back to the vertical scroll that drives the pin and glide
+ // there, so focus order stays visible. RTL_SIGN: +1px scroll → +1px translate,
+ // so the scroll delta equals the horizontal delta needed to centre the element.
+ const revealOnFocus = (e: React.FocusEvent<HTMLDivElement>) => {
+  const el = e.target as HTMLElement;
+  const track = pinTrackRef.current;
+  if (!el || el === e.currentTarget || !track) return;
+  const vw = window.innerWidth;
+  const margin = 24;
+  const rect = el.getBoundingClientRect();
+  if (rect.left >= margin && rect.right <= vw - margin) return; // already visible
+  const desiredLeft = Math.max(margin, (vw - rect.width) / 2);
+  const trackTop = track.getBoundingClientRect().top + window.scrollY;
+  const targetY = Math.min(
+   Math.max(window.scrollY + (desiredLeft - rect.left) / RTL_SIGN, trackTop),
+   trackTop + overflowRef.current
+  );
+  if (lenis) lenis.scrollTo(targetY, { duration: 0.4 });
+  else window.scrollTo({ top: targetY });
+ };
 
  const { scrollYProgress } = useScroll({
   target: pinTrackRef,
@@ -140,7 +166,7 @@ function PinnedRow({ children }: { children: React.ReactNode }) {
  return (
   <div ref={pinTrackRef} className="relative -mr-fib-5 md:-mr-fib-8" style={{ height: pinHeight }}>
    <div ref={pinViewportRef} className="sticky top-0 h-screen flex items-center overflow-hidden">
-    <motion.div ref={rowRef} style={{ x }} className="flex items-center gap-0 w-max will-change-transform px-fib-5 md:px-fib-8">
+    <motion.div ref={rowRef} onFocus={revealOnFocus} style={{ x }} className="flex items-center gap-0 w-max will-change-transform px-fib-5 md:px-fib-8">
      {children}
     </motion.div>
    </div>

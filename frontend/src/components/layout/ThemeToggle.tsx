@@ -57,7 +57,7 @@ export function ThemeToggle() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="انتخاب حالت نمایش"
-        className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary"
+        className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <CurrentIcon className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />
       </button>
