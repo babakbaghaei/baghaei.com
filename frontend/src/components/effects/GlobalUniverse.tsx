@@ -18,15 +18,8 @@ interface PlanetData {
   color: string;
   texture: string;
   targetSection: string;
-  isRetrograde?: boolean;
   hasMoon?: boolean;
   hasRing?: boolean;
-}
-
-interface EclipseData {
-  size: number;
-  offset: number;
-  opacity: number;
 }
 
 /**
@@ -41,7 +34,7 @@ export const PLANETS_DATA: PlanetData[] = [
  },
  { 
    id: 'venus', name: 'زهره', enName: 'Venus', diameter: 12104, au: 0.72, period: 224.7, 
-   temp: '۴۶۴°C', mass: '۴.۸ × ۱۰²۴ kg', color: '#E3BB76', isRetrograde: true, 
+   temp: '۴۶۴°C', mass: '۴.۸ × ۱۰²۴ kg', color: '#E3BB76',
    texture: 'linear-gradient(45deg, #E3BB76, #A67C37)',
    targetSection: 'philosophy'
  },
@@ -71,7 +64,7 @@ export const PLANETS_DATA: PlanetData[] = [
  },
  { 
    id: 'uranus', name: 'اورانوس', enName: 'Uranus', diameter: 51118, au: 19.22, period: 30589, 
-   temp: '-۱۹۵°C', mass: '۸.۶ × ۱۰²۵ kg', color: '#B5E3E3', isRetrograde: true, 
+   temp: '-۱۹۵°C', mass: '۸.۶ × ۱۰²۵ kg', color: '#B5E3E3',
    texture: 'radial-gradient(circle at 50% 50%, #B5E3E3, #5DA5A5)',
    targetSection: 'contact'
  },
@@ -114,8 +107,11 @@ const norm360 = (deg: number) => ((deg % 360) + 360) % 360;
 const norm180 = (deg: number) => { const x = norm360(deg); return x > 180 ? x - 360 : x; };
 
 // Days elapsed since the J2000.0 epoch (2000-01-01 12:00 TT, JD 2451545.0).
+// getTime() is UTC; ephemeris time is TT, which leads UTC by ΔT (~69s in 2025).
+// The constant offset keeps planetary/lunar longitudes on the TT timescale the
+// orbital elements assume — sub-arcsecond, but free correctness.
 const daysSinceJ2000 = (date: Date) =>
-  date.getTime() / 86400000 + 2440587.5 - 2451545.0;
+  date.getTime() / 86400000 + 2440587.5 - 2451545.0 + 69.2 / 86400;
 
 // True heliocentric ecliptic longitude (deg) of a planet at a given instant.
 const planetLongitude = (id: string, date: Date) => {
@@ -137,13 +133,32 @@ const planetLongitude = (id: string, date: Date) => {
 // Sun's geocentric longitude is opposite Earth's heliocentric longitude.
 const sunLongitude = (date: Date) => norm360(planetLongitude('earth', date) + 180);
 
-// Moon's geocentric ecliptic longitude (deg): mean longitude + main elliptic
-// term (Meeus). Good enough for showing the real phase / eclipse timing.
+// Moon's geocentric ecliptic longitude (deg): mean longitude + the four
+// largest periodic terms (Meeus) — equation of centre, evection, variation,
+// and the annual equation. Accurate to ~0.2°, enough that eclipse timing lands
+// on the right day rather than drifting hours.
 const moonLongitude = (date: Date) => {
   const d = daysSinceJ2000(date);
   const meanLon = 218.3164477 + 13.17639648 * d;
-  const meanAnom = (134.9633964 + 13.06499295 * d) * DEG;
-  return norm360(meanLon + 6.289 * Math.sin(meanAnom));
+  const M = (134.9633964 + 13.06499295 * d) * DEG;   // Moon mean anomaly
+  const D = (297.8501921 + 12.19074912 * d) * DEG;   // mean elongation Moon–Sun
+  const Msun = (357.5291092 + 0.98560028 * d) * DEG; // Sun mean anomaly
+  return norm360(
+    meanLon +
+      6.289 * Math.sin(M) +
+      1.274 * Math.sin(2 * D - M) +
+      0.658 * Math.sin(2 * D) -
+      0.186 * Math.sin(Msun)
+  );
+};
+
+// Moon's ecliptic latitude (deg). Principal term in the argument of latitude F.
+// This is what decides whether a syzygy is a real eclipse: the Moon must be
+// within ~1.5° of the ecliptic, which is why most new/full moons miss.
+const moonLatitude = (date: Date) => {
+  const d = daysSinceJ2000(date);
+  const F = (93.272095 + 13.22935024 * d) * DEG; // mean argument of latitude
+  return 5.1281 * Math.sin(F);
 };
 
 // Map a real ecliptic longitude (0°=+x, increasing counter-clockwise) to the
@@ -177,7 +192,7 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const milkyRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
-  const starsRef = useRef<{ x: number, y: number, size: number, opacity: number, parallax: number, twinkle: number }[] | null>(null);
+  const starsRef = useRef<{ x: number, y: number, size: number, opacity: number, parallax: number, twinkle: number, color: string }[] | null>(null);
   // Track scrollProgress in a ref so updating it never tears down / restarts
   // the requestAnimationFrame loop (which previously happened on every scroll
   // frame and was the main cause of jank / the tab locking up).
@@ -202,17 +217,28 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
     // Constant areal density instead of magic per-breakpoint counts: ~1 star per
     // 2000px² of viewport, clamped so phones never go sparse and 4K never turns
     // to noise. Density now reads consistent on every display.
-    const starCount = Math.max(280, Math.min(Math.round((vw * vh) / 2000), 1000));
-    starsRef.current = [...Array(starCount)].map(() => ({
-      x: Math.random() * 5000,
-      y: Math.random() * 5000,
-      size: 0.2 + Math.random() * 1.8,
-      // Lower opacity ceiling (~0.4 vs 0.65) keeps foreground text readable
-      // while the twinkle below still gives the field life.
-      opacity: 0.08 + Math.random() * 0.32,
-      parallax: 0.02 + Math.random() * 0.2,
-      twinkle: 1 + Math.random() * 4
-    }));
+    // Discount by devicePixelRatio: a 2× retina panel paints every star across
+    // 4 physical pixels, so the same areal count costs ~4× the fill. Thinning
+    // it keeps the field calm and cheap on high-DPR screens without going sparse.
+    const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
+    const starCount = Math.max(220, Math.min(Math.round((vw * vh) / (2000 * Math.max(dpr, 1))), 900));
+    starsRef.current = [...Array(starCount)].map(() => {
+      // Weighted tint: mostly white, a fifth cool indigo, a tenth warm amber —
+      // seeds the brand palette into the field at zero extra draw cost.
+      const r = Math.random();
+      const color = r < 0.7 ? '255, 255, 255' : r < 0.9 ? '160, 180, 255' : '255, 210, 150';
+      return {
+        x: Math.random() * 5000,
+        y: Math.random() * 5000,
+        size: 0.2 + Math.random() * 1.8,
+        // Lower opacity ceiling (~0.4 vs 0.65) keeps foreground text readable
+        // while the twinkle below still gives the field life.
+        opacity: 0.08 + Math.random() * 0.32,
+        parallax: 0.02 + Math.random() * 0.2,
+        twinkle: 1 + Math.random() * 4,
+        color,
+      };
+    });
   }
 
   useEffect(() => {
@@ -292,9 +318,15 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       const speed = Math.min(Math.abs(signedVel) * 0.05, 1); // 0..1 normalised
       const trailDir = signedVel >= 0 ? 1 : -1;
 
+      // Stars use 'screen' on the dark theme so overlapping/parallaxed dots add
+      // light (a soft bloom) instead of overwriting; normal blend for light mode.
+      ctx.globalCompositeOperation = isDark ? 'screen' : 'source-over';
+
       starsRef.current?.forEach(s => {
         const xPos = wrapMod(s.x + hAccum * s.parallax, width);
         const yPos = wrapMod(s.y + vAccum * s.parallax, height);
+        // Per-star tint on dark; neutral dark dots on light.
+        const col = isDark ? s.color : starColor;
         const twinkle = prefersReducedMotion
           ? 1
           : 0.7 + Math.sin((now * 0.002 * s.twinkle) + s.x) * 0.3;
@@ -314,7 +346,7 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
           : Math.min(speed * s.parallax * 70, 12);
 
         if (trail > 1.5) {
-          ctx.strokeStyle = `rgba(${starColor}, ${alpha * 0.8})`;
+          ctx.strokeStyle = `rgba(${col}, ${alpha * 0.8})`;
           ctx.lineWidth = s.size;
           ctx.lineCap = 'round';
           ctx.beginPath();
@@ -323,12 +355,13 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
           else ctx.lineTo(xPos, yPos - trailDir * trail);
           ctx.stroke();
         } else {
-          ctx.fillStyle = `rgba(${starColor}, ${alpha})`;
+          ctx.fillStyle = `rgba(${col}, ${alpha})`;
           ctx.beginPath();
           ctx.arc(xPos, yPos, s.size, 0, Math.PI * 2);
           ctx.fill();
         }
       });
+      ctx.globalCompositeOperation = 'source-over';
     };
 
     let animationId = 0;
@@ -396,31 +429,42 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
     <>
       {showMilkyWay && (
         <div aria-hidden className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          {/* Procedural galaxy band, four stacked layers for real depth (no
+              image): broad faint arms, a warm→cool core band, an offset
+              galactic bulge, and a dark central dust rift. The draw loop drives
+              its slow parallax via milkyRef's transform. */}
           <div
             ref={milkyRef}
-            className="absolute left-1/2 top-1/2 h-[170%] w-[62%] -rotate-[24deg] will-change-transform"
-            style={{
-              transform: 'translate(-50%, -50%) rotate(-24deg)',
-              background:
-                'radial-gradient(46% 26% at 50% 50%, rgba(198,203,255,0.13), transparent 72%),' +
-                'linear-gradient(to right, transparent 15%, rgba(150,166,255,0.045) 35%, rgba(228,230,255,0.11) 50%, rgba(150,166,255,0.045) 65%, transparent 85%),' +
-                'linear-gradient(to right, transparent 45%, rgba(6,5,18,0.34) 50%, transparent 55%)',
-              filter: 'blur(14px)',
-              opacity: 0.55,
-            }}
-          />
+            className="absolute left-1/2 top-1/2 h-[180%] w-[140%] will-change-transform"
+            style={{ transform: 'translate(-50%, -50%) rotate(-24deg)' }}
+          >
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent 8%, rgba(150,166,255,0.05) 30%, rgba(170,150,255,0.07) 50%, rgba(150,166,255,0.05) 70%, transparent 92%)', filter: 'blur(26px)' }} />
+            <div className="absolute left-1/2 top-1/2 h-[44%] w-[80%] -translate-x-1/2 -translate-y-1/2" style={{ background: 'linear-gradient(to right, transparent 12%, rgba(255,225,180,0.06) 40%, rgba(220,225,255,0.13) 50%, rgba(190,205,255,0.06) 60%, transparent 88%)', filter: 'blur(16px)' }} />
+            <div className="absolute left-[42%] top-1/2 h-[34%] w-[26%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: 'radial-gradient(circle, rgba(255,236,200,0.16), rgba(210,200,255,0.06) 55%, transparent 75%)', filter: 'blur(14px)' }} />
+            <div className="absolute left-1/2 top-1/2 h-[60%] w-[6%] -translate-x-1/2 -translate-y-1/2" style={{ background: 'linear-gradient(to right, transparent, rgba(4,3,14,0.55) 50%, transparent)', filter: 'blur(6px)' }} />
+          </div>
         </div>
       )}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
+      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 w-full h-full pointer-events-none z-0" />
+      {showMilkyWay && (
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{ background: 'radial-gradient(ellipse 120% 90% at 50% 42%, transparent 52%, rgba(0,0,0,0.5) 100%)' }}
+        />
+      )}
     </>
   );
 };
 
-const PlanetBody = ({ planet, eclipseData, moonRotate = 0, moonEclipse }: { planet: PlanetData, eclipseData: EclipseData | null, moonRotate?: number, moonEclipse?: { isSolar: boolean, isLunar: boolean } }) => {
+const PlanetBody = ({ planet, moonRotate = 0, moonEclipse }: { planet: PlanetData, moonRotate?: number, moonEclipse?: { isSolar: boolean, isLunar: boolean } }) => {
  const earthDiameter = 12756;
  const earthSizeBase = 4;
  const pSize = (planet.diameter / earthDiameter) * earthSizeBase;
- const finalSize = planet.diameter > 50000 ? 10 + Math.log10(planet.diameter/10000) * 12 : pSize + 2;
+ // Two display-scaling regimes: linear (Earth-relative) for the small inner
+ // worlds, log10 compression for the gas giants so Jupiter doesn't dwarf the
+ // hero. 9.3 makes the two branches meet continuously at the 50000 km seam.
+ const finalSize = planet.diameter > 50000 ? 9.3 + Math.log10(planet.diameter/10000) * 12 : pSize + 2;
 
  const isClickable = !!planet.targetSection;
  const goToSection = () => {
@@ -463,30 +507,20 @@ const PlanetBody = ({ planet, eclipseData, moonRotate = 0, moonEclipse }: { plan
 
    {planet.id === 'earth' && moonEclipse?.isSolar && (
      <div className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center">
-        <div className="w-[20%] h-[20%] bg-black/90 rounded-full blur-[1px] shadow-[0_0_8px_black]" />
-     </div>
-   )}
-
-   {eclipseData && (
-     <div className="absolute inset-0 rounded-full overflow-hidden z-30 pointer-events-none" style={{ opacity: eclipseData.opacity }}>
-        <div
-          className="absolute bg-black/90 rounded-full blur-[2px]"
-          style={{
-            width: `${eclipseData.size * 100}%`,
-            height: `${eclipseData.size * 100}%`,
-            left: '50%', top: '100%',
-            transform: `translate(-50%, -70%) translateX(${eclipseData.offset * 80}%)`,
-            boxShadow: '0 0 10px 3px rgba(0,0,0,0.6)'
-          }}
-        />
+        {/* A real solar-eclipse shadow seen from space: a soft penumbra ring
+            around a dark umbra core, with a thin warm atmospheric limb — not a
+            flat black dot. */}
+        <div className="absolute w-[44%] h-[44%] rounded-full" style={{ background: 'radial-gradient(circle, rgba(0,0,0,0.85) 28%, rgba(0,0,0,0.32) 62%, transparent 82%)' }} />
+        <div className="absolute w-[16%] h-[16%] rounded-full bg-black/90" style={{ boxShadow: '0 0 4px 1px rgba(255,120,30,0.5)' }} />
      </div>
    )}
 
    {planet.hasRing && (
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280%] h-[20%] rounded-full rotate-[15deg] pointer-events-none" 
-     style={{ 
-       background: `radial-gradient(ellipse at center, transparent 45%, ${planet.color}33 46%, ${planet.color}11 65%, transparent 70%)`, 
-       border: `1px solid ${planet.color}22` 
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300%] h-[26%] rounded-[50%] rotate-[27deg] pointer-events-none"
+     style={{
+       // Real ring structure: faint C ring, bright B ring, the dark Cassini
+       // division, then the A ring — at Saturn's true ~26.7° axial tilt.
+       background: `radial-gradient(ellipse at center, transparent 38%, ${planet.color}22 41%, ${planet.color}55 49%, transparent 56%, transparent 59%, ${planet.color}66 62%, ${planet.color}33 72%, transparent 77%)`,
      }}
     />
    )}
@@ -503,7 +537,7 @@ const PlanetBody = ({ planet, eclipseData, moonRotate = 0, moonEclipse }: { plan
             width: 2, height: 2, 
             backgroundColor: moonEclipse?.isLunar ? '#7f1d1d' : '#d1d5db',
             boxShadow: moonEclipse?.isLunar ? '0 0 5px #ef4444' : '0 0 4px rgba(255,255,255,0.8)',
-            zIndex: (moonRotate % 360) > 180 ? 10 : 30
+            zIndex: (moonRotate % 360) > 180 ? 30 : 10
         }} 
       />
      </motion.div>
@@ -513,7 +547,7 @@ const PlanetBody = ({ planet, eclipseData, moonRotate = 0, moonEclipse }: { plan
  );
 };
 
-const Planet = ({ planet, date, allPlanets }: { planet: PlanetData, date: Date, allPlanets: PlanetData[] }) => {
+const Planet = ({ planet, date }: { planet: PlanetData, date: Date }) => {
  const pDist = 45 + Math.pow(planet.au, 0.55) * 140;
 
  // Real heliocentric longitude → on-screen orbital angle.
@@ -529,44 +563,36 @@ const Planet = ({ planet, date, allPlanets }: { planet: PlanetData, date: Date, 
     moonRotate = norm360(180 - elongation);
     const distNew = Math.min(elongation, 360 - elongation);
     const distFull = Math.abs(elongation - 180);
-    if (distNew < 3) moonEclipse.isSolar = true;
-    if (distFull < 3) moonEclipse.isLunar = true;
+    // A syzygy is an eclipse only when the Moon is ALSO near the ecliptic
+    // (|β| small) — otherwise its shadow misses Earth above/below. Without this
+    // every new/full moon falsely eclipses (~25/yr instead of the real 4–7).
+    const beta = Math.abs(moonLatitude(date));
+    if (distNew < 1 && beta < 1.4) moonEclipse.isSolar = true;
+    if (distFull < 1 && beta < 1.0) moonEclipse.isLunar = true;
  }
 
- let bestEclipse: EclipseData | null = null;
- for (const p of allPlanets) {
-    if (p.au >= planet.au) continue;
-
-    const innerAngle = planetLongitude(p.id, date);
-    const diff = ((innerAngle - currentAngle + 180 + 360) % 360) - 180;
-    
-    const outerAngRadius = (planet.diameter / (2 * planet.au * 1.5e8)) * 500000;
-    const innerAngRadius = (p.diameter / (2 * p.au * 1.5e8)) * 500000;
-    const threshold = innerAngRadius + outerAngRadius;
-    
-    if (Math.abs(diff) < threshold) {
-        const shadowSizeRatio = (p.diameter / p.au) / (planet.diameter / planet.au);
-        const offset = diff / outerAngRadius;
-        // Planet-on-planet occultations are astronomically near-invisible, so
-        // keep the hint subtle (cap opacity) and proportional (clamp the
-        // relative angular size) instead of a dramatic, inaccurate black blob.
-        const opacity = Math.max(0, 1 - Math.abs(diff) / threshold) * 0.55;
-        const size = Math.min(shadowSizeRatio, 1.3);
-
-        if (!bestEclipse || opacity > bestEclipse.opacity) {
-            bestEclipse = { size, offset, opacity };
-        }
-    }
- }
+ // Depth of field: the outer giants read as "further away", so soften them a
+ // touch while the inner four stay crisp. Purely cosmetic — never touches the
+ // real position/longitude.
+ const dof = planet.au > 5 ? Math.min((planet.au - 5) * 0.06, 1.3) : 0;
 
  return (
   <div className="absolute pointer-events-none" style={{ width: pDist * 2, height: pDist * 2, left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
-   <div className="absolute inset-0 border rounded-full opacity-[0.08]" style={{ borderColor: planet.color }} />
+   {/* Orbit ring — now actually visible: a faint tinted stroke with a soft
+       same-hue glow, instead of the old sub-pixel border that anti-aliased to
+       nothing. */}
+   <div
+    className="absolute inset-0 rounded-full"
+    style={{
+      border: `1px solid ${planet.color}26`,
+      boxShadow: `0 0 10px ${planet.color}1a, inset 0 0 12px ${planet.color}12`,
+    }}
+   />
    <motion.div
     className="absolute inset-0 will-change-transform"
-    style={{ rotate: longitudeToScreenAngle(currentAngle) }}
+    style={{ rotate: longitudeToScreenAngle(currentAngle), filter: dof ? `blur(${dof}px)` : undefined }}
    >
-    <PlanetBody planet={planet} eclipseData={bestEclipse} moonRotate={moonRotate} moonEclipse={moonEclipse} />
+    <PlanetBody planet={planet} moonRotate={moonRotate} moonEclipse={moonEclipse} />
    </motion.div>
   </div>
  );
@@ -575,10 +601,18 @@ const Planet = ({ planet, date, allPlanets }: { planet: PlanetData, date: Date, 
 export default function GlobalUniverse({ renderBackground = false, scrollProgress: externalProgress }: { renderBackground?: boolean, scrollProgress?: number }) {
  const { scrollYProgress } = useScroll();
  const [progress, setProgress] = useState(0);
+ const lastSetRef = useRef(0);
  const prefersReducedMotion = usePrefersReducedMotion();
 
  useEffect(() => {
-    return scrollYProgress.on('change', (v) => setProgress(v));
+    return scrollYProgress.on('change', (v) => {
+      // Throttle the React re-render: planets + parallax only need ~1px
+      // granularity, so skip sub-threshold deltas instead of re-rendering the
+      // whole solar system 60×/s. Endpoints always commit.
+      if (v !== 0 && v !== 1 && Math.abs(v - lastSetRef.current) < 0.0015) return;
+      lastSetRef.current = v;
+      setProgress(v);
+    });
  }, [scrollYProgress]);
 
  const activeProgress = externalProgress !== undefined ? externalProgress : progress;
@@ -613,31 +647,45 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
  // advances simulated time, so the planets/moon hold a single static position
  // (the declarative motion.div rotations are already neutralised by the root
  // <MotionConfig reducedMotion="user">, this stops the value itself moving).
+ // Cubic ease on the scroll→time mapping: the first third of the scroll drifts
+ // slowly (contemplative), then the orbits accelerate toward the projects
+ // section — a crescendo instead of a flat, mechanical sweep.
+ const easedProgress = activeProgress * activeProgress * activeProgress;
  const date = now
-   ? new Date(now.getTime() + (prefersReducedMotion ? 0 : activeProgress * SCROLL_TIME_SPAN_MS))
+   ? new Date(now.getTime() + (prefersReducedMotion ? 0 : easedProgress * SCROLL_TIME_SPAN_MS))
    : null;
 
  return (
   <div className="absolute inset-0 pointer-events-none z-[50]">
    <div className="absolute inset-0 flex items-center justify-center">
-    <div className="relative w-full h-full">
+    {/* Scale the whole system down on small heroes so the outer planets (the
+        Neptune orbit is ~1000px) don't clip out of a 280px mobile box. */}
+    <div className="relative w-full h-full scale-[0.42] sm:scale-[0.62] md:scale-90 lg:scale-100">
      <motion.div 
       id="sun-element" 
       className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10" 
       style={{ width: 45, height: 45 }}
      >
-      <div className={`absolute inset-[-60px] rounded-full bg-orange-500/10 blur-[40px] ${prefersReducedMotion ? '' : 'animate-pulse'}`} />
-      <div className="absolute inset-[-20px] rounded-full bg-yellow-500/20 blur-[20px]" />
-      <div className="absolute inset-0 rounded-full bg-[#FFD700] shadow-[0_0_40px_rgba(255,165,0,0.6)]" />
-      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,#FFFFFF_0%,#FFD700_40%,#FF8C00_100%)]" />
-      <div className="absolute inset-[10%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.8)_0%,transparent_70%)] opacity-40" />
+      {/* Layered corona: a wide warm bleed into the void → mid amber → tight
+          white-hot core. The outer corona breathes by SCALE (not opacity) so
+          it reads as a living star, not a blinking dot. */}
+      <motion.div
+        className="absolute inset-[-90px] rounded-full"
+        style={{ background: 'radial-gradient(circle, rgba(255,170,60,0.18) 0%, rgba(255,120,20,0.07) 38%, transparent 70%)' }}
+        animate={prefersReducedMotion ? undefined : { scale: [1, 1.12, 1], opacity: [0.85, 1, 0.85] }}
+        transition={prefersReducedMotion ? undefined : { duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <div className="absolute inset-[-44px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(255,200,90,0.28) 0%, rgba(255,150,40,0.12) 45%, transparent 72%)', filter: 'blur(8px)' }} />
+      <div className="absolute inset-[-14px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(255,230,150,0.55) 0%, transparent 70%)', filter: 'blur(4px)' }} />
+      <div className="absolute inset-0 rounded-full bg-[#FFD700] shadow-[0_0_50px_rgba(255,165,0,0.7)]" />
+      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_32%_30%,#FFFFFF_0%,#FFE680_28%,#FFC107_55%,#FF8C00_100%)]" />
+      <div className="absolute inset-[12%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9)_0%,transparent_70%)] opacity-50" />
      </motion.div>
      {date && PLANETS_DATA.map((planet) => (
       <Planet
         key={planet.id}
         planet={planet}
         date={date}
-        allPlanets={PLANETS_DATA}
       />
      ))}
     </div>
