@@ -149,7 +149,7 @@ export default function Navbar() {
       <button
        type="button"
        onClick={() => window.dispatchEvent(new CustomEvent('command-menu:open'))}
-       aria-label="جستجو (Ctrl+K)"
+       aria-label="جستجو"
        className="flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full px-2.5 text-muted-foreground outline-none transition-colors hover:text-foreground hover:bg-secondary focus-visible:ring-2 focus-visible:ring-primary/50"
       >
        <Search aria-hidden="true" className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />

@@ -368,7 +368,7 @@ function MoneyInput({
         placeholder="۰"
         dir="ltr"
         aria-label={label}
-        className="w-full bg-background border-2 border-border rounded-2xl py-5 px-5 pl-14 font-bold font-display text-center focus:border-primary transition-all outline-none text-2xl md:text-4xl placeholder:text-muted/30"
+        className="w-full bg-background border-2 border-border rounded-2xl py-5 px-5 pl-14 font-bold font-display text-center focus:border-foreground/40 transition-all outline-none text-2xl md:text-4xl placeholder:text-muted/30"
       />
       <span className="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-muted-foreground/40">
         {unitLabel(unit)}
@@ -405,7 +405,7 @@ export function Select({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={ariaLabel}
-        className="w-full bg-background border-2 border-border rounded-xl py-3 pr-3 pl-8 font-display text-sm focus:border-primary outline-none transition-all text-foreground appearance-none cursor-pointer text-center min-h-11"
+        className="w-full bg-background border-2 border-border rounded-xl py-3 pr-3 pl-8 font-display text-sm focus:border-foreground/40 outline-none transition-all text-foreground appearance-none cursor-pointer text-center min-h-11"
       >
         {children}
       </select>

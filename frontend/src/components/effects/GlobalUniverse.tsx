@@ -281,11 +281,12 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
           `translate(-50%, -50%) translate(${(-hAccum * 0.03).toFixed(1)}px, ${(-vAccum * 0.03).toFixed(1)}px) rotate(-24deg)`;
       }
 
-      // Streak length follows the velocity on the ACTIVE axis only.
+      // Scroll velocity (active axis) drives ONLY a subtle brightness lift — no
+      // streaking. The earlier elongation read as ugly vertical "rain" and was
+      // the exact thing the field is meant to avoid.
       const axisDelta = pinActive ? dH * H_TRAVEL : dV * V_TRAVEL;
       velRef.current = velRef.current + (axisDelta - velRef.current) * 0.15;
       const speed = Math.min(Math.abs(velRef.current) * 0.05, 1); // 0..1 normalised
-      const dir = velRef.current >= 0 ? 1 : -1;
 
       starsRef.current?.forEach(s => {
         const xPos = wrapMod(s.x + hAccum * s.parallax, width);
@@ -303,21 +304,11 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
         // but is HARD-capped so even a fast fling makes short tasteful trails —
         // never a screen-filling "rain". At rest streak→0 and we fall back to
         // the calm, readable dot.
-        const streak = Math.min(speed * s.parallax * 320, 24);
-        if (streak > 1.2) {
-          ctx.strokeStyle = `rgba(${starColor}, ${alpha})`;
-          ctx.lineWidth = s.size;
-          ctx.beginPath();
-          ctx.moveTo(xPos, yPos);
-          if (pinActive) ctx.lineTo(xPos - dir * streak, yPos);
-          else ctx.lineTo(xPos, yPos - dir * streak);
-          ctx.stroke();
-        } else {
-          ctx.fillStyle = `rgba(${starColor}, ${alpha})`;
-          ctx.beginPath();
-          ctx.arc(xPos, yPos, s.size, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        // Calm dot — never a line. Scroll reactivity lives in `alpha` above.
+        ctx.fillStyle = `rgba(${starColor}, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(xPos, yPos, s.size, 0, Math.PI * 2);
+        ctx.fill();
       });
     };
 

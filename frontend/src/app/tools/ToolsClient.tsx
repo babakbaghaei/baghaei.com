@@ -90,7 +90,7 @@ export default function ToolsIndex() {
               enterKeyHint="search"
               placeholder="جستجوی ابزار…"
               aria-label="جستجوی ابزار"
-              className="w-full bg-card border border-border rounded-2xl py-3.5 pr-11 pl-4 text-sm font-sans focus:border-primary outline-none focus-visible:border-primary transition-colors placeholder:text-muted-foreground/50"
+              className="w-full bg-card border border-border rounded-2xl py-3.5 pr-11 pl-4 text-sm font-sans focus:border-foreground/40 outline-none focus-visible:border-foreground/40 transition-colors placeholder:text-muted-foreground/50"
             />
           </div>
 
