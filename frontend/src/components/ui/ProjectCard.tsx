@@ -27,8 +27,11 @@ export interface Project {
   // Lucide icon name used as the corner mark when there is no brand-logo asset.
   icon?: string;
   images?: string[];
-  // Heavily blur/lock the project's screenshots in the detail modal (NDA work).
+  // Heavily blur/lock the project's screenshots in the detail modal.
   imagesLocked?: boolean;
+  // Why the images are locked. 'nda' (default when unset) → confidential wording;
+  // 'publishing' → softer "being published / coming soon" wording.
+  imagesLockReason?: 'nda' | 'publishing';
   // Keep in data but hide from every public listing (re-enable later).
   hidden?: boolean;
   isLocked: boolean;

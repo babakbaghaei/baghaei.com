@@ -28,6 +28,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(30, 64, 175, 0.4)',
    borderColor: 'rgba(30, 64, 175, 0.8)',
    isLocked: false,
+   imagesLocked: true,
+   imagesLockReason: 'publishing',
    logo: '/assets/projects/kish-airport-fids/logo.png',
    images: ['/assets/projects/kish-airport-fids/01.jpg', '/assets/projects/kish-airport-fids/02.jpg', '/assets/projects/kish-airport-fids/03.jpg', '/assets/projects/kish-airport-fids/04.jpg'],
    tech: ['C++', 'Qt', 'WebSockets', 'Linux']
@@ -43,6 +45,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(153, 27, 27, 0.4)',
    borderColor: 'rgba(153, 27, 27, 0.8)',
    isLocked: false,
+   imagesLocked: true,
+   imagesLockReason: 'publishing',
    icon: 'Globe',
    images: ['/assets/projects/kevany-tuning/01.jpg', '/assets/projects/kevany-tuning/02.jpg'],
    tech: ['WebGL', 'Three.js', 'React', 'Next.js']
@@ -149,6 +153,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(14, 165, 233, 0.3)',
    borderColor: 'rgba(14, 165, 233, 0.8)',
    isLocked: false,
+   imagesLocked: true,
+   imagesLockReason: 'publishing',
    tech: ['Next.js', 'Go', 'Redis', 'Kubernetes']
   },
   {
@@ -176,6 +182,7 @@ export const PROJECTS_DATA: Project[] = [
    borderColor: 'rgba(124, 58, 237, 0.8)',
    isLocked: false,
    imagesLocked: true,
+   imagesLockReason: 'publishing',
    images: ['/assets/projects/darso-platform/01.jpg', '/assets/projects/darso-platform/02.jpg', '/assets/projects/darso-platform/03.jpg', '/assets/projects/darso-platform/04.jpg'],
    tech: ['React', 'GraphQL', 'AWS', 'Node.js']
   },
@@ -206,6 +213,8 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(225, 29, 72, 0.4)',
    borderColor: 'rgba(225, 29, 72, 0.8)',
    isLocked: false,
+   imagesLocked: true,
+   imagesLockReason: 'publishing',
    icon: 'Dumbbell',
    images: ['/assets/projects/royal-aghdasieh-club/01.jpg', '/assets/projects/royal-aghdasieh-club/02.jpg', '/assets/projects/royal-aghdasieh-club/03.jpg', '/assets/projects/royal-aghdasieh-club/04.jpg'],
    tech: ['Branding', 'UI/UX', 'Next.js', 'Prisma']
