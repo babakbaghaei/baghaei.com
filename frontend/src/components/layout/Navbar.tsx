@@ -131,11 +131,12 @@ export default function Navbar() {
          // unmounted (AnimatePresence) while closed and a dangling IDREF is invalid.
          aria-expanded={link.hasDropdown ? openMenu === link.id : undefined}
          onClick={() => {
+          if (link.id === 'projects') { router.push('/projects'); return; }
           if (link.id === 'tools') { router.push('/tools'); return; }
           if (link.id === 'about') { router.push('/about'); return; }
           if (!link.hasDropdown) scrollTo(link.id);
          }}
-         className={`flex items-center gap-1 ${link.hasDropdown && link.id !== 'tools' ? 'cursor-default' : ''}`}
+         className={`flex items-center gap-1 ${link.hasDropdown && link.id !== 'tools' && link.id !== 'projects' ? 'cursor-default' : ''}`}
         />
         {link.hasDropdown && (
          <ChevronDown aria-hidden="true" className={`w-3 h-3 transition-transform duration-300 ${openMenu === link.id ? 'rotate-180' : ''} absolute end-[-14px] top-1/2 -translate-y-1/2`} />
@@ -230,7 +231,7 @@ export default function Navbar() {
                  return (
                    <button
                      key={project.slug ?? project.id}
-                     onClick={() => { setOpenMenu(null); scrollTo('projects'); }}
+                     onClick={() => { setOpenMenu(null); router.push('/projects'); }}
                      className="p-4 rounded-2xl bg-secondary/30 border border-transparent hover:bg-secondary hover:border-border transition-all cursor-pointer group flex items-start gap-3.5 text-right"
                    >
                      <div className="w-10 h-10 rounded-xl bg-muted/10 flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-110 transition-transform">

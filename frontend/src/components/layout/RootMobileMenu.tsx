@@ -18,6 +18,10 @@ export function RootMobileMenu() {
 
  const scrollTo = (id: string) => {
   setIsOpen(false);
+  if (id === 'projects') {
+   router.push('/projects');
+   return;
+  }
   if (id === 'tools') {
    router.push('/tools');
    return;

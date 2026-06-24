@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { motion, useScroll } from 'framer-motion';
+import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
@@ -77,27 +77,39 @@ export const PLANETS_DATA: PlanetData[] = [
  },
 ];
 
-// ── Display scaling — "balanced realistic" ───────────────────────────────────
-// PURELY VISUAL. None of these touch the ephemeris/longitude math, so the live
-// planetary positions, eclipses and Moon phase stay exact regardless of how the
-// system is sized. True linear-to-scale is impossible in a hero box (Neptune is
-// 77× Mercury's distance; a to-scale Earth would sit *inside* the Sun), so we
-// keep the real *ratios* and compress them with a gentle power law:
-//
-//   size  = (diameter / Earth)^SIZE_EXP × SIZE_BASE   → gas giants stay properly
-//           dominant (Jupiter ≈ 8× Earth at exp 0.85) without dwarfing the hero.
-//   orbit = DIST_OFFSET + AU^DIST_EXP × DIST_K        → outer worlds spread far,
-//           inner four still clear the Sun. exp→1 = truer (but clips), exp↓ = tighter.
-//
-// Retune the look by editing only these seven numbers.
+// ── Display scaling — "corner star, real-ratio fan" ─────────────────────────
+// PURELY VISUAL. None of these touch the ephemeris/longitude math below, so the
+// live longitudes, eclipses and Moon phase stay exact. The Sun is anchored just
+// off the TOP-LEFT corner (a dominant light source, partly out of frame); the
+// planets fan DOWN-RIGHT from it along a diagonal at their REAL relative sizes
+// and distances. Every planet is lit from the corner and casts a long dusty
+// shadow cone toward the bottom-right — the "obstacle in front of a light in a
+// dusty night" look the brief asked for. Retune by editing these numbers only.
 const EARTH_DIAMETER_KM = 12756;
-const SIZE_EXP = 0.85;   // 1 = true diameter ratios; <1 tames the giants
-const SIZE_BASE = 7;     // Earth's on-screen diameter (px) — the whole ramp scales off it
-const SIZE_FLOOR = 5;    // smallest visual/click target (px) so Mercury/Mars stay grabbable
-const DIST_EXP = 0.62;   // 1 = true linear AU; <1 pulls the outer giants inward to fit
-const DIST_K = 97;       // orbit-radius scale (px)
-const DIST_OFFSET = 21;  // base inset (px) so the inner orbits sit outside the Sun
-const SUN_SIZE = 88;     // Sun core diameter (px) — kept larger than Jupiter so it dominates
+
+// Sizes: real diameter ratio, gently compressed so the giants dominate without
+// swallowing the frame and the inner worlds stay clickable. Multiplied by the
+// responsive factor `k` at render so the whole system scales with the viewport.
+const SIZE_EXP = 0.82;   // 1 = true diameter ratios; <1 tames the giants
+const SIZE_BASE = 15;    // Earth's on-screen diameter (px) at full scale
+const SIZE_FLOOR = 9;    // smallest visual/click target (px)
+
+// Distances along the diagonal from the corner Sun, as a fraction of the frame
+// diagonal. Real AU compressed by a power law so Mercury clears the Sun's glow
+// and Neptune reaches the far corner.
+const DIST_EXP = 0.58;   // 1 = true linear AU; <1 pulls the outer giants inward
+const DIST_NEAR = 0.20;  // Mercury's distance from the Sun (fraction of diagonal)
+const DIST_FAR = 0.97;   // Neptune's distance (fraction of diagonal)
+
+// The Sun: a huge corner light. Its center sits just off the top-left corner.
+const SUN_SIZE = 440;    // Sun core diameter (px) at full scale
+const SUN_CX = -0.05;    // Sun center X as a fraction of frame width  (off-frame)
+const SUN_CY = -0.09;    // Sun center Y as a fraction of frame height (off-frame)
+
+// The diagonal the planets fan along, measured from +x (right) toward +y (down).
+const FAN_ANGLE_DEG = 40;   // base diagonal direction toward the bottom-right
+const FAN_SPREAD_DEG = 9;   // static per-planet spread so they don't sit on one line
+const FAN_SWAY_DEG = 6;     // live longitude sways each planet ± this (keeps it alive)
 
 /**
  * Live ephemeris — real planetary positions.
@@ -184,19 +196,18 @@ const moonLatitude = (date: Date) => {
   return 5.1281 * Math.sin(F);
 };
 
-// Map a real ecliptic longitude (0°=+x, increasing counter-clockwise) to the
-// CSS rotation of an orbit ring whose body sits at the top. This reproduces a
-// conventional "view from the north" star chart instead of a mirrored one.
-const longitudeToScreenAngle = (lon: number) => norm360(90 - lon);
-
-// Human-readable Persian names for the page sections each planet links to, used
-// to build descriptive aria-labels for the clickable planet controls.
-const SECTION_LABELS: Record<string, string> = {
-  hero: 'خانه',
-  philosophy: 'فلسفه',
-  projects: 'پروژه‌ها',
-  services: 'خدمات',
-  contact: 'تماس',
+// Persian Moon-phase name from the Sun–Moon elongation (0°=new … 180°=full).
+// Shown live in the focused-planet view for Earth.
+const moonPhaseName = (elongation: number) => {
+  const e = norm360(elongation);
+  if (e < 22.5 || e >= 337.5) return 'ماه نو';
+  if (e < 67.5) return 'هلال نو';
+  if (e < 112.5) return 'تربیع اول';
+  if (e < 157.5) return 'احدب فزاینده';
+  if (e < 202.5) return 'بدر';
+  if (e < 247.5) return 'احدب کاهنده';
+  if (e < 292.5) return 'تربیع آخر';
+  return 'هلال کهنه';
 };
 
 // Scrolling the page fast-forwards time so the orbits visibly advance, just
@@ -586,143 +597,269 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
   );
 };
 
-const PlanetBody = ({ planet, moonRotate = 0, moonEclipse }: { planet: PlanetData, moonRotate?: number, moonEclipse?: { isSolar: boolean, isLunar: boolean } }) => {
- // Single continuous power law on the real diameter ratio (see SIZE_* consts):
- // keeps every planet's TRUE relative size — gas giants properly dominant — while
- // a sub-1 exponent compresses the 11× Jupiter/Earth span enough to fit the hero.
- const finalSize = Math.max(SIZE_FLOOR, Math.pow(planet.diameter / EARTH_DIAMETER_KM, SIZE_EXP) * SIZE_BASE);
-
- const isClickable = !!planet.targetSection;
- const goToSection = () => {
-   if (planet.targetSection) {
-     document.getElementById(planet.targetSection)?.scrollIntoView({ behavior: 'smooth' });
-   }
- };
- const sectionLabel = SECTION_LABELS[planet.targetSection] || planet.targetSection;
-
- return (
-  <motion.div
-   {...(isClickable
-     ? {
-         onClick: goToSection,
-         onKeyDown: (e: React.KeyboardEvent) => {
-           if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-             e.preventDefault();
-             goToSection();
-           }
-         },
-         role: 'button',
-         tabIndex: 0,
-         'aria-label': `${planet.name} — رفتن به بخش ${sectionLabel}`,
-       }
-     : { 'aria-hidden': true })}
-   style={{ width: finalSize, height: finalSize, zIndex: 20 }}
-   className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 group/planet active:scale-95 transition-transform rounded-full ${isClickable ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black' : ''}`}
-  >
-   {/* Real Sun lighting. The Sun sits at the orbit centre, and because it's the
-       orbit RING that rotates, that centre is ALWAYS toward the bottom of each
-       planet's local frame — so every planet is lit from below, day-side down,
-       night-side up, regardless of where it is on its orbit. */}
-   {/* Warm sunlight rim spilling out behind the sun-facing edge ("رده نوری"). */}
-   <div
-    className="absolute -inset-[28%] rounded-full pointer-events-none"
-    style={{ background: 'radial-gradient(circle at 50% 82%, rgba(255,238,210,0.55), transparent 60%)', filter: 'blur(3px)', zIndex: 0 }}
-   />
-   <div className="w-full h-full rounded-full relative overflow-hidden shadow-2xl pointer-events-none" style={{ background: planet.texture, zIndex: 10 }}>
-    {/* day-side specular toward the Sun (bottom) */}
-    <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 86%, rgba(255,255,255,0.42) 0%, transparent 54%)' }} />
-    {/* Night side: a RADIAL shadow growing from the anti-solar (top) point, so the
-        terminator curves around the limb like a real lit sphere instead of a flat
-        horizontal band. Soft multi-stop falloff keeps the day→night seam gradual. */}
-    <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 6%, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.62) 28%, rgba(0,0,0,0.22) 48%, transparent 64%)' }} />
-    {/* faint atmospheric back-scatter on the night limb (rim light) */}
-    <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 1px 2px -0.5px rgba(150,170,255,0.18)' }} />
-    {/* bright sunlit limb on the bottom edge */}
-    <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 -1.5px 2.5px -0.5px rgba(255,247,230,0.6)' }} />
-   </div>
-
-   {planet.id === 'earth' && moonEclipse?.isSolar && (
-     <div className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center">
-        {/* A real solar-eclipse shadow seen from space: a soft penumbra ring
-            around a dark umbra core, with a thin warm atmospheric limb — not a
-            flat black dot. */}
-        <div className="absolute w-[44%] h-[44%] rounded-full" style={{ background: 'radial-gradient(circle, rgba(0,0,0,0.85) 28%, rgba(0,0,0,0.32) 62%, transparent 82%)' }} />
-        <div className="absolute w-[16%] h-[16%] rounded-full bg-black/90" style={{ boxShadow: '0 0 4px 1px rgba(255,120,30,0.5)' }} />
-     </div>
-   )}
-
-   {planet.hasRing && (
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300%] h-[26%] rounded-[50%] rotate-[27deg] pointer-events-none"
-     style={{
-       // Real ring structure: faint C ring, bright B ring, the dark Cassini
-       // division, then the A ring — at Saturn's true ~26.7° axial tilt.
-       background: `radial-gradient(ellipse at center, transparent 38%, ${planet.color}22 41%, ${planet.color}55 49%, transparent 56%, transparent 59%, ${planet.color}66 62%, ${planet.color}33 72%, transparent 77%)`,
-     }}
-    />
-   )}
-
-   {planet.hasMoon && (
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ width: 35, height: 35 }}>
-     <motion.div 
-      className="absolute inset-0 will-change-transform" 
-      style={{ rotate: moonRotate }}
-     >
-      <div 
-        className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full transition-colors duration-500" 
-        style={{ 
-            width: 2, height: 2, 
-            backgroundColor: moonEclipse?.isLunar ? '#7f1d1d' : '#d1d5db',
-            boxShadow: moonEclipse?.isLunar ? '0 0 5px #ef4444' : '0 0 4px rgba(255,255,255,0.8)',
-            zIndex: (moonRotate % 360) > 180 ? 30 : 10
-        }} 
-      />
-     </motion.div>
-    </div>
-   )}
-  </motion.div>
- );
+// ── Per-planet surfaces ───────────────────────────────────────────────────────
+// Layered CSS gradients give the now real-ratio-sized planets genuine surface
+// detail (bands, spots, polar caps, clouds) with zero image assets. Listed
+// top→bottom: detail layers first, base sphere colour last.
+const SURFACE: Record<string, string> = {
+  mercury:
+    'radial-gradient(circle at 62% 60%, rgba(0,0,0,0.34) 0 5%, transparent 6%),' +
+    'radial-gradient(circle at 40% 72%, rgba(0,0,0,0.28) 0 4%, transparent 5%),' +
+    'radial-gradient(circle at 70% 34%, rgba(255,255,255,0.10) 0 4%, transparent 5%),' +
+    'radial-gradient(circle at 34% 32%, #c2c2c2, #6f6f6f 55%, #3a3a3a 100%)',
+  venus:
+    'repeating-linear-gradient(26deg, rgba(255,255,255,0.07) 0 7px, transparent 7px 17px),' +
+    'radial-gradient(circle at 36% 30%, #f4dca4, #d8ad5f 58%, #9b7331 100%)',
+  earth:
+    'radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0 7%, transparent 12%),' +
+    'radial-gradient(circle at 30% 64%, rgba(40,120,70,0.92) 0 12%, transparent 19%),' +
+    'radial-gradient(circle at 60% 44%, rgba(36,130,80,0.9) 0 14%, transparent 21%),' +
+    'radial-gradient(circle at 48% 80%, rgba(235,235,245,0.6) 0 9%, transparent 15%),' +
+    'radial-gradient(circle at 33% 30%, #6fb7ea, #2a6fb2 55%, #123769 100%)',
+  mars:
+    'radial-gradient(circle at 50% 13%, rgba(255,255,255,0.78) 0 8%, transparent 11%),' +
+    'radial-gradient(circle at 52% 90%, rgba(255,255,255,0.6) 0 6%, transparent 10%),' +
+    'radial-gradient(circle at 64% 55%, rgba(0,0,0,0.26) 0 11%, transparent 17%),' +
+    'radial-gradient(circle at 34% 30%, #e28a5b, #b6552d 55%, #6d2c16 100%)',
+  jupiter:
+    'radial-gradient(ellipse 16% 11% at 66% 63%, #c1492f, #7c2d1c 70%, transparent 73%),' +
+    'repeating-linear-gradient(0deg, #d9b48f 0 6%, #c0966e 6% 10%, #e7cdab 10% 15%, #b8895f 15% 20%, #ddbd95 20% 25%)',
+  saturn:
+    'repeating-linear-gradient(0deg, #d8c081 0 7%, #c2a766 7% 12%, #e6d4a0 12% 18%, #cdb87f 18% 24%)',
+  uranus:
+    'repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 9%, transparent 9% 19%),' +
+    'radial-gradient(circle at 38% 34%, #cbf1ef, #8fd0d4 60%, #5aa3aa 100%)',
+  neptune:
+    'radial-gradient(ellipse 13% 9% at 60% 66%, rgba(255,255,255,0.22), transparent 70%),' +
+    'repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 11%, transparent 11% 22%),' +
+    'radial-gradient(circle at 38% 32%, #6f8bff, #2f4fc9 58%, #142468 100%)',
 };
 
-const Planet = ({ planet, date }: { planet: PlanetData, date: Date }) => {
- const pDist = DIST_OFFSET + Math.pow(planet.au, DIST_EXP) * DIST_K;
+const PLANET_ORDER = PLANETS_DATA.map((p) => p.id);
+const AU_MIN_POW = Math.pow(0.39, DIST_EXP);
+const AU_MAX_POW = Math.pow(30.06, DIST_EXP);
 
- // Real heliocentric longitude → on-screen orbital angle.
- const currentAngle = planetLongitude(planet.id, date);
+// Earth's live Moon geometry (shared by the fan + the focused view).
+const earthMoon = (date: Date) => {
+  // Elongation of the Moon from the Sun: 0° = new moon, 180° = full moon.
+  const elongation = norm360(moonLongitude(date) - sunLongitude(date));
+  const moonRotate = norm360(180 - elongation);
+  const distNew = Math.min(elongation, 360 - elongation);
+  const distFull = Math.abs(elongation - 180);
+  // A syzygy is an eclipse only when the Moon is ALSO near the ecliptic
+  // (|β| small) — otherwise its shadow misses Earth above/below.
+  const beta = Math.abs(moonLatitude(date));
+  return { elongation, moonRotate, isSolar: distNew < 1 && beta < 1.4, isLunar: distFull < 1 && beta < 1.0 };
+};
 
- const moonEclipse = { isSolar: false, isLunar: false };
- let moonRotate = 0;
- if (planet.id === 'earth') {
-    // Elongation of the Moon from the Sun: 0° = new moon, 180° = full moon.
-    const elongation = norm360(moonLongitude(date) - sunLongitude(date));
-    // Earth's frame points away from the Sun at the top (rotate 0), so the
-    // far-side full moon sits at 0° and the sunward new moon at 180°.
-    moonRotate = norm360(180 - elongation);
-    const distNew = Math.min(elongation, 360 - elongation);
-    const distFull = Math.abs(elongation - 180);
-    // A syzygy is an eclipse only when the Moon is ALSO near the ecliptic
-    // (|β| small) — otherwise its shadow misses Earth above/below. Without this
-    // every new/full moon falsely eclipses (~25/yr instead of the real 4–7).
-    const beta = Math.abs(moonLatitude(date));
-    if (distNew < 1 && beta < 1.4) moonEclipse.isSolar = true;
-    if (distFull < 1 && beta < 1.0) moonEclipse.isLunar = true;
- }
+interface Frame { W: number; H: number; k: number; }
 
- // Depth of field: the outer giants read as "further away", so soften them a
- // touch while the inner four stay crisp. Purely cosmetic — never touches the
- // real position/longitude.
- const dof = planet.au > 5 ? Math.min((planet.au - 5) * 0.06, 1.3) : 0;
+// A lit sphere illuminated from screen-direction `sunDirDeg` (degrees, measured
+// from +x toward +y/down, pointing AT the Sun). Reused by the fan and the
+// focused view; `spin` scrolls the surface bands in the big focused view.
+const PlanetBody = ({ planet, size, sunDirDeg, moonRotate = 0, moonEclipse, spin = false }: { planet: PlanetData; size: number; sunDirDeg: number; moonRotate?: number; moonEclipse?: { isSolar: boolean; isLunar: boolean }; spin?: boolean }) => {
+  const c = Math.cos(sunDirDeg * DEG);
+  const s = Math.sin(sunDirDeg * DEG);
+  // Lit highlight toward the Sun; night shadow grows from the anti-solar point
+  // so the terminator curves around the limb like a real sphere.
+  const lx = 50 + 40 * c, ly = 50 + 40 * s;
+  const nx = 50 - 46 * c, ny = 50 - 46 * s;
+  const hasAtmo = planet.id === 'earth' || planet.id === 'venus' || planet.id === 'neptune' || planet.id === 'uranus';
+  const moonOrbit = size * 2.3;
+  const moonDot = Math.max(2.5, size * 0.26);
+  return (
+    <div className="relative rounded-full" style={{ width: size, height: size }}>
+      <motion.div
+        className="absolute inset-0 overflow-hidden rounded-full shadow-2xl"
+        style={{ background: SURFACE[planet.id] || planet.texture, backgroundSize: spin ? '220% 100%' : 'cover' }}
+        animate={spin ? { backgroundPositionX: ['0%', '-220%'] } : undefined}
+        transition={spin ? { duration: 30, repeat: Infinity, ease: 'linear' } : undefined}
+      >
+        {/* day-side specular toward the Sun */}
+        <div className="absolute inset-0" style={{ background: `radial-gradient(circle at ${lx}% ${ly}%, rgba(255,248,232,0.5) 0%, transparent 46%)` }} />
+        {/* spherical night side / terminator from the anti-solar point */}
+        <div className="absolute inset-0" style={{ background: `radial-gradient(circle at ${nx}% ${ny}%, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.72) 26%, rgba(0,0,0,0.34) 46%, transparent 63%)` }} />
+      </motion.div>
+      {/* atmospheric back-scatter on the sun-facing limb */}
+      {hasAtmo && (
+        <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: `inset ${(2 * c).toFixed(2)}px ${(2 * s).toFixed(2)}px 5px -1px rgba(150,190,255,0.5)` }} />
+      )}
+      {/* bright sunlit crescent on the limb facing the Sun */}
+      <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: `inset ${(1.6 * c).toFixed(2)}px ${(1.6 * s).toFixed(2)}px 2.5px -0.5px rgba(255,247,230,0.65)` }} />
 
- return (
-  <div className="absolute pointer-events-none" style={{ width: pDist * 2, height: pDist * 2, left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
-   {/* No orbit ring drawn — the planets float on invisible orbits. */}
-   <motion.div
-    className="absolute inset-0 will-change-transform"
-    style={{ rotate: longitudeToScreenAngle(currentAngle), filter: dof ? `blur(${dof}px)` : undefined }}
-   >
-    <PlanetBody planet={planet} moonRotate={moonRotate} moonEclipse={moonEclipse} />
-   </motion.div>
-  </div>
- );
+      {planet.hasRing && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300%] h-[26%] rounded-[50%] rotate-[27deg] pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at center, transparent 38%, ${planet.color}22 41%, ${planet.color}55 49%, transparent 56%, transparent 59%, ${planet.color}66 62%, ${planet.color}33 72%, transparent 77%)` }}
+        />
+      )}
+
+      {planet.id === 'earth' && moonEclipse?.isSolar && (
+        <div className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center">
+          <div className="absolute w-[44%] h-[44%] rounded-full" style={{ background: 'radial-gradient(circle, rgba(0,0,0,0.85) 28%, rgba(0,0,0,0.32) 62%, transparent 82%)' }} />
+          <div className="absolute w-[16%] h-[16%] rounded-full bg-black/90" style={{ boxShadow: '0 0 4px 1px rgba(255,120,30,0.5)' }} />
+        </div>
+      )}
+
+      {planet.hasMoon && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ width: moonOrbit, height: moonOrbit }}>
+          <motion.div className="absolute inset-0 will-change-transform" style={{ rotate: moonRotate }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full transition-colors duration-500"
+              style={{ width: moonDot, height: moonDot, backgroundColor: moonEclipse?.isLunar ? '#7f1d1d' : '#d1d5db', boxShadow: moonEclipse?.isLunar ? '0 0 5px #ef4444' : '0 0 4px rgba(255,255,255,0.8)', zIndex: (moonRotate % 360) > 180 ? 30 : 10 }}
+            />
+          </motion.div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Planet = ({ planet, date, frame, onFocus }: { planet: PlanetData; date: Date; frame: Frame; onFocus: (p: PlanetData) => void }) => {
+  const size = Math.max(SIZE_FLOOR, Math.pow(planet.diameter / EARTH_DIAMETER_KM, SIZE_EXP) * SIZE_BASE) * frame.k;
+  const diag = Math.hypot(frame.W, frame.H);
+  // Real-ratio distance along the diagonal (Mercury→Neptune mapped to NEAR→FAR).
+  const rFrac = DIST_NEAR + ((Math.pow(planet.au, DIST_EXP) - AU_MIN_POW) / (AU_MAX_POW - AU_MIN_POW)) * (DIST_FAR - DIST_NEAR);
+  const r = rFrac * diag;
+  const idx = PLANET_ORDER.indexOf(planet.id);
+  const spread = (idx / (PLANET_ORDER.length - 1) - 0.5) * 2 * FAN_SPREAD_DEG;
+  // Live longitude keeps the fan breathing (scroll fast-forwards it).
+  const sway = Math.sin(planetLongitude(planet.id, date) * DEG) * FAN_SWAY_DEG;
+  const theta = (FAN_ANGLE_DEG + spread + sway) * DEG;
+  const sx = SUN_CX * frame.W, sy = SUN_CY * frame.H;
+  const x = sx + r * Math.cos(theta);
+  const y = sy + r * Math.sin(theta);
+  // Direction from this planet toward the Sun (drives lighting + shadow cone).
+  const sunDirDeg = (Math.atan2(sy - y, sx - x) * 180) / Math.PI;
+  const antiDeg = sunDirDeg + 180;
+
+  const m = planet.id === 'earth' ? earthMoon(date) : null;
+  const moonEclipse = { isSolar: m?.isSolar ?? false, isLunar: m?.isLunar ?? false };
+
+  const coneLen = Math.min(size * 11, diag * 0.34);
+  const coneH = Math.max(size * 1.25, 12);
+
+  return (
+    <div className="absolute" style={{ left: x, top: y, transform: 'translate(-50%, -50%)' }}>
+      {/* Dusty shadow cone cast away from the Sun (the "dark line behind the
+          obstacle in a dusty night"): a sharp-ish near edge fading into the haze. */}
+      <div aria-hidden className="absolute pointer-events-none"
+        style={{ left: '50%', top: '50%', width: coneLen, height: coneH, transform: `translateY(-50%) rotate(${antiDeg}deg)`, transformOrigin: '0% 50%', background: 'linear-gradient(90deg, rgba(2,4,12,0.62) 0%, rgba(2,4,12,0.5) 13%, rgba(2,4,12,0.22) 44%, transparent 82%)', borderRadius: '50%', filter: 'blur(3px)', WebkitMaskImage: 'linear-gradient(90deg, #000 0%, #000 7%, transparent 95%)', maskImage: 'linear-gradient(90deg, #000 0%, #000 7%, transparent 95%)', zIndex: 1 }}
+      />
+      <button type="button" onClick={() => onFocus(planet)} aria-label={`نمایش اطلاعات ${planet.name}`}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-auto cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        style={{ width: size, height: size, zIndex: 2 }}>
+        <PlanetBody planet={planet} size={size} sunDirDeg={sunDirDeg} moonRotate={m?.moonRotate ?? 0} moonEclipse={moonEclipse} />
+      </button>
+    </div>
+  );
+};
+
+// The corner Sun: a natural warm-white star (white-hot core → warm amber halo,
+// not a flat gold disc), anchored just off the top-left corner.
+const SunCorner = ({ frame, reduced }: { frame: Frame; reduced: boolean }) => {
+  const d = SUN_SIZE * frame.k;
+  return (
+    <motion.div className="absolute" style={{ left: SUN_CX * frame.W, top: SUN_CY * frame.H, width: d, height: d, transform: 'translate(-50%, -50%)' }}>
+      <motion.div className="absolute rounded-full" style={{ inset: -d * 1.7, background: 'radial-gradient(circle, rgba(255,214,150,0.16) 0%, rgba(255,160,70,0.07) 40%, transparent 72%)' }}
+        animate={reduced ? undefined : { scale: [1, 1.08, 1], opacity: [0.85, 1, 0.85] }}
+        transition={reduced ? undefined : { duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <div className="absolute rounded-full" style={{ inset: -d * 0.85, background: 'radial-gradient(circle, rgba(255,228,180,0.3) 0%, rgba(255,180,90,0.12) 46%, transparent 72%)', filter: 'blur(10px)' }} />
+      <div className="absolute rounded-full" style={{ inset: -d * 0.28, background: 'radial-gradient(circle, rgba(255,246,224,0.6) 0%, transparent 70%)', filter: 'blur(5px)' }} />
+      <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle at 50% 50%, #ffffff 0%, #fff6e0 16%, #ffe2a6 40%, #ffc266 66%, #ff9d3c 100%)', boxShadow: `0 0 ${d * 0.6}px rgba(255,190,110,0.7)` }} />
+      <div className="absolute inset-[14%] rounded-full" style={{ background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0%, transparent 72%)', opacity: 0.55 }} />
+    </motion.div>
+  );
+};
+
+// Focused "game" view: tap a planet → it blooms to centre beside a live data
+// card (current state from the real ephemeris). Backdrop click / Escape closes.
+const PlanetFocus = ({ planet, date, onClose, reduced }: { planet: PlanetData | null; date: Date | null; onClose: () => void; reduced: boolean }) => {
+  useEffect(() => {
+    if (!planet) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [planet, onClose]);
+
+  const big = 300;
+  const m = planet && date && planet.id === 'earth' ? earthMoon(date) : null;
+  const lon = planet && date ? Math.round(planetLongitude(planet.id, date)) : 0;
+  const periodLabel = planet
+    ? planet.period >= 1000
+      ? `${(planet.period / 365.25).toLocaleString('fa-IR', { maximumFractionDigits: 1 })} سال`
+      : `${planet.period.toLocaleString('fa-IR')} روز`
+    : '';
+  const rows: [string, string][] = planet
+    ? [
+        ['قطر', `${planet.diameter.toLocaleString('fa-IR')} کیلومتر`],
+        ['فاصله از خورشید', `${planet.au.toLocaleString('fa-IR')} AU`],
+        ['دورهٔ گردش', periodLabel],
+        ['دما', planet.temp],
+        ['جرم', planet.mass],
+        ['طول دائرةالبروجیِ کنونی', `${lon.toLocaleString('fa-IR')}°`],
+      ]
+    : [];
+
+  return (
+    <AnimatePresence>
+      {planet && (
+        <motion.div
+          className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-auto"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: reduced ? 0 : 0.3 }}
+          onClick={onClose}
+          role="dialog" aria-modal="true" aria-label={`اطلاعات ${planet.name}`}
+        >
+          <div className="absolute inset-0 bg-black/75 backdrop-blur-md" />
+          <motion.div
+            className="relative z-10 mx-4 flex max-w-3xl flex-col items-center gap-8 md:flex-row md:gap-14"
+            initial={reduced ? false : { scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={reduced ? undefined : { scale: 0.9, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 220, damping: 26 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <motion.div
+              className="shrink-0"
+              animate={reduced ? undefined : { y: [0, -10, 0] }}
+              transition={reduced ? undefined : { duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ width: big, height: big }}
+            >
+              <PlanetBody planet={planet} size={big} sunDirDeg={221} moonRotate={m?.moonRotate ?? 0} moonEclipse={{ isSolar: m?.isSolar ?? false, isLunar: m?.isLunar ?? false }} spin={!reduced} />
+            </motion.div>
+
+            <div dir="rtl" className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/5 p-7 text-right backdrop-blur-xl">
+              <div className="mb-5 flex items-baseline justify-between gap-3">
+                <h3 className="font-display text-3xl font-black text-white">{planet.name}</h3>
+                <span className="font-display text-sm text-white/50">{planet.enName}</span>
+              </div>
+              <dl className="space-y-2.5">
+                {rows.map(([label, value]) => (
+                  <div key={label} className="flex items-center justify-between gap-4 border-b border-white/5 pb-2.5 text-sm">
+                    <dt className="font-display text-white/55">{label}</dt>
+                    <dd className="font-display font-bold text-white">{value}</dd>
+                  </div>
+                ))}
+                {planet.id === 'earth' && m && (
+                  <div className="flex items-center justify-between gap-4 pt-1 text-sm">
+                    <dt className="font-display text-white/55">فاز ماه</dt>
+                    <dd className="font-display font-bold text-white">
+                      {moonPhaseName(m.elongation)}
+                      {m.isSolar && <span className="mr-2 rounded-full bg-amber-500/20 px-2 py-0.5 text-[11px] text-amber-300">خورشیدگرفتگی</span>}
+                      {m.isLunar && <span className="mr-2 rounded-full bg-rose-500/20 px-2 py-0.5 text-[11px] text-rose-300">ماه‌گرفتگی</span>}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+          </motion.div>
+
+          <button type="button" onClick={onClose} aria-label="بستن"
+            className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/80 backdrop-blur-md transition-colors hover:bg-white/20 hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-white/80">
+            <span className="text-xl leading-none">✕</span>
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 };
 
 export default function GlobalUniverse({ renderBackground = false, scrollProgress: externalProgress }: { renderBackground?: boolean, scrollProgress?: number }) {
@@ -730,21 +867,18 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
  const [progress, setProgress] = useState(0);
  const prefersReducedMotion = usePrefersReducedMotion();
 
- // Update on every scroll change so the orbits turn smoothly with the scroll.
- // (An earlier delta-throttle here made slow scrolling step/freeze the planets.)
+ // Update on every scroll change so the system advances smoothly with scroll.
  useEffect(() => {
     return scrollYProgress.on('change', (v) => setProgress(v));
  }, [scrollYProgress]);
 
  const activeProgress = externalProgress !== undefined ? externalProgress : progress;
 
- // Live clock for the foreground solar system. Planets are positioned from
- // the real current date, refreshed every minute so the view stays accurate.
+ // Live clock for the foreground solar system. Planets are positioned from the
+ // real current date, refreshed every minute so the view stays accurate.
  const [now, setNow] = useState<Date | null>(null);
  useEffect(() => {
     const tick = () => setNow(new Date());
-    // Defer the first tick out of the effect body to avoid a synchronous
-    // setState (and keep the clock strictly client-side for hydration safety).
     const raf = requestAnimationFrame(tick);
     const id = setInterval(tick, 60000);
     return () => {
@@ -753,65 +887,54 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
     };
  }, []);
 
+ // The corner Sun + the fan are positioned as fractions of the hero box, so we
+ // measure its live pixel size. Until it's known we render no Sun/planets.
+ const frameRef = useRef<HTMLDivElement>(null);
+ const [size, setSize] = useState<{ W: number; H: number } | null>(null);
+ useEffect(() => {
+    const el = frameRef.current;
+    if (!el) return;
+    const measure = () => setSize({ W: el.clientWidth, H: el.clientHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+ }, []);
+
+ const [focused, setFocused] = useState<PlanetData | null>(null);
+
  if (renderBackground) {
     // Observe the canvas so the starfield rAF loop pauses whenever it is
-    // scrolled out of the viewport. The site mounts this inside a `fixed
-    // inset-0` wrapper, so it always intersects and is never wrongly frozen;
-    // the observer only ever pauses it in a non-fixed/scrollable host.
+    // scrolled out of the viewport.
     return <GalaxyBackground scrollProgress={activeProgress} observeVisibility />;
  }
 
  // Avoid a server/client hydration mismatch: render nothing until the
- // client-side clock is set. The base is the real "now" (live), and scrolling
- // fast-forwards time from there so the orbits animate just like before.
- // Under reduced motion we anchor to the live "now" only — scrolling no longer
- // advances simulated time, so the planets/moon hold a single static position
- // (the declarative motion.div rotations are already neutralised by the root
- // <MotionConfig reducedMotion="user">, this stops the value itself moving).
- // Linear scroll→time mapping: the hero only occupies a small slice of total
- // page scroll, so any easing curve (e.g. cubic) collapses that slice to almost
- // no motion and the orbits look frozen. Linear keeps them visibly turning as
- // you scroll through the hero.
+ // client-side clock is set. The base is the real "now" (live); scrolling
+ // fast-forwards simulated time so the fan visibly advances. Under reduced
+ // motion we anchor to "now" only (no scroll-advance).
  const date = now
    ? new Date(now.getTime() + (prefersReducedMotion ? 0 : activeProgress * SCROLL_TIME_SPAN_MS))
    : null;
 
+ const frame: Frame | null = size
+   ? { W: size.W, H: size.H, k: Math.max(0.5, Math.min(1.15, Math.hypot(size.W, size.H) / 1600)) }
+   : null;
+
  return (
-  <div className="absolute inset-0 pointer-events-none z-[50]">
-   <div className="absolute inset-0 flex items-center justify-center">
-    {/* Scale the whole system down on small heroes so the outer planets (the
-        Neptune orbit is ~1000px) don't clip out of a 280px mobile box. */}
-    <div className="relative w-full h-full scale-[0.42] sm:scale-[0.62] md:scale-90 lg:scale-100">
-     <motion.div
-      id="sun-element"
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
-      style={{ width: SUN_SIZE, height: SUN_SIZE }}
-     >
-      {/* Layered corona: a wide warm bleed into the void → mid amber → tight
-          white-hot core. Insets scale off SUN_SIZE so the glow keeps its shape
-          when the core is resized. The outer corona breathes by SCALE (not
-          opacity) so it reads as a living star, not a blinking dot. */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{ inset: -SUN_SIZE * 2, background: 'radial-gradient(circle, rgba(255,170,60,0.18) 0%, rgba(255,120,20,0.07) 38%, transparent 70%)' }}
-        animate={prefersReducedMotion ? undefined : { scale: [1, 1.12, 1], opacity: [0.85, 1, 0.85] }}
-        transition={prefersReducedMotion ? undefined : { duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <div className="absolute rounded-full" style={{ inset: -SUN_SIZE * 0.98, background: 'radial-gradient(circle, rgba(255,200,90,0.28) 0%, rgba(255,150,40,0.12) 45%, transparent 72%)', filter: 'blur(8px)' }} />
-      <div className="absolute rounded-full" style={{ inset: -SUN_SIZE * 0.31, background: 'radial-gradient(circle, rgba(255,230,150,0.55) 0%, transparent 70%)', filter: 'blur(4px)' }} />
-      <div className="absolute inset-0 rounded-full bg-[#FFD700]" style={{ boxShadow: `0 0 ${SUN_SIZE}px rgba(255,165,0,0.7)` }} />
-      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_32%_30%,#FFFFFF_0%,#FFE680_28%,#FFC107_55%,#FF8C00_100%)]" />
-      <div className="absolute inset-[12%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9)_0%,transparent_70%)] opacity-50" />
-     </motion.div>
+  <div ref={frameRef} className="absolute inset-0 overflow-hidden pointer-events-none z-[50]">
+   {/* Warm light scattering through the dusty field, anchored at the corner Sun
+       — this is the haze the shadow cones cut into. */}
+   <div aria-hidden className="absolute inset-0" style={{ background: `radial-gradient(75% 75% at ${SUN_CX * 100}% ${SUN_CY * 100}%, rgba(255,206,140,0.10) 0%, rgba(255,168,82,0.05) 30%, transparent 64%)` }} />
+   {frame && (
+    <>
+     <SunCorner frame={frame} reduced={prefersReducedMotion} />
      {date && PLANETS_DATA.map((planet) => (
-      <Planet
-        key={planet.id}
-        planet={planet}
-        date={date}
-      />
+      <Planet key={planet.id} planet={planet} date={date} frame={frame} onFocus={setFocused} />
      ))}
-    </div>
-   </div>
+    </>
+   )}
+   <PlanetFocus planet={focused} date={date} onClose={() => setFocused(null)} reduced={prefersReducedMotion} />
   </div>
  );
 }

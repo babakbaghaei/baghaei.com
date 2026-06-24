@@ -1,11 +1,11 @@
 // Single canonical source for the primary navigation items.
 //
 // `id` is the in-page section element id (home page) OR a route key the consumer
-// resolves to a route (e.g. 'tools' -> /tools, 'about' -> /about). The products
-// item intentionally points at the real home section element `id="projects"`
-// (verified in src/components/home/Projects.tsx) while labelling it محصولات.
-// `hasDropdown` flags the mega-menu items in the desktop Navbar; the mobile menu
-// and command palette ignore it.
+// resolves to a route (e.g. 'projects' -> /projects, 'tools' -> /tools,
+// 'about' -> /about). Clicking محصولات navigates to the dedicated /projects page
+// (Navbar + RootMobileMenu special-case the id); the `hasDropdown` mega-menu is
+// only a hover preview on desktop. The mobile menu and command palette ignore
+// `hasDropdown`.
 
 export interface NavLink {
  id: string;

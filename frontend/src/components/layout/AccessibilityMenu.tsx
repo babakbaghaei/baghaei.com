@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Accessibility, Type, Zap } from 'lucide-react';
+import { SlidersHorizontal, Type, Zap } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSound } from '@/lib/utils/sounds';
 import { useA11yPrefs, applyA11yPrefs, FONT_SCALES, type FontScale } from '@/lib/utils/a11y-prefs';
@@ -66,7 +66,7 @@ export function AccessibilityMenu() {
         aria-label="گزینه‌های دسترس‌پذیری"
         className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
-        <Accessibility className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />
+        <SlidersHorizontal className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />
       </button>
 
       <AnimatePresence>

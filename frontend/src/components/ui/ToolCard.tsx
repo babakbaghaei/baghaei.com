@@ -1,74 +1,43 @@
 'use client';
 
-import React, { useRef, useCallback } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { ArrowUpLeft } from 'lucide-react';
+import { Card } from './Card';
 import { getCategoryMeta, type Tool } from '@/lib/data/tools';
 
 /**
- * Lightweight tool card for the dense /tools grid.
- * Unlike the heavy shared Card.tsx (which attaches a global window mousemove
- * listener per instance), this tracks the pointer locally — only the hovered
- * card runs any work — so a grid of 16+ cards stays smooth. Keeps the house
- * glass + accent-glow + subtle 3D tilt signature.
+ * Tool card for the dense /tools grid.
+ * Built on the shared <Card> so it inherits the exact house physics — glass
+ * blur, 3D mouse-tilt, and corner radial-lighting — identical to ProjectCard
+ * and the home page's SquareToolCard. Content is layered with translateZ for
+ * the 3D pop. The bespoke local pointer-tracking lived here before and diverged
+ * from the shared lighting; Card now owns all of it.
  */
 export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
   const Icon = tool.icon;
   const isSoon = tool.status === 'soon';
   const accent = getCategoryMeta(tool.category).color;
-  const ref = useRef<HTMLDivElement>(null);
-
-  const onMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width; // 0..1
-    const py = (e.clientY - r.top) / r.height; // 0..1
-    el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-    el.style.setProperty('--my', `${e.clientY - r.top}px`);
-    el.style.setProperty('--rx', `${(0.5 - py) * 5}deg`);
-    el.style.setProperty('--ry', `${(px - 0.5) * 5}deg`);
-  }, []);
-
-  const onLeave = useCallback(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.setProperty('--rx', '0deg');
-    el.style.setProperty('--ry', '0deg');
-  }, []);
 
   const card = (
-    <div
-      ref={ref}
-      onMouseMove={isSoon ? undefined : onMove}
-      onMouseLeave={isSoon ? undefined : onLeave}
-      className="group/card relative h-full min-h-[168px] overflow-hidden rounded-3xl border border-border bg-card/40 p-6 shadow-xl backdrop-blur-xl backdrop-saturate-150 transition-[transform,border-color,background-color] duration-300 ease-out will-change-transform hover:border-foreground/15 hover:bg-card/60"
-      style={{
-        transform:
-          'perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))',
-      }}
+    <Card
+      glowColor={`rgba(${accent}, 0.22)`}
+      roundedClass="rounded-3xl"
+      contentClassName="p-6"
+      className="min-h-[168px]"
+      isHoverable={!isSoon}
+      colorOnHoverOnly
     >
-      {/* accent spotlight following the cursor */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100"
-        style={{
-          background: `radial-gradient(440px circle at var(--mx, 50%) var(--my, 0%), rgba(${accent}, 0.12), transparent 60%)`,
-        }}
-        aria-hidden
-      />
-      {/* hairline top highlight for glassiness */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px opacity-60"
-        style={{
-          background:
-            'linear-gradient(90deg, transparent, var(--glass-border), transparent)',
-        }}
-        aria-hidden
-      />
-
-      <div className="relative flex h-full flex-col" dir="rtl">
+        className="flex h-full flex-col text-right"
+        dir="rtl"
+        style={{ transformStyle: 'preserve-3d' }}
+      >
         {/* top row: icon + status / arrow */}
-        <div className="flex items-start justify-between">
+        <div
+          className="flex items-start justify-between"
+          style={{ transform: 'translateZ(40px)' }}
+        >
           <div
             className="flex h-11 w-11 items-center justify-center rounded-2xl"
             style={{
@@ -84,7 +53,7 @@ export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
             </span>
           ) : (
             <ArrowUpLeft
-              className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-300 group-hover/card:translate-x-0 group-hover/card:opacity-100"
+              className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
               style={{ color: `rgb(${accent})` }}
               aria-hidden
             />
@@ -92,7 +61,7 @@ export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
         </div>
 
         {/* title + description anchored to the bottom */}
-        <div className="mt-auto pt-5">
+        <div className="mt-auto pt-5" style={{ transform: 'translateZ(30px)' }}>
           <h3 className="font-display text-base font-black leading-snug text-foreground">
             {tool.title}
           </h3>
@@ -101,7 +70,7 @@ export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
           </p>
         </div>
       </div>
-    </div>
+    </Card>
   );
 
   if (isSoon) {
