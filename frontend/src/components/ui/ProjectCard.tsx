@@ -121,8 +121,11 @@ const ProjectContent = ({ project }: { project: Project }) => {
       {/* Clipped, FLAT surface layer (colour + watermark + sheen + scrims). It
           owns the overflow-hidden so the texture stays inside the rounded card —
           kept on its OWN element, because overflow-hidden forces a flat stacking
-          context and would otherwise collapse every translateZ on the content. */}
-      <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
+          context and would otherwise collapse every translateZ on the content.
+          Desktop: desaturated until hover, then eases to full colour (touch
+          devices have no hover, so they stay full colour — md: gate). The text
+          layer is a separate sibling, so this never dims the white copy. */}
+      <div className="absolute inset-0 overflow-hidden rounded-[2rem] transition-[filter] duration-500 ease-out motion-reduce:transition-none md:grayscale md:group-hover/card:grayscale-0">
         {/* Fully-coloured background — the assigned project colour, edge to edge. */}
         <div className="absolute inset-0" style={{ background: panelBg }} />
 
