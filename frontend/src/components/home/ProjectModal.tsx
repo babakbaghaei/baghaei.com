@@ -18,6 +18,7 @@ import {
  Box,
  Braces,
  Lock,
+ Clock,
  Image as ImageIcon
 } from 'lucide-react';
 import Logo from '../layout/Logo';
@@ -221,6 +222,7 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
  if (!mounted || !display) return null;
 
  const accent = display.borderColor;
+ const isPublishing = display.imagesLockReason === 'publishing';
  const accentSoft = display.color;
  const hasMetrics = display.metrics && display.metrics.length > 0;
  const hasImages = !!(display.images && display.images.length > 0);
@@ -376,9 +378,15 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
              className={`object-cover ${display.imagesLocked ? 'blur-[26px] scale-150 select-none pointer-events-none' : ''}`}
             />
             {display.imagesLocked && (
-             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-background/40 backdrop-blur-2xl text-muted-foreground" role="img" aria-label="تصاویر محرمانه">
-              <Lock className="w-6 h-6" />
-              <span className="text-xs font-display font-bold">تصاویر این پروژه محرمانه است</span>
+             <div
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-background/40 backdrop-blur-2xl text-muted-foreground"
+              role="img"
+              aria-label={isPublishing ? 'در حال انتشار' : 'تصاویر محرمانه'}
+             >
+              {isPublishing ? <Clock className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
+              <span className="text-xs font-display font-bold">
+               {isPublishing ? 'تصاویر این پروژه در حال انتشار است' : 'تصاویر این پروژه محرمانه است'}
+              </span>
              </div>
             )}
            </div>
@@ -391,8 +399,10 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
            style={{ background: `radial-gradient(120% 100% at 50% 0%, ${accentSoft}, transparent 70%)` }}
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground/50">
-           <ImageIcon className="w-7 h-7" />
-           <span className="text-xs font-sans">پیش‌نمایش پروژه به‌زودی اضافه می‌شود</span>
+           {isPublishing ? <Clock className="w-7 h-7" /> : <ImageIcon className="w-7 h-7" />}
+           <span className="text-xs font-sans">
+            {isPublishing ? 'تصاویر این پروژه در حال انتشار است' : 'پیش‌نمایش پروژه به‌زودی اضافه می‌شود'}
+           </span>
           </div>
          </div>
         )}
