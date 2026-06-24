@@ -69,13 +69,35 @@ export const PLANETS_DATA: PlanetData[] = [
    texture: 'radial-gradient(circle at 50% 50%, #B5E3E3, #5DA5A5)',
    targetSection: 'contact'
  },
- { 
-   id: 'neptune', name: 'نپتون', enName: 'Neptune', diameter: 49528, au: 30.06, period: 59800, 
-   temp: '-۲۰۰°C', mass: '۱.۰ × ۱۰²۶ kg', color: '#6081FF', 
+ {
+   id: 'neptune', name: 'نپتون', enName: 'Neptune', diameter: 49528, au: 30.06, period: 59800,
+   temp: '-۲۰۰°C', mass: '۱.۰ × ۱۰²۶ kg', color: '#6081FF',
    texture: 'radial-gradient(circle at 50% 50%, #6081FF, #1E3A8A)',
    targetSection: 'contact'
  },
 ];
+
+// ── Display scaling — "balanced realistic" ───────────────────────────────────
+// PURELY VISUAL. None of these touch the ephemeris/longitude math, so the live
+// planetary positions, eclipses and Moon phase stay exact regardless of how the
+// system is sized. True linear-to-scale is impossible in a hero box (Neptune is
+// 77× Mercury's distance; a to-scale Earth would sit *inside* the Sun), so we
+// keep the real *ratios* and compress them with a gentle power law:
+//
+//   size  = (diameter / Earth)^SIZE_EXP × SIZE_BASE   → gas giants stay properly
+//           dominant (Jupiter ≈ 8× Earth at exp 0.85) without dwarfing the hero.
+//   orbit = DIST_OFFSET + AU^DIST_EXP × DIST_K        → outer worlds spread far,
+//           inner four still clear the Sun. exp→1 = truer (but clips), exp↓ = tighter.
+//
+// Retune the look by editing only these seven numbers.
+const EARTH_DIAMETER_KM = 12756;
+const SIZE_EXP = 0.85;   // 1 = true diameter ratios; <1 tames the giants
+const SIZE_BASE = 7;     // Earth's on-screen diameter (px) — the whole ramp scales off it
+const SIZE_FLOOR = 5;    // smallest visual/click target (px) so Mercury/Mars stay grabbable
+const DIST_EXP = 0.62;   // 1 = true linear AU; <1 pulls the outer giants inward to fit
+const DIST_K = 97;       // orbit-radius scale (px)
+const DIST_OFFSET = 21;  // base inset (px) so the inner orbits sit outside the Sun
+const SUN_SIZE = 88;     // Sun core diameter (px) — kept larger than Jupiter so it dominates
 
 /**
  * Live ephemeris — real planetary positions.
@@ -565,13 +587,10 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
 };
 
 const PlanetBody = ({ planet, moonRotate = 0, moonEclipse }: { planet: PlanetData, moonRotate?: number, moonEclipse?: { isSolar: boolean, isLunar: boolean } }) => {
- const earthDiameter = 12756;
- const earthSizeBase = 4;
- const pSize = (planet.diameter / earthDiameter) * earthSizeBase;
- // Two display-scaling regimes: linear (Earth-relative) for the small inner
- // worlds, log10 compression for the gas giants so Jupiter doesn't dwarf the
- // hero. 9.3 makes the two branches meet continuously at the 50000 km seam.
- const finalSize = planet.diameter > 50000 ? 9.3 + Math.log10(planet.diameter/10000) * 12 : pSize + 2;
+ // Single continuous power law on the real diameter ratio (see SIZE_* consts):
+ // keeps every planet's TRUE relative size — gas giants properly dominant — while
+ // a sub-1 exponent compresses the 11× Jupiter/Earth span enough to fit the hero.
+ const finalSize = Math.max(SIZE_FLOOR, Math.pow(planet.diameter / EARTH_DIAMETER_KM, SIZE_EXP) * SIZE_BASE);
 
  const isClickable = !!planet.targetSection;
  const goToSection = () => {
@@ -611,11 +630,15 @@ const PlanetBody = ({ planet, moonRotate = 0, moonEclipse }: { planet: PlanetDat
    />
    <div className="w-full h-full rounded-full relative overflow-hidden shadow-2xl pointer-events-none" style={{ background: planet.texture, zIndex: 10 }}>
     {/* day-side specular toward the Sun (bottom) */}
-    <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 84%, rgba(255,255,255,0.42) 0%, transparent 52%)' }} />
-    {/* night-side terminator falling away from the Sun (top) */}
-    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, transparent 26%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.84) 100%)' }} />
+    <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 86%, rgba(255,255,255,0.42) 0%, transparent 54%)' }} />
+    {/* Night side: a RADIAL shadow growing from the anti-solar (top) point, so the
+        terminator curves around the limb like a real lit sphere instead of a flat
+        horizontal band. Soft multi-stop falloff keeps the day→night seam gradual. */}
+    <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 6%, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.62) 28%, rgba(0,0,0,0.22) 48%, transparent 64%)' }} />
+    {/* faint atmospheric back-scatter on the night limb (rim light) */}
+    <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 1px 2px -0.5px rgba(150,170,255,0.18)' }} />
     {/* bright sunlit limb on the bottom edge */}
-    <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 -1.5px 2.5px -0.5px rgba(255,247,230,0.55)' }} />
+    <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 -1.5px 2.5px -0.5px rgba(255,247,230,0.6)' }} />
    </div>
 
    {planet.id === 'earth' && moonEclipse?.isSolar && (
@@ -661,7 +684,7 @@ const PlanetBody = ({ planet, moonRotate = 0, moonEclipse }: { planet: PlanetDat
 };
 
 const Planet = ({ planet, date }: { planet: PlanetData, date: Date }) => {
- const pDist = 45 + Math.pow(planet.au, 0.55) * 140;
+ const pDist = DIST_OFFSET + Math.pow(planet.au, DIST_EXP) * DIST_K;
 
  // Real heliocentric longitude → on-screen orbital angle.
  const currentAngle = planetLongitude(planet.id, date);
@@ -759,23 +782,24 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
     {/* Scale the whole system down on small heroes so the outer planets (the
         Neptune orbit is ~1000px) don't clip out of a 280px mobile box. */}
     <div className="relative w-full h-full scale-[0.42] sm:scale-[0.62] md:scale-90 lg:scale-100">
-     <motion.div 
-      id="sun-element" 
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10" 
-      style={{ width: 45, height: 45 }}
+     <motion.div
+      id="sun-element"
+      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
+      style={{ width: SUN_SIZE, height: SUN_SIZE }}
      >
       {/* Layered corona: a wide warm bleed into the void → mid amber → tight
-          white-hot core. The outer corona breathes by SCALE (not opacity) so
-          it reads as a living star, not a blinking dot. */}
+          white-hot core. Insets scale off SUN_SIZE so the glow keeps its shape
+          when the core is resized. The outer corona breathes by SCALE (not
+          opacity) so it reads as a living star, not a blinking dot. */}
       <motion.div
-        className="absolute inset-[-90px] rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(255,170,60,0.18) 0%, rgba(255,120,20,0.07) 38%, transparent 70%)' }}
+        className="absolute rounded-full"
+        style={{ inset: -SUN_SIZE * 2, background: 'radial-gradient(circle, rgba(255,170,60,0.18) 0%, rgba(255,120,20,0.07) 38%, transparent 70%)' }}
         animate={prefersReducedMotion ? undefined : { scale: [1, 1.12, 1], opacity: [0.85, 1, 0.85] }}
         transition={prefersReducedMotion ? undefined : { duration: 6, repeat: Infinity, ease: 'easeInOut' }}
       />
-      <div className="absolute inset-[-44px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(255,200,90,0.28) 0%, rgba(255,150,40,0.12) 45%, transparent 72%)', filter: 'blur(8px)' }} />
-      <div className="absolute inset-[-14px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(255,230,150,0.55) 0%, transparent 70%)', filter: 'blur(4px)' }} />
-      <div className="absolute inset-0 rounded-full bg-[#FFD700] shadow-[0_0_50px_rgba(255,165,0,0.7)]" />
+      <div className="absolute rounded-full" style={{ inset: -SUN_SIZE * 0.98, background: 'radial-gradient(circle, rgba(255,200,90,0.28) 0%, rgba(255,150,40,0.12) 45%, transparent 72%)', filter: 'blur(8px)' }} />
+      <div className="absolute rounded-full" style={{ inset: -SUN_SIZE * 0.31, background: 'radial-gradient(circle, rgba(255,230,150,0.55) 0%, transparent 70%)', filter: 'blur(4px)' }} />
+      <div className="absolute inset-0 rounded-full bg-[#FFD700]" style={{ boxShadow: `0 0 ${SUN_SIZE}px rgba(255,165,0,0.7)` }} />
       <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_32%_30%,#FFFFFF_0%,#FFE680_28%,#FFC107_55%,#FF8C00_100%)]" />
       <div className="absolute inset-[12%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.9)_0%,transparent_70%)] opacity-50" />
      </motion.div>

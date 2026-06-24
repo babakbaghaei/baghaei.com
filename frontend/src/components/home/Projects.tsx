@@ -124,9 +124,14 @@ function PinnedRow({ children }: { children: React.ReactNode }) {
   target: pinTrackRef,
   offset: ['start start', 'end end'],
  });
+ // Eased shoulders: ramp the horizontal travel gently across the first/last
+ // slice of the pin so the vertical→horizontal→vertical handoff feels like a
+ // deliberate glide rather than a hard scroll-lock. The middle ~88% stays
+ // near-linear, so the keyboard reveal + star parallax still track ~1:1.
+ const xProgress = useTransform(scrollYProgress, [0, 0.06, 0.94, 1], [0, 0.03, 0.97, 1]);
  // Read the measured overflow from a ref inside the transform so the mapping
  // always uses the latest width without re-instantiating the motion value.
- const x = useTransform(scrollYProgress, (v) => v * RTL_SIGN * overflowRef.current);
+ const x = useTransform(xProgress, (v) => v * RTL_SIGN * overflowRef.current);
 
  // Publish horizontal pin progress to the star field so the background travels
  // sideways with the cards (and freezes its vertical drift) while pinned.
@@ -169,6 +174,12 @@ function PinnedRow({ children }: { children: React.ReactNode }) {
     <motion.div ref={rowRef} onFocus={revealOnFocus} style={{ x }} className="flex items-center gap-0 w-max will-change-transform px-fib-5 md:px-fib-8">
      {children}
     </motion.div>
+    {/* Horizontal-scroll progress: a small meter under the row that fills as the
+        pinned gallery advances, so the sideways motion reads as intentional
+        navigation. RTL → it fills from the right (origin-right). */}
+    <div aria-hidden className="pointer-events-none absolute bottom-10 left-1/2 z-20 h-[3px] w-28 -translate-x-1/2 overflow-hidden rounded-full bg-foreground/10">
+     <motion.div style={{ scaleX: scrollYProgress }} className="h-full w-full origin-right rounded-full bg-foreground/45" />
+    </div>
    </div>
   </div>
  );
@@ -266,7 +277,7 @@ export default function Projects() {
  );
 
  return (
- <Section id="projects" sectionRef={sectionRef} className="border-t border-border overflow-visible !pb-fib-55 bg-transparent">
+ <Section id="projects" sectionRef={sectionRef} className="border-t border-border overflow-visible !pb-fib-21 bg-transparent">
   <motion.div aria-hidden="true" style={{ y: bgY }} className="absolute top-0 right-0 -mr-fib-34 -mt-fib-34 opacity-[0.03] pointer-events-none select-none z-0 overflow-hidden">
   <Box className="w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-muted-foreground" strokeWidth={0.5} />
   </motion.div>
