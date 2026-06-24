@@ -175,6 +175,7 @@ const wrapMod = (v: number, m: number) => ((v % m) + m) % m;
 
 export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: { scrollProgress: number, observeVisibility?: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const milkyRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
   const starsRef = useRef<{ x: number, y: number, size: number, opacity: number, parallax: number, twinkle: number }[] | null>(null);
   // Track scrollProgress in a ref so updating it never tears down / restarts
@@ -269,6 +270,16 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       else vAccumRef.current += dV * V_TRAVEL;
       const hAccum = hAccumRef.current;
       const vAccum = vAccumRef.current;
+
+      // The Milky Way band is the deepest layer — it drifts with the field but
+      // at a small fraction (slow parallax), so it reads as "further away" than
+      // the stars. Centered via translate(-50%,-50%) in markup; we append the
+      // drift here without re-centering.
+      const milky = milkyRef.current;
+      if (milky) {
+        milky.style.transform =
+          `translate(-50%, -50%) translate(${(-hAccum * 0.03).toFixed(1)}px, ${(-vAccum * 0.03).toFixed(1)}px) rotate(-24deg)`;
+      }
 
       // Streak length follows the velocity on the ACTIVE axis only.
       const axisDelta = pinActive ? dH * H_TRAVEL : dV * V_TRAVEL;
@@ -376,8 +387,10 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
       {showMilkyWay && (
         <div aria-hidden className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div
-            className="absolute left-1/2 top-1/2 h-[170%] w-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-[24deg]"
+            ref={milkyRef}
+            className="absolute left-1/2 top-1/2 h-[170%] w-[62%] -rotate-[24deg] will-change-transform"
             style={{
+              transform: 'translate(-50%, -50%) rotate(-24deg)',
               background:
                 'radial-gradient(46% 26% at 50% 50%, rgba(198,203,255,0.13), transparent 72%),' +
                 'linear-gradient(to right, transparent 15%, rgba(150,166,255,0.045) 35%, rgba(228,230,255,0.11) 50%, rgba(150,166,255,0.045) 65%, transparent 85%),' +

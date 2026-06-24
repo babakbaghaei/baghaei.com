@@ -50,19 +50,19 @@ const DELIMITERS = new Set([' ', '،', '.', '!', '؟', '؛', ':']);
 const AUTO_INSERT_SET = new Set(['\u200C', '،', '.', '!', '؟', '؛', ':', '(', ')', '-', '_']);
 
 const HUD = memo(({ wpm, accuracy }: { wpm: number, accuracy: number }) => (
-  <div className="flex justify-between items-end mb-16 px-4" dir="rtl">
-    <div className="flex flex-col gap-2 text-right">
+  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10 md:mb-16 px-2 sm:px-4" dir="rtl">
+    <div className="flex flex-col gap-1.5 text-right">
       <h1 className="text-[clamp(1.75rem,5vw,2.5rem)] font-black font-display text-foreground text-right">سرعت‌سنج تایپ</h1>
       <div className="text-xs font-bold text-muted-foreground uppercase text-right">تست سرعت و دقت تایپ فارسی</div>
     </div>
-    <div className="flex gap-10">
-      <div className="text-right border-r border-border pr-6">
+    <div className="flex gap-6 sm:gap-10 self-start sm:self-auto">
+      <div className="text-right sm:border-r sm:border-border sm:pr-6">
         <div className="text-xs font-black text-muted-foreground uppercase mb-1">سرعت (WPM)</div>
-        <div className="text-3xl font-black font-display text-primary">{toPersianDigits(wpm)}</div>
+        <div className="text-2xl sm:text-3xl font-black font-display text-primary">{toPersianDigits(wpm)}</div>
       </div>
       <div className="text-right">
         <div className="text-xs font-black text-muted-foreground uppercase mb-1">دقت</div>
-        <div className="text-3xl font-black font-display text-primary">{toPersianDigits(accuracy)}٪</div>
+        <div className="text-2xl sm:text-3xl font-black font-display text-primary">{toPersianDigits(accuracy)}٪</div>
       </div>
     </div>
   </div>
@@ -234,10 +234,10 @@ export default function TypeJangi() {
         </Link>
 
         {/* Settings Bar */}
-        <div className="flex flex-wrap justify-center gap-6 mb-12 bg-card/30 border border-border p-4 rounded-3xl backdrop-blur-md" dir="rtl">
-          <div className="flex items-center gap-2 border-l border-border pl-6">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-3 mb-12 bg-card/40 border border-border p-4 rounded-3xl backdrop-blur-xl backdrop-saturate-150" dir="rtl">
+          <div className="flex items-center gap-2">
             <span className="text-xs font-black text-muted-foreground uppercase">دسته بندی:</span>
-            <select value={settings.category} onChange={(e) => { setSettings({...settings, category: e.target.value as any}); restartAll(); }} className="bg-transparent text-sm font-bold text-foreground outline-none">
+            <select value={settings.category} onChange={(e) => { setSettings({...settings, category: e.target.value as any}); restartAll(); }} className="bg-transparent text-sm font-bold text-foreground outline-none min-h-11">
               <option value="all">همه</option>
               <option value="movies">سینما</option>
               <option value="literature">ادبیات</option>
@@ -247,34 +247,34 @@ export default function TypeJangi() {
             </select>
           </div>
 
-          <div className="flex items-center gap-3 border-l border-border pl-6">
-            <span className="text-xs font-black text-muted-foreground uppercase">اوپسیتی:</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-black text-muted-foreground uppercase">شفافیت:</span>
             <input type="range" min="0.1" max="0.8" step="0.1" value={settings.opacity} onChange={(e) => setSettings({...settings, opacity: parseFloat(e.target.value)})} className="w-20 accent-primary" />
           </div>
 
-          <div className="flex items-center gap-3 border-l border-border pl-6">
+          <div className="flex items-center gap-3">
             <span className="text-xs font-black text-muted-foreground uppercase">سایز:</span>
             <div className="flex gap-2">
               {[32, 40, 56].map(s => (
-                <button key={s} onClick={() => setSettings({...settings, fontSize: s})} className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${settings.fontSize === s ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'}`}>
-                  {toPersianDigits(s === 32 ? 'S' : s === 40 ? 'M' : 'L')}
+                <button key={s} onClick={() => setSettings({...settings, fontSize: s})} className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold transition-all ${settings.fontSize === s ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'}`}>
+                  {s === 32 ? 'S' : s === 40 ? 'M' : 'L'}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="flex items-center gap-3 border-l border-border pl-6">
+          <div className="flex items-center gap-3">
             <span className="text-xs font-black text-muted-foreground uppercase">وزن:</span>
             <div className="flex gap-2">
               {(['normal', 'bold'] as const).map(w => (
-                <button key={w} onClick={() => setSettings({...settings, fontWeight: w})} className={`px-3 h-8 rounded-lg text-xs font-bold transition-all ${settings.fontWeight === w ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'}`}>
+                <button key={w} onClick={() => setSettings({...settings, fontWeight: w})} className={`px-3 h-9 rounded-lg text-xs font-bold transition-all ${settings.fontWeight === w ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'}`}>
                   {w === 'bold' ? 'ضخیم' : 'معمولی'}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="flex items-center gap-3 pl-4">
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 group/help relative">
               <span className="text-xs font-black text-muted-foreground uppercase">حالت تفریحی:</span>
               <HelpCircle className="w-3 h-3 text-muted-foreground cursor-help" />
@@ -282,7 +282,7 @@ export default function TypeJangi() {
                 در این حالت علائم نگارشی خودکار درج شده و نام منبع اثر برای استراحت کوتاه نمایش داده می‌شود.
               </div>
             </div>
-            <button onClick={() => setSettings({...settings, funMode: !settings.funMode})} className={`w-12 h-6 rounded-full relative transition-colors ${settings.funMode ? 'bg-primary' : 'bg-secondary'}`}>
+            <button onClick={() => setSettings({...settings, funMode: !settings.funMode})} aria-label="حالت تفریحی" className={`w-12 h-6 rounded-full relative transition-colors ${settings.funMode ? 'bg-primary' : 'bg-secondary'}`}>
               <motion.div animate={{ x: settings.funMode ? -24 : -4 }} className="absolute top-1 right-0 w-4 h-4 bg-background rounded-full shadow-sm" />
             </button>
           </div>
@@ -290,7 +290,7 @@ export default function TypeJangi() {
 
         <HUD wpm={stats.wpm} accuracy={stats.accuracy} />
 
-        <div className={`relative bg-secondary/10 border rounded-[2.5rem] p-12 md:p-20 shadow-2xl backdrop-blur-sm min-h-[350px] flex items-center justify-center overflow-hidden transition-all duration-100 ${isWrong ? 'border-primary shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] bg-primary/5' : 'border-border'}`}>
+        <div className={`relative bg-secondary/10 border rounded-[2.5rem] p-8 sm:p-12 md:p-20 shadow-2xl backdrop-blur-sm min-h-[280px] md:min-h-[350px] flex items-center justify-center overflow-hidden transition-all duration-100 ${isWrong ? 'border-primary shadow-[0_0_30px_rgba(255,255,255,0.12)] bg-primary/5' : 'border-border'}`}>
           <AnimatePresence>
             {isRoundOver && (
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/90 backdrop-blur-xl">
