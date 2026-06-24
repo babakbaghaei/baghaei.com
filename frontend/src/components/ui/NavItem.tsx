@@ -20,6 +20,7 @@ export const NavItem: React.FC<NavItemProps> = ({
  return (
   <button
    onClick={onClick}
+   aria-current={isActive ? 'page' : undefined}
    className={`relative py-2 hover:text-foreground transition-colors font-display ${isActive ? 'text-foreground font-bold' : 'text-muted-foreground'} ${className}`}
    {...rest}
   >

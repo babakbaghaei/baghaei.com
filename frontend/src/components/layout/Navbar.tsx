@@ -236,7 +236,7 @@ export default function Navbar() {
                    >
                      <div className="w-10 h-10 rounded-xl bg-muted/10 flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-110 transition-transform">
                        {project.logo ? (
-                         <Image src={project.logo} alt="" aria-hidden width={24} height={24} className="w-6 h-6 object-contain" />
+                         <Image src={project.logo} alt="" aria-hidden width={24} height={24} sizes="24px" className="w-6 h-6 object-contain" />
                        ) : (
                          <FallbackIcon className="w-5 h-5 text-foreground" />
                        )}

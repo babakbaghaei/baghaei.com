@@ -8,6 +8,13 @@ export const metadata: Metadata = {
   description:
     'گروه فناوری بقایی؛ تیمی از مهندسان نرم‌افزار با تمرکز بر معماری سیستم‌های مقیاس‌پذیر، امنیت سایبری، زیرساخت ابری و هوش مصنوعی.',
   alternates: { canonical: '/about' },
+  openGraph: {
+    type: 'website',
+    title: 'درباره گروه فناوری بقایی',
+    description:
+      'گروه فناوری بقایی؛ تیمی از مهندسان نرم‌افزار با تمرکز بر معماری سیستم‌های مقیاس‌پذیر، امنیت سایبری، زیرساخت ابری و هوش مصنوعی.',
+    url: '/about',
+  },
 };
 
 export default function AboutLayout({

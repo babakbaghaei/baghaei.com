@@ -68,6 +68,7 @@ const ProjectLogo = ({ project, size }: { project: Project; size: string }) => {
         aria-hidden
         width={40}
         height={40}
+        sizes="40px"
         className={`${size} object-contain shrink-0 drop-shadow-lg`}
       />
     );

@@ -2,6 +2,7 @@
 
 import React, { ReactNode } from 'react';
 import { motion } from 'framer-motion';
+import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 
 interface RevealProps {
   children: ReactNode;
@@ -10,6 +11,11 @@ interface RevealProps {
 }
 
 export const Reveal = ({ children, width = 'fit-content', delay = 0.2 }: RevealProps) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  // Reduced motion: render the content at its final state, no slide/fade-in.
+  if (prefersReducedMotion) {
+    return <div style={{ position: 'relative', width, overflow: 'hidden' }}>{children}</div>;
+  }
   return (
     <div style={{ position: 'relative', width, overflow: 'hidden' }}>
       <motion.div

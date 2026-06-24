@@ -85,7 +85,6 @@ export const Card: React.FC<CardProps> = ({
   const springConfig = { stiffness: 300, damping: 40, restDelta: 0.001 };
   const tiltX = useSpring(0, springConfig);
   const tiltY = useSpring(0, springConfig);
-  const scale = useSpring(1, springConfig);
   const innerGlowOpacity = useSpring(0, { stiffness: 200, damping: 35 });
   const borderOpacity = useSpring(0.2, { stiffness: 200, damping: 35 });
   const colorOpacity = useSpring(colorOnHoverOnly ? 0 : 1, { stiffness: 200, damping: 35 });
@@ -143,7 +142,7 @@ export const Card: React.FC<CardProps> = ({
     // cursor reacts immediately, matching the previous per-card behavior.
     onMouseMove(latestClientX, latestClientY);
     return unsubscribe;
-  }, [isTouchDevice, isHoverable, innerGlowOpacity, borderOpacity, scale, tiltX, tiltY, mouseX, mouseY, colorOnHoverOnly, colorOpacity]);
+  }, [isTouchDevice, isHoverable, innerGlowOpacity, borderOpacity, tiltX, tiltY, mouseX, mouseY, colorOnHoverOnly, colorOpacity]);
 
   // Touch devices / non-hoverable cards can't hover, so keep them colored.
   useEffect(() => {
@@ -163,7 +162,6 @@ export const Card: React.FC<CardProps> = ({
           style={{
             rotateX,
             rotateY,
-            scale,
             transformStyle: "preserve-3d",
             willChange: "transform"
           }}

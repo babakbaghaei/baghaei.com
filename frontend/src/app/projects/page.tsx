@@ -8,6 +8,12 @@ export const metadata: Metadata = {
  title: 'پروژه‌ها',
  description: 'نمونه‌کارهای گروه فناوری بقایی — پروژه‌های سازمانی در امنیت سایبری، زیرساخت ابری، هوش مصنوعی و طراحی رابط کاربری.',
  alternates: { canonical: '/projects' },
+ openGraph: {
+  type: 'website',
+  title: 'پروژه‌ها | گروه فناوری بقایی',
+  description: 'نمونه‌کارهای گروه فناوری بقایی — پروژه‌های سازمانی در امنیت سایبری، زیرساخت ابری، هوش مصنوعی و طراحی رابط کاربری.',
+  url: '/projects',
+ },
 };
 
 export default function AllProjectsPage() {

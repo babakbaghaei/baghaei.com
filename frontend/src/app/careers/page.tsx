@@ -8,6 +8,12 @@ export const metadata: Metadata = {
  title: 'فرصت‌های شغلی',
  description: 'به تیم گروه فناوری بقایی بپیوندید؛ موقعیت‌های شغلی در توسعه نرم‌افزار، هوش مصنوعی و معماری سیستم.',
  alternates: { canonical: '/careers' },
+ openGraph: {
+  type: 'website',
+  title: 'فرصت‌های شغلی | گروه فناوری بقایی',
+  description: 'به تیم گروه فناوری بقایی بپیوندید؛ موقعیت‌های شغلی در توسعه نرم‌افزار، هوش مصنوعی و معماری سیستم.',
+  url: '/careers',
+ },
 };
 
 export default function CareersPage() {

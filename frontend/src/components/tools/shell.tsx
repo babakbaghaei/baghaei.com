@@ -8,6 +8,7 @@
 
 import React, { useState, useCallback, useSyncExternalStore, useId } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight,
@@ -75,12 +76,30 @@ export function ToolShell({
   info?: ToolInfo[];
   disclaimer?: React.ReactNode;
 }) {
+  // Per-tool SoftwareApplication structured data. Every shell-based tool is a
+  // free, offline, in-browser web app — emitting this lets the calculators
+  // qualify for rich results on their (high-intent, Persian) search queries.
+  const pathname = usePathname();
+  const softwareLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: title,
+    description: subtitle,
+    applicationCategory: 'UtilityApplication',
+    operatingSystem: 'Web',
+    url: `https://baghaei.com${pathname || ''}`,
+    inLanguage: 'fa-IR',
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'IRR' },
+    publisher: { '@type': 'Organization', name: 'گروه فناوری بقایی', url: 'https://baghaei.com' },
+  };
   return (
     <main
       className="relative overflow-x-hidden px-4 md:px-6 pt-24 pb-28"
       dir="rtl"
       style={{ ['--accent' as string]: accent }}
     >
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareLd) }} />
       {/* ambient background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <div

@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   description:
     'مجموعه ابزارهای رایگان آنلاین: ماشین‌حساب‌های حقوقی، مالی، ملکی و کمکی. همه محاسبات در مرورگر شما.',
   alternates: { canonical: '/tools' },
+  openGraph: {
+    type: 'website',
+    title: 'جعبه ابزار | گروه فناوری بقایی',
+    description:
+      'مجموعه ابزارهای رایگان آنلاین: ماشین‌حساب‌های حقوقی، مالی، ملکی و کمکی. همه محاسبات در مرورگر شما.',
+    url: '/tools',
+  },
 };
 
 export default function Page() {
