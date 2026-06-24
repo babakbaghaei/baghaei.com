@@ -171,8 +171,15 @@ const ProjectContent = ({ project }: { project: Project }) => {
         </span>
       </div>
 
-      {/* NDA lock badge. */}
-      {project.isLocked && (
+      {/* Lock / status badge (bottom-leading). NDA → lock icon; publishing →
+          a soft "being published" pill so users know images aren't viewable yet. */}
+      {project.imagesLockReason === 'publishing' ? (
+        <div className="absolute left-4 bottom-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(55px)] motion-reduce:transition-none" style={{ transform: "translateZ(24px)" }}>
+          <span className="rounded-full bg-black/40 px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
+            در حال انتشار
+          </span>
+        </div>
+      ) : project.isLocked && (
         <div className="absolute left-4 bottom-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(55px)] motion-reduce:transition-none" style={{ transform: "translateZ(24px)" }}>
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white/80 ring-1 ring-white/15 backdrop-blur-md">
             <Lock className="h-3.5 w-3.5" aria-hidden />
