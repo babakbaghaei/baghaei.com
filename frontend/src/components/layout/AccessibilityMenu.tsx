@@ -63,7 +63,6 @@ export function AccessibilityMenu() {
         }}
         onMouseEnter={() => play('hover')}
         aria-expanded={open}
-        aria-controls="a11y-menu-panel"
         aria-label="گزینه‌های دسترس‌پذیری"
         className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
@@ -77,7 +76,6 @@ export function AccessibilityMenu() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] as any }}
-            id="a11y-menu-panel"
             role="group"
             aria-label="گزینه‌های دسترس‌پذیری"
             dir="rtl"

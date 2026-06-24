@@ -117,7 +117,7 @@ function PinnedRow({ children }: { children: React.ReactNode }) {
    trackTop + overflowRef.current
   );
   if (lenis) lenis.scrollTo(targetY, { duration: 0.4 });
-  else window.scrollTo({ top: targetY });
+  else if (typeof window !== 'undefined') window.scrollTo({ top: targetY });
  };
 
  const { scrollYProgress } = useScroll({

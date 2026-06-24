@@ -127,9 +127,9 @@ export default function Navbar() {
          isActive={currentActive === link.id}
          // Disclosure pattern: the dropdown reveals a labelled region (not a
          // menu/listbox/dialog), so aria-haspopup would be a lie. aria-expanded
-         // + aria-controls on the trigger is the correct contract for AT.
+         // alone is the correct contract — no aria-controls, since the panel is
+         // unmounted (AnimatePresence) while closed and a dangling IDREF is invalid.
          aria-expanded={link.hasDropdown ? openMenu === link.id : undefined}
-         aria-controls={link.hasDropdown ? 'mega-menu-panel' : undefined}
          onClick={() => {
           if (link.id === 'tools') { router.push('/tools'); return; }
           if (link.id === 'about') { router.push('/about'); return; }
@@ -190,7 +190,6 @@ export default function Navbar() {
     <AnimatePresence>
      {openMenu && (
       <motion.div
-       id="mega-menu-panel"
        role="region"
        aria-label={openMenu === 'projects' ? 'محصولات و پلتفرم‌ها' : 'جعبه ابزار'}
        initial={{ opacity: 0, y: -10 }}
