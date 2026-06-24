@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { TOOLS } from '@/lib/data/tools';
 import { PROJECTS_DATA } from '@/lib/data/projects';
+import { getAllPostsMeta } from '@/lib/blog';
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -40,5 +41,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   priority: 0.7,
  }));
 
- return [...routes, ...tools, ...projects];
+ // Blog posts — read straight from the MDX frontmatter so new articles appear
+ // in the sitemap automatically with their real publish date.
+ const posts = getAllPostsMeta().map((post) => ({
+  url: `${baseUrl}/blog/${post.slug}`,
+  lastModified: post.date ? new Date(post.date) : new Date(),
+  changeFrequency: 'monthly' as const,
+  priority: 0.6,
+ }));
+
+ return [...routes, ...tools, ...projects, ...posts];
 }
