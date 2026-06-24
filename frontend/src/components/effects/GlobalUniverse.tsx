@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll } from 'framer-motion';
 import { useTheme } from 'next-themes';
+import { usePathname } from 'next/navigation';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 import { parallaxBus } from '@/lib/utils/parallaxBus';
 
@@ -188,11 +189,31 @@ const H_TRAVEL = 1400;
 // Positive modulo so accumulated (possibly negative) offsets wrap cleanly.
 const wrapMod = (v: number, m: number) => ((v % m) + m) % m;
 
+// ── Constellations ──────────────────────────────────────────────────────────
+// Real naked-eye asterisms, coordinates normalised 0..1 inside their own box.
+// Every route shows a DIFFERENT couple of these (steady bright stars joined by
+// faint lines), so the night sky is never the same on two pages.
+interface Asterism { fa: string; stars: [number, number][]; lines: [number, number][]; }
+const ASTERISMS: Asterism[] = [
+  { fa: 'دب اکبر', stars: [[0.00, 0.16], [0.18, 0.28], [0.37, 0.37], [0.55, 0.45], [0.60, 0.72], [0.84, 0.75], [0.82, 0.48]], lines: [[0, 1], [1, 2], [2, 3], [3, 6], [6, 5], [5, 4], [4, 3]] },
+  { fa: 'جبار', stars: [[0.20, 0.08], [0.72, 0.12], [0.40, 0.50], [0.50, 0.52], [0.60, 0.55], [0.26, 0.93], [0.80, 0.92]], lines: [[0, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6], [5, 6]] },
+  { fa: 'ذات‌الکرسی', stars: [[0.00, 0.30], [0.25, 0.72], [0.50, 0.24], [0.75, 0.74], [1.00, 0.28]], lines: [[0, 1], [1, 2], [2, 3], [3, 4]] },
+  { fa: 'دجاجه', stars: [[0.50, 0.00], [0.50, 0.45], [0.50, 1.00], [0.08, 0.40], [0.92, 0.52]], lines: [[0, 1], [1, 2], [3, 1], [1, 4]] },
+  { fa: 'عقرب', stars: [[0.10, 0.06], [0.20, 0.22], [0.32, 0.34], [0.46, 0.46], [0.56, 0.62], [0.62, 0.78], [0.52, 0.90], [0.36, 0.92]], lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]] },
+  { fa: 'شلیاق', stars: [[0.20, 0.06], [0.36, 0.36], [0.58, 0.46], [0.66, 0.78], [0.44, 0.66]], lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 1]] },
+  { fa: 'اسد', stars: [[0.10, 0.80], [0.16, 0.55], [0.22, 0.36], [0.34, 0.28], [0.52, 0.40], [0.92, 0.52], [0.66, 0.60]], lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 6], [6, 5], [5, 4]] },
+  { fa: 'صلیب جنوبی', stars: [[0.50, 0.00], [0.50, 1.00], [0.06, 0.46], [0.94, 0.56]], lines: [[0, 1], [2, 3]] },
+];
+// Screen anchors (fractions) the constellations snap to — spread around, away
+// from the dead centre where the hero headline sits.
+const ANCHORS: [number, number][] = [[0.16, 0.24], [0.30, 0.72], [0.78, 0.28], [0.68, 0.80], [0.12, 0.56], [0.86, 0.60], [0.44, 0.16]];
+const hashStr = (s: string) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+
 export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: { scrollProgress: number, observeVisibility?: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const milkyRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
-  const starsRef = useRef<{ x: number, y: number, size: number, opacity: number, parallax: number, twinkle: number, color: string }[] | null>(null);
+  const starsRef = useRef<{ x: number, y: number, size: number, opacity: number, parallax: number, twinkle: number, twinkles: boolean, color: string }[] | null>(null);
   // Track scrollProgress in a ref so updating it never tears down / restarts
   // the requestAnimationFrame loop (which previously happened on every scroll
   // frame and was the main cause of jank / the tab locking up).
@@ -207,6 +228,12 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
   const prevHxRef = useRef(0);
   const hAccumRef = useRef(0);
   const vAccumRef = useRef(0);
+  // Per-route constellations + an idle "shooting star".
+  const pathname = usePathname();
+  const placedRef = useRef<{ ast: Asterism, ax: number, ay: number, scale: number }[]>([]);
+  const meteorRef = useRef<{ x: number, y: number, vx: number, vy: number, life: number, maxLife: number } | null>(null);
+  const lastActivityRef = useRef(0);
+  const lastMeteorRef = useRef(0);
 
   if (!starsRef.current) {
     // Responsive density: thin the field on small screens so it never becomes
@@ -223,10 +250,16 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
     const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
     const starCount = Math.max(220, Math.min(Math.round((vw * vh) / (2000 * Math.max(dpr, 1))), 900));
     starsRef.current = [...Array(starCount)].map(() => {
-      // Weighted tint: mostly white, a fifth cool indigo, a tenth warm amber —
-      // seeds the brand palette into the field at zero extra draw cost.
+      // Real stellar colours by temperature (what the eye actually sees): mostly
+      // white & blue-white, fewer warm yellow/orange, a rare red. No uniform tint.
       const r = Math.random();
-      const color = r < 0.7 ? '255, 255, 255' : r < 0.9 ? '160, 180, 255' : '255, 210, 150';
+      const color =
+        r < 0.40 ? '255, 255, 255' :   // white
+        r < 0.62 ? '202, 216, 255' :   // blue-white
+        r < 0.80 ? '255, 247, 232' :   // yellow-white
+        r < 0.90 ? '255, 233, 180' :   // yellow (Sun-like)
+        r < 0.97 ? '255, 206, 150' :   // orange
+                   '255, 180, 150';    // red
       return {
         x: Math.random() * 5000,
         y: Math.random() * 5000,
@@ -236,10 +269,36 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
         opacity: 0.08 + Math.random() * 0.32,
         parallax: 0.02 + Math.random() * 0.2,
         twinkle: 1 + Math.random() * 4,
+        // Only ~30% scintillate — real skies aren't a field of blinkers.
+        twinkles: Math.random() < 0.3,
         color,
       };
     });
   }
+
+  // Choose this route's constellations. Different pathname → different hash →
+  // different asterisms + anchors, with no repeat within a single page.
+  useEffect(() => {
+    const path = pathname || '/';
+    const count = 2 + (hashStr(path) % 2); // 2 or 3 per page
+    const orderA = ASTERISMS.map((_, i) => i).sort((a, b) => hashStr(path + 'a' + a) - hashStr(path + 'a' + b));
+    const orderN = ANCHORS.map((_, i) => i).sort((a, b) => hashStr(path + 'n' + a) - hashStr(path + 'n' + b));
+    placedRef.current = orderA.slice(0, count).map((idx, i) => ({
+      ast: ASTERISMS[idx],
+      ax: ANCHORS[orderN[i % ANCHORS.length]][0],
+      ay: ANCHORS[orderN[i % ANCHORS.length]][1],
+      scale: 0.15 + (hashStr(path + 's' + i) % 7) / 100,
+    }));
+  }, [pathname]);
+
+  // Track user activity so the shooting star only appears after a short idle.
+  useEffect(() => {
+    lastActivityRef.current = Date.now();
+    const onActivity = () => { lastActivityRef.current = Date.now(); };
+    const evs: (keyof WindowEventMap)[] = ['mousemove', 'pointerdown', 'keydown', 'scroll', 'touchstart', 'wheel'];
+    evs.forEach((e) => window.addEventListener(e, onActivity, { passive: true }));
+    return () => evs.forEach((e) => window.removeEventListener(e, onActivity));
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -327,9 +386,10 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
         const yPos = wrapMod(s.y + vAccum * s.parallax, height);
         // Per-star tint on dark; neutral dark dots on light.
         const col = isDark ? s.color : starColor;
-        const twinkle = prefersReducedMotion
+        // Only the stars flagged `twinkles` scintillate; the rest hold steady.
+        const twinkle = (!s.twinkles || prefersReducedMotion)
           ? 1
-          : 0.7 + Math.sin((now * 0.002 * s.twinkle) + s.x) * 0.3;
+          : 0.65 + Math.sin((now * 0.002 * s.twinkle) + s.x) * 0.35;
         // Scroll "wakes" the field: a capped brightness lift while moving.
         const alpha = Math.min(
           s.opacity * twinkle * themeOpacityFactor * (1 + speed * 0.5),
@@ -361,6 +421,54 @@ export const GalaxyBackground = ({ scrollProgress, observeVisibility = false }: 
           ctx.fill();
         }
       });
+
+      // Constellations: just the steady BRIGHT stars in the asterism shape — no
+      // connecting lines — so the real patterns (Big Dipper, Orion, …) read like
+      // an actual sky. Drift with the field at a shallow parallax; dark only.
+      if (isDark && placedRef.current.length) {
+        for (const p of placedRef.current) {
+          const base = Math.min(width, height) * p.scale;
+          const ox = p.ax * width + hAccum * 0.05;
+          const oy = p.ay * height + vAccum * 0.05;
+          for (const st of p.ast.stars) {
+            const sx = ox + st[0] * base, sy = oy + st[1] * base;
+            ctx.fillStyle = 'rgba(190,205,255,0.22)';
+            ctx.beginPath(); ctx.arc(sx, sy, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.92)';
+            ctx.beginPath(); ctx.arc(sx, sy, 1.5, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+      }
+
+      // Idle "shooting star": after ~9s AFK, a meteor streaks across and fades,
+      // repeating every few seconds while idle. Any input cancels future ones.
+      if (isDark && !prefersReducedMotion) {
+        const nowMs = Date.now();
+        const idle = nowMs - lastActivityRef.current > 9000;
+        if (!meteorRef.current && idle && nowMs - lastMeteorRef.current > 13000) {
+          const fromLeft = Math.random() < 0.5;
+          const sx = fromLeft ? width * (0.02 + Math.random() * 0.25) : width * (0.73 + Math.random() * 0.25);
+          const sy = height * (0.04 + Math.random() * 0.28);
+          const sp = Math.max(width, height) * 0.013;
+          meteorRef.current = { x: sx, y: sy, vx: (fromLeft ? 1 : -1) * sp * 0.86, vy: sp * 0.5, life: 0, maxLife: 80 };
+          lastMeteorRef.current = nowMs;
+        }
+        const m = meteorRef.current;
+        if (m) {
+          m.x += m.vx; m.y += m.vy; m.life++;
+          const fade = Math.min(1, Math.min(m.life, m.maxLife - m.life) / 12);
+          const tailX = m.x - m.vx * 7, tailY = m.y - m.vy * 7;
+          const g = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+          g.addColorStop(0, `rgba(255,255,255,${0.85 * fade})`);
+          g.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.strokeStyle = g; ctx.lineWidth = 2; ctx.lineCap = 'round';
+          ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(tailX, tailY); ctx.stroke();
+          ctx.fillStyle = `rgba(255,255,255,${0.9 * fade})`;
+          ctx.beginPath(); ctx.arc(m.x, m.y, 1.6, 0, Math.PI * 2); ctx.fill();
+          if (m.life >= m.maxLife || m.x < -60 || m.x > width + 60 || m.y > height + 60) meteorRef.current = null;
+        }
+      }
+
       ctx.globalCompositeOperation = 'source-over';
     };
 
@@ -583,16 +691,7 @@ const Planet = ({ planet, date }: { planet: PlanetData, date: Date }) => {
 
  return (
   <div className="absolute pointer-events-none" style={{ width: pDist * 2, height: pDist * 2, left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
-   {/* Orbit ring — now actually visible: a faint tinted stroke with a soft
-       same-hue glow, instead of the old sub-pixel border that anti-aliased to
-       nothing. */}
-   <div
-    className="absolute inset-0 rounded-full"
-    style={{
-      border: `1px solid ${planet.color}26`,
-      boxShadow: `0 0 10px ${planet.color}1a, inset 0 0 12px ${planet.color}12`,
-    }}
-   />
+   {/* No orbit ring drawn — the planets float on invisible orbits. */}
    <motion.div
     className="absolute inset-0 will-change-transform"
     style={{ rotate: longitudeToScreenAngle(currentAngle), filter: dof ? `blur(${dof}px)` : undefined }}
