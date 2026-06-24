@@ -171,7 +171,7 @@ function PinnedRow({ children }: { children: React.ReactNode }) {
  return (
   <div ref={pinTrackRef} className="relative -mr-fib-5 md:-mr-fib-8" style={{ height: pinHeight }}>
    <div ref={pinViewportRef} className="sticky top-0 h-screen flex items-center overflow-hidden">
-    <motion.div ref={rowRef} onFocus={revealOnFocus} style={{ x }} className="flex items-center gap-0 w-max will-change-transform px-fib-5 md:px-fib-8">
+    <motion.div ref={rowRef} onFocus={revealOnFocus} style={{ x }} className="flex items-center gap-5 md:gap-6 w-max will-change-transform px-fib-5 md:px-fib-8">
      {children}
     </motion.div>
     {/* Horizontal-scroll progress: a small meter under the row that fills as the
@@ -314,7 +314,7 @@ export default function Projects() {
      data-lenis-prevent
      role="region"
      aria-label="اسکرول افقی پروژه‌ها و ابزارها"
-     className="flex items-center overflow-x-auto overscroll-x-contain pb-20 scrollbar-hide relative z-10 gap-0 rounded-[2rem]">
+     className="flex items-center overflow-x-auto overscroll-x-contain pb-20 scrollbar-hide relative z-10 gap-5 md:gap-6 rounded-[2rem]">
      {horizontalItems}
     </div>
    </div>

@@ -117,44 +117,48 @@ const ProjectContent = ({ project }: { project: Project }) => {
     `linear-gradient(152deg, rgb(${base}) 0%, rgb(${shade(base, 0.5)}) 100%)`;
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-[2rem]" style={{ transformStyle: "preserve-3d" }}>
-      {/* Fully-coloured background — the assigned project colour, edge to edge. */}
-      <div className="absolute inset-0" style={{ background: panelBg }} />
+    <div className="relative h-full w-full rounded-[2rem]" style={{ transformStyle: "preserve-3d" }}>
+      {/* Clipped, FLAT surface layer (colour + watermark + sheen + scrims). It
+          owns the overflow-hidden so the texture stays inside the rounded card —
+          kept on its OWN element, because overflow-hidden forces a flat stacking
+          context and would otherwise collapse every translateZ on the content. */}
+      <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
+        {/* Fully-coloured background — the assigned project colour, edge to edge. */}
+        <div className="absolute inset-0" style={{ background: panelBg }} />
 
-      {/* Faint oversized brand watermark — gives the flat colour depth and texture.
-          Floats slightly forward and drifts on hover for a parallax read. */}
-      <div
-        className="pointer-events-none absolute -bottom-6 -left-6 text-white/[0.06] transition-transform duration-700 ease-out group-hover/card:scale-110 group-hover/card:-rotate-6 motion-reduce:transition-none"
-        style={{ transform: "translateZ(8px)" }}
-        aria-hidden
-      >
-        <BrandIcon project={project} className="h-44 w-44" />
+        {/* Faint oversized brand watermark — gives the flat colour depth + texture. */}
+        <div
+          className="pointer-events-none absolute -bottom-6 -left-6 text-white/[0.06] transition-transform duration-700 ease-out group-hover/card:scale-110 group-hover/card:-rotate-6 motion-reduce:transition-none"
+          aria-hidden
+        >
+          <BrandIcon project={project} className="h-44 w-44" />
+        </div>
+
+        {/* Tilt-reactive glass reflection (signature sheen). */}
+        <motion.div
+          aria-hidden
+          style={{ background: sheen, mixBlendMode: "overlay" }}
+          className="pointer-events-none absolute inset-0"
+        />
+
+        {/* Bottom scrim for copy legibility. */}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
       </div>
 
-      {/* Tilt-reactive glass reflection (signature sheen). */}
-      <motion.div
-        aria-hidden
-        style={{ background: sheen, mixBlendMode: "overlay" }}
-        className="pointer-events-none absolute inset-0"
-      />
-
-      {/* Top scrim only where the chips sit; bottom scrim for copy legibility. */}
-      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
-
-      {/* Category chip (top, leading edge in RTL) — lifts forward on hover. */}
+      {/* Category chip (top, leading edge in RTL) — lifts further forward on hover. */}
       <div
-        className="absolute right-4 top-4 z-10 transition-transform duration-300 ease-out motion-reduce:transition-none"
-        style={{ transform: "translateZ(55px)" }}
+        className="absolute right-4 top-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(60px)] motion-reduce:transition-none"
+        style={{ transform: "translateZ(24px)" }}
       >
-        <span className="rounded-full bg-black/35 px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md group-hover/card:[transform:translateZ(28px)] transition-transform duration-300 motion-reduce:transition-none">
+        <span className="rounded-full bg-black/35 px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
           {project.category}
         </span>
       </div>
 
       {/* Open affordance — appears + pops forward on hover. */}
       <div
-        className="absolute left-4 top-4 z-10 opacity-0 transition-all duration-300 group-hover/card:opacity-100 group-hover/card:[transform:translateZ(85px)] motion-reduce:transition-none"
-        style={{ transform: "translateZ(55px)" }}
+        className="absolute left-4 top-4 z-10 opacity-0 transition-all duration-300 group-hover/card:opacity-100 group-hover/card:[transform:translateZ(88px)] motion-reduce:transition-none"
+        style={{ transform: "translateZ(24px)" }}
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/12 text-white ring-1 ring-white/20 backdrop-blur-md">
           <ArrowUpLeft className="h-4 w-4" aria-hidden />
@@ -163,7 +167,7 @@ const ProjectContent = ({ project }: { project: Project }) => {
 
       {/* NDA lock badge. */}
       {project.isLocked && (
-        <div className="absolute left-4 bottom-4 z-10" style={{ transform: "translateZ(45px)" }}>
+        <div className="absolute left-4 bottom-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(55px)] motion-reduce:transition-none" style={{ transform: "translateZ(24px)" }}>
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white/80 ring-1 ring-white/15 backdrop-blur-md">
             <Lock className="h-3.5 w-3.5" aria-hidden />
           </span>
@@ -173,9 +177,9 @@ const ProjectContent = ({ project }: { project: Project }) => {
       {/* Bottom content: brand + title always visible (float forward on hover);
           desc + tech reveal on hover (always open on touch where there is no hover). */}
       <div
-        className="absolute inset-x-0 bottom-0 z-10 p-5 text-right transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(70px)] motion-reduce:transition-none md:p-6"
+        className="absolute inset-x-0 bottom-0 z-10 p-5 text-right transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(74px)] motion-reduce:transition-none md:p-6"
         dir="rtl"
-        style={{ transform: "translateZ(40px)" }}
+        style={{ transform: "translateZ(30px)" }}
       >
         <div className="flex items-center gap-2.5">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur-md">
