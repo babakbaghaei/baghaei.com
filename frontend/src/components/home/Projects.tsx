@@ -170,7 +170,7 @@ function PinnedRow({ children }: { children: React.ReactNode }) {
 
  return (
   <div ref={pinTrackRef} className="relative -mr-fib-5 md:-mr-fib-8" style={{ height: pinHeight }}>
-   <div ref={pinViewportRef} className="sticky top-0 h-screen flex items-center overflow-hidden">
+   <div ref={pinViewportRef} className="sticky top-0 h-screen flex items-start overflow-hidden pt-[18vh]">
     <motion.div ref={rowRef} onFocus={revealOnFocus} style={{ x }} className="flex items-center gap-5 md:gap-6 w-max will-change-transform px-fib-5 md:px-fib-8">
      {children}
     </motion.div>
