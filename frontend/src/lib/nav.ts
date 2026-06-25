@@ -2,10 +2,10 @@
 //
 // `id` is the in-page section element id (home page) OR a route key the consumer
 // resolves to a route (e.g. 'projects' -> /projects, 'tools' -> /tools,
-// 'about' -> /about). Clicking محصولات navigates to the dedicated /projects page
+// 'about' -> /about). Clicking نمونه‌کار navigates to the dedicated /projects page
 // (Navbar + RootMobileMenu special-case the id); the `hasDropdown` mega-menu is
 // only a hover preview on desktop. The mobile menu and command palette ignore
-// `hasDropdown`.
+// `hasDropdown`. Order: ابزارها precedes نمونه‌کار by request.
 
 export interface NavLink {
  id: string;
@@ -15,7 +15,7 @@ export interface NavLink {
 
 export const navLinks: NavLink[] = [
  { id: 'hero', label: 'خانه' },
- { id: 'projects', label: 'محصولات', hasDropdown: true },
  { id: 'tools', label: 'ابزارها', hasDropdown: true },
+ { id: 'projects', label: 'نمونه‌کار', hasDropdown: true },
  { id: 'about', label: 'درباره ما' },
 ];

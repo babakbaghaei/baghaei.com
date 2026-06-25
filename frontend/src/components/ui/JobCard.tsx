@@ -28,11 +28,12 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
    }}
    role="button"
    tabIndex={0}
+   dir="rtl"
    aria-label={`ارسال درخواست برای موقعیت شغلی ${job.title}`}
    className="cursor-pointer h-full rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
   >
    <Card
-    className="group space-y-8 h-full flex flex-col"
+    className="group space-y-8 h-full flex flex-col text-right"
     glowColor="var(--glass-fill)"
    >
     <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-display">

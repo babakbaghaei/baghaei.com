@@ -229,8 +229,15 @@ export default function SpinWin() {
                   animate={{ rotate: rotation }}
                   transition={{ duration: 5, ease: [0.16, 1, 0.3, 1] }}
                   className="rounded-full w-[300px] h-[300px] md:w-[500px] md:h-[500px] cursor-pointer"
-                  onClick={handleSpin}
+                  onClick={isSpinning ? undefined : handleSpin}
                 />
+                {options.length === 0 && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span className="text-sm font-bold text-muted-foreground text-center px-6">
+                      گزینه‌ای اضافه کنید
+                    </span>
+                  </div>
+                )}
               </div>
       
               {/* Master Button */}

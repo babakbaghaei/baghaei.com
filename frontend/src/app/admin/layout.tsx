@@ -9,6 +9,7 @@ import {
   Layers,
   MessageSquare,
   ShieldCheck,
+  Orbit,
   LogOut,
   Menu,
   X,
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { label: 'پروژه‌ها', href: '/admin/projects', icon: FolderKanban },
   { label: 'خدمات', href: '/admin/services', icon: Layers },
   { label: 'پیام‌ها', href: '/admin/messages', icon: MessageSquare },
+  { label: 'منظومه شمسی', href: '/admin/universe', icon: Orbit },
   { label: 'امنیت', href: '/admin/security', icon: ShieldCheck },
 ];
 

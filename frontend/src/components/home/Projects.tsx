@@ -170,7 +170,7 @@ function PinnedRow({ children }: { children: React.ReactNode }) {
 
  return (
   <div ref={pinTrackRef} className="relative -mr-fib-5 md:-mr-fib-8" style={{ height: pinHeight }}>
-   <div ref={pinViewportRef} className="sticky top-0 h-screen flex items-start overflow-hidden pt-[18vh]">
+   <div ref={pinViewportRef} className="sticky top-0 h-screen flex items-center overflow-hidden">
     <motion.div ref={rowRef} onFocus={revealOnFocus} style={{ x }} className="flex items-center gap-5 md:gap-6 w-max will-change-transform px-fib-5 md:px-fib-8">
      {children}
     </motion.div>
@@ -289,7 +289,7 @@ export default function Projects() {
    <PinnedRow>{horizontalItems}</PinnedRow>
   ) : mode === 'stack' ? (
    // Reduced motion: plain vertical stack — no pin, no horizontal travel.
-   <div className="flex flex-col items-center gap-fib-13 mb-fib-34">
+   <div className="flex flex-col items-center gap-fib-13 mb-fib-13">
     {SELECTED_PROJECTS.map((p) => (
      <div key={p.id} data-project-frame className="w-full max-w-[420px] min-h-[360px] md:min-h-[380px] relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
       <ProjectCard project={p} onClick={(e) => openProject(p, e)} />
@@ -304,7 +304,7 @@ export default function Projects() {
   ) : (
    // Mobile: native horizontal swipe row (no wheel hijack). data-lenis-prevent
    // lets native touch drive horizontal scrolling without Lenis interference.
-   <div className="relative group/projects-container mb-fib-34 -mr-fib-5 md:-mr-fib-8">
+   <div className="relative group/projects-container mb-fib-8 -mr-fib-5 md:-mr-fib-8">
     <div className={`absolute inset-y-0 right-0 w-20 md:w-fib-55 bg-gradient-to-l from-background via-background/80 to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
     <div className={`absolute inset-y-0 left-0 w-20 md:w-fib-55 bg-gradient-to-r from-background via-background/80 to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
 
@@ -314,7 +314,7 @@ export default function Projects() {
      data-lenis-prevent
      role="region"
      aria-label="اسکرول افقی پروژه‌ها و ابزارها"
-     className="flex items-center overflow-x-auto overscroll-x-contain pb-20 scrollbar-hide relative z-10 gap-5 md:gap-6 rounded-[2rem]">
+     className="flex items-center overflow-x-auto overscroll-x-contain pb-10 scrollbar-hide relative z-10 gap-5 md:gap-6 rounded-[2rem]">
      {horizontalItems}
     </div>
    </div>

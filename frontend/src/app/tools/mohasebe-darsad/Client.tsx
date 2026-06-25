@@ -40,7 +40,9 @@ const LABELS: Record<Mode, { a: string; b: string; aHint?: string; bHint?: strin
 
 const parse = (s: string) => {
   const v = normalizeDigits(s).replace(/[^\d.-]/g, '');
-  return v === '' || v === '-' || v === '.' ? null : Number(v);
+  if (v === '' || v === '-' || v === '.') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
 };
 
 export default function MohasebeDarsad() {

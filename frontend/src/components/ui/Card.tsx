@@ -105,6 +105,19 @@ export const Card: React.FC<CardProps> = ({
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
+  // Deterministic ease-back to rest. The tilt/glow/colour are driven only by the
+  // delegated window `mousemove`, so a fast flick off the card (or the card
+  // scrolling out from under a static cursor) can freeze the state mid-hover and
+  // then snap on the next stray move. Pointer-leave / blur springs everything
+  // home immediately so the exit always glides instead of jumping.
+  const resetToRest = () => {
+    tiltX.set(0);
+    tiltY.set(0);
+    innerGlowOpacity.set(0);
+    borderOpacity.set(0.2);
+    if (colorOnHoverOnly) colorOpacity.set(0);
+  };
+
   useEffect(() => {
     if (isTouchDevice || !isHoverable) return;
 
@@ -155,6 +168,12 @@ export const Card: React.FC<CardProps> = ({
     <CardContext.Provider value={{ tiltX, tiltY }}>
       <div
         ref={containerRef}
+        onMouseLeave={!isTouchDevice && isHoverable ? resetToRest : undefined}
+        onBlur={
+          !isTouchDevice && isHoverable
+            ? (e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) resetToRest(); }
+            : undefined
+        }
         className={`relative group ${className} ${roundedClass} select-none h-full`}
         style={{ perspective: "2000px" }}
       >

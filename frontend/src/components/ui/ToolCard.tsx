@@ -17,6 +17,7 @@ import { getCategoryMeta, type Tool } from '@/lib/data/tools';
 export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
   const Icon = tool.icon;
   const isSoon = tool.status === 'soon';
+  const isBeta = tool.status === 'beta';
   const accent = getCategoryMeta(tool.category).color;
 
   const card = (
@@ -53,11 +54,25 @@ export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
               {tool.lockNote ?? 'به‌زودی'}
             </span>
           ) : (
-            <ArrowUpLeft
-              className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
-              style={{ color: `rgb(${accent})` }}
-              aria-hidden
-            />
+            <div className="flex items-center gap-2">
+              {isBeta && (
+                <span
+                  className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-black font-display leading-tight"
+                  style={{
+                    background: `rgba(${accent}, 0.12)`,
+                    color: `rgb(${accent})`,
+                    border: `1px solid rgba(${accent}, 0.25)`,
+                  }}
+                >
+                  آزمایشی
+                </span>
+              )}
+              <ArrowUpLeft
+                className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                style={{ color: `rgb(${accent})` }}
+                aria-hidden
+              />
+            </div>
           )}
         </div>
 

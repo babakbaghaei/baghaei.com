@@ -7,7 +7,8 @@ import { FooterGroup } from '../ui/FooterGroup';
 const footerLinks = {
  company: [
   { label: 'خانه', href: '/' },
-  { label: 'پروژه‌ها', href: '/projects' },
+  { label: 'ابزارها', href: '/tools' },
+  { label: 'نمونه‌کار', href: '/projects' },
   { label: 'بلاگ', href: '/blog' },
   { label: 'استخدام', href: '/careers' },
   { label: 'خوراک RSS', href: '/feed.xml' },

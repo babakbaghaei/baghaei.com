@@ -125,12 +125,15 @@ const ProjectContent = ({ project }: { project: Project }) => {
           owns the overflow-hidden so the texture stays inside the rounded card —
           kept on its OWN element, because overflow-hidden forces a flat stacking
           context and would otherwise collapse every translateZ on the content.
-          Desktop: desaturated until hover, then eases to full colour (touch
-          devices have no hover, so they stay full colour — md: gate). The text
-          layer is a separate sibling, so this never dims the white copy. */}
-      <div className="absolute inset-0 overflow-hidden rounded-[2rem] transition-[filter] duration-500 ease-out motion-reduce:transition-none md:grayscale md:group-hover/card:grayscale-0">
-        {/* Fully-coloured background — the assigned project colour, edge to edge. */}
-        <div className="absolute inset-0" style={{ background: panelBg }} />
+          At REST the card shows the SAME neutral glass surface as the tool cards
+          (the Card's colorOnHoverOnly glass-fill below); the assigned project
+          colour fades in on hover. Touch devices have no hover, so they stay
+          full colour (md: gate). The text layer is a separate sibling, so this
+          never dims the white copy. */}
+      <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
+        {/* Project colour — hidden at rest on desktop (neutral like the tool
+            cards), fades in on hover; always on for touch (md: gate). */}
+        <div className="absolute inset-0 opacity-100 transition-opacity duration-500 ease-out md:opacity-0 md:group-hover/card:opacity-100 motion-reduce:transition-none" style={{ background: panelBg }} />
 
         {/* Faint oversized brand watermark — gives the flat colour depth + texture. */}
         <div
@@ -140,15 +143,19 @@ const ProjectContent = ({ project }: { project: Project }) => {
           <BrandIcon project={project} className="h-44 w-44" />
         </div>
 
-        {/* Tilt-reactive glass reflection (signature sheen). */}
+        {/* Tilt-reactive glass reflection (signature sheen) — gated to hover like
+            the colour, so the neutral rest card shows NO gradient overlay. The
+            sheen only belongs on the coloured hover state; on touch (no hover)
+            the card is coloured, so it stays on there. */}
         <motion.div
           aria-hidden
           style={{ background: sheen, mixBlendMode: "overlay" }}
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 opacity-100 transition-opacity duration-500 ease-out md:opacity-0 md:group-hover/card:opacity-100 motion-reduce:transition-none"
         />
 
-        {/* Bottom scrim for copy legibility. */}
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+        {/* No bottom scrim — Babak wants no shadow under the title/info. White
+            copy stays legible on the deep brand body (and the neutral glass at
+            rest) without it. */}
       </div>
 
       {/* Category chip (top, leading edge in RTL) — lifts further forward on hover. */}
@@ -156,7 +163,7 @@ const ProjectContent = ({ project }: { project: Project }) => {
         className="absolute right-4 top-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(60px)] motion-reduce:transition-none"
         style={{ transform: "translateZ(24px)" }}
       >
-        <span className="rounded-full bg-black/35 px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
+        <span className="rounded-full bg-black/35 md:bg-transparent md:group-hover/card:bg-black/35 transition-colors duration-500 ease-out motion-reduce:transition-none px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
           {project.category}
         </span>
       </div>
@@ -175,13 +182,13 @@ const ProjectContent = ({ project }: { project: Project }) => {
           a soft "being published" pill so users know images aren't viewable yet. */}
       {project.imagesLockReason === 'publishing' ? (
         <div className="absolute left-4 bottom-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(55px)] motion-reduce:transition-none" style={{ transform: "translateZ(24px)" }}>
-          <span className="rounded-full bg-black/40 px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
+          <span className="rounded-full bg-black/40 md:bg-transparent md:group-hover/card:bg-black/40 transition-colors duration-500 ease-out motion-reduce:transition-none px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
             در حال انتشار
           </span>
         </div>
       ) : project.isLocked && (
         <div className="absolute left-4 bottom-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(55px)] motion-reduce:transition-none" style={{ transform: "translateZ(24px)" }}>
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white/80 ring-1 ring-white/15 backdrop-blur-md">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 md:bg-transparent md:group-hover/card:bg-black/40 transition-colors duration-500 ease-out motion-reduce:transition-none text-white/80 ring-1 ring-white/15 backdrop-blur-md">
             <Lock className="h-3.5 w-3.5" aria-hidden />
           </span>
         </div>
@@ -198,7 +205,7 @@ const ProjectContent = ({ project }: { project: Project }) => {
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur-md">
             <BrandMark project={project} />
           </span>
-          <h3 className="font-display text-lg font-black leading-tight text-white line-clamp-2 drop-shadow-lg md:text-xl">
+          <h3 className="font-display text-lg font-black leading-tight text-white line-clamp-2 md:text-xl">
             {project.title}
           </h3>
         </div>
@@ -232,6 +239,7 @@ export const ProjectCard: React.FC<{ project: Project, onClick: (e: React.MouseE
       roundedClass="rounded-[2rem]"
       className={isActive ? "ring-1 ring-white/15" : ""}
       isHoverable={true}
+      colorOnHoverOnly
       contentClassName="p-0"
     >
       <div

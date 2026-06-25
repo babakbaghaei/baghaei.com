@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { Cake, CalendarHeart, Gift, Hourglass } from 'lucide-react';
-import { toGregorian, toJalaali, jalaaliMonthLength } from 'jalaali-js';
 import {
   differenceInYears,
   differenceInMonths,
@@ -15,7 +14,7 @@ import {
   TwoPane,
   Panel,
   VerdictPanel,
-  SelectField,
+  Field,
   Row,
   Headline,
   EmptyState,
@@ -27,23 +26,20 @@ import {
   motion,
   faNum,
 } from '@/components/tools/shell';
+import {
+  PersianDatePicker,
+  type PDate,
+  pdateFromGregorian,
+  pdateToDate,
+} from '@/components/tools/DatePicker';
 
 const ACCENT = '244, 63, 94'; // rose — matches the «سرگرمی» category
 
-const MONTHS = [
-  'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
-  'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',
-];
 // getDay(): 0=Sunday … 6=Saturday
 const WEEKDAYS = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
 
-const todayJ = toJalaali(new Date());
-const YEARS = Array.from({ length: todayJ.jy - 1299 }, (_, i) => todayJ.jy - i); // current → 1300
-
 export default function MohasebeSen() {
-  const [jy, setJy] = useState(String(todayJ.jy - 30));
-  const [jm, setJm] = useState('1');
-  const [jd, setJd] = useState('1');
+  const [birthP, setBirthP] = useState<PDate | null>(null);
 
   const { share, copied } = useShareResult();
 
@@ -53,26 +49,22 @@ export default function MohasebeSen() {
     const y = p.get('y');
     const m = p.get('m');
     const d = p.get('d');
-    if (y && /^\d+$/.test(y)) setJy(y);
-    if (m && /^\d+$/.test(m)) setJm(m);
-    if (d && /^\d+$/.test(d)) setJd(d);
+    if (y && m && d && /^\d+$/.test(y) && /^\d+$/.test(m) && /^\d+$/.test(d)) {
+      setBirthP(pdateFromGregorian(Number(y), Number(m), Number(d)));
+    }
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  const yNum = Number(jy);
-  const mNum = Number(jm);
-  // Clamp the day to the selected month's length (handles 31/30/29).
-  const monthLen = jalaaliMonthLength(yNum, mNum) || 31;
-  const dNum = Math.min(Number(jd), monthLen);
-
   const birth = useMemo(() => {
-    const g = toGregorian(yNum, mNum, dNum);
-    return new Date(g.gy, g.gm - 1, g.gd, 12, 0, 0);
-  }, [yNum, mNum, dNum]);
+    if (!birthP) return null;
+    const d = pdateToDate(birthP);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+  }, [birthP]);
 
   const calc = useMemo(() => {
+    if (!birth) return { empty: true } as const;
     const now = new Date();
-    if (birth.getTime() > now.getTime()) return { future: true } as const;
+    if (birth.getTime() > now.getTime()) return { empty: false, future: true } as const;
 
     const years = differenceInYears(now, birth);
     const months = differenceInMonths(now, addYears(birth, years));
@@ -86,6 +78,7 @@ export default function MohasebeSen() {
     const daysToNext = differenceInDays(nextB, now);
 
     return {
+      empty: false as const,
       future: false as const,
       years,
       months,
@@ -97,14 +90,14 @@ export default function MohasebeSen() {
     };
   }, [birth]);
 
-  const valid = !calc.future;
+  const valid = !calc.empty && !calc.future;
 
   const onShare = () => {
-    if (!valid) return;
+    if (!valid || !birthP) return;
     share({
       title: 'محاسبه‌گر سن',
       text: `سن من ${faNum(String(calc.years))} سال و ${faNum(String(calc.months))} ماه و ${faNum(String(calc.days))} روز است.`,
-      params: { y: String(yNum), m: String(mNum), d: String(dNum) },
+      params: { y: String(birthP.gy), m: String(birthP.gm), d: String(birthP.gd) },
     });
   };
 
@@ -135,26 +128,25 @@ export default function MohasebeSen() {
     >
       <TwoPane>
         <Panel className="space-y-5">
-          <SelectField label="سال تولد" value={jy} onChange={setJy}>
-            {YEARS.map((y) => (
-              <option key={y} value={y}>{faNum(String(y))}</option>
-            ))}
-          </SelectField>
-          <SelectField label="ماه تولد" value={jm} onChange={setJm}>
-            {MONTHS.map((name, i) => (
-              <option key={i} value={i + 1}>{name}</option>
-            ))}
-          </SelectField>
-          <SelectField label="روز تولد" value={jd} onChange={setJd}>
-            {Array.from({ length: monthLen }, (_, i) => i + 1).map((d) => (
-              <option key={d} value={d}>{faNum(String(d))}</option>
-            ))}
-          </SelectField>
+          <Field label="تاریخ تولد">
+            <PersianDatePicker
+              value={birthP}
+              onChange={(p) => setBirthP(p)}
+              placeholder="تاریخ تولد را انتخاب کنید"
+              clearable
+              onClear={() => setBirthP(null)}
+              ariaLabel="تاریخ تولد"
+            />
+          </Field>
         </Panel>
 
         <VerdictPanel accent={ACCENT}>
           <AnimatePresence mode="wait">
-            {calc.future ? (
+            {calc.empty ? (
+              <EmptyState accent={ACCENT} icon={<Cake className="w-6 h-6" />}>
+                برای محاسبهٔ سن، تاریخ تولد خود را انتخاب کنید.
+              </EmptyState>
+            ) : calc.future ? (
               <EmptyState accent={ACCENT} icon={<Cake className="w-6 h-6" />}>
                 تاریخ تولد نمی‌تواند در آینده باشد. لطفاً تاریخ معتبری انتخاب کنید.
               </EmptyState>

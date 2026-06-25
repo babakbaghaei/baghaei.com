@@ -75,7 +75,7 @@ export default function Diyeh() {
   const calc = useMemo(() => {
     const fullRial = DIYEH_FULL_RIAL[year];
     if (!fullRial) return null;
-    const base = haram ? fullRial * DIYEH_HARAM_FACTOR : fullRial;
+    const base = haram && part === 'full' ? fullRial * DIYEH_HARAM_FACTOR : fullRial;
     const selected = PARTS.find((p) => p.key === part)!;
     const frac = selected.frac ?? Math.max(0, Math.min(100, Number(pct) || 0)) / 100;
     if (frac <= 0) return null;
@@ -144,14 +144,23 @@ export default function Diyeh() {
             ))}
           </SelectField>
 
-          <Toggle
-            label="در ماه‌های حرام (تغلیظ دیه)"
-            hint="افزایش یک‌سوم دیهٔ نفس در ماه‌های حرام"
-            checked={haram}
-            onChange={setHaram}
-          />
+          {part === 'full' && (
+            <Toggle
+              label="در ماه‌های حرام (تغلیظ دیه)"
+              hint="افزایش یک‌سوم دیهٔ نفس در ماه‌های حرام"
+              checked={haram}
+              onChange={setHaram}
+            />
+          )}
 
-          <SelectField label="عضو / نوع آسیب" value={part} onChange={setPart}>
+          <SelectField
+            label="عضو / نوع آسیب"
+            value={part}
+            onChange={(v) => {
+              setPart(v);
+              if (v !== 'full') setHaram(false);
+            }}
+          >
             {PARTS.map((p) => (
               <option key={p.key} value={p.key}>
                 {p.label}

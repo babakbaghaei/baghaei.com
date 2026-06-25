@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { NavItem } from '../ui/NavItem';
 import { Menu, ChevronDown, Layout, Globe, Sparkles, Dumbbell, Gamepad2, Cpu, Shield, Smartphone, Palette, ArrowLeft, Search } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
-import { AccessibilityMenu } from './AccessibilityMenu';
 import { TOOLS, TOOL_CATEGORIES, getCategoryMeta } from '@/lib/data/tools';
 import { PROJECTS_DATA } from '@/lib/data/projects';
 import { Button } from '../ui/Button';
@@ -159,7 +158,6 @@ export default function Navbar() {
        <Search aria-hidden="true" className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />
       </button>
       <ThemeToggle />
-      <AccessibilityMenu />
       <div className="h-6 w-px bg-border" />
      </div>
 
@@ -173,7 +171,6 @@ export default function Navbar() {
     </div>
 
     <div className="md:hidden flex items-center gap-2 relative z-[210]">
-     <AccessibilityMenu />
      <ThemeToggle />
      <button
       onClick={() => {
@@ -187,12 +184,12 @@ export default function Navbar() {
      </button>
     </div>
 
-    {/* Mega Dropdown — separate panels for محصولات، ابزارها و خدمات */}
+    {/* Mega Dropdown — separate panels for نمونه‌کار، ابزارها و خدمات */}
     <AnimatePresence>
      {openMenu && (
       <motion.div
        role="region"
-       aria-label={openMenu === 'projects' ? 'محصولات و پلتفرم‌ها' : 'جعبه ابزار'}
+       aria-label={openMenu === 'projects' ? 'نمونه‌کارها و پلتفرم‌ها' : 'جعبه ابزار'}
        initial={{ opacity: 0, y: -10 }}
        animate={{ opacity: 1, y: 0 }}
        exit={{ opacity: 0, y: -10 }}
@@ -209,10 +206,10 @@ export default function Navbar() {
                <div className="space-y-3">
                  <div className="flex items-center gap-2.5">
                    <Layout className="w-4 h-4 text-primary" />
-                   <h4 className="text-sm font-black uppercase text-foreground">محصولات و پلتفرم‌ها</h4>
+                   <h4 className="text-sm font-black uppercase text-foreground">نمونه‌کارها و پلتفرم‌ها</h4>
                  </div>
                  <p className="text-[12px] text-muted-foreground leading-relaxed">
-                   منتخبی از پلتفرم‌ها و محصولاتی که از ایده تا اجرا طراحی، توسعه و راه‌اندازی کرده‌ایم.
+                   منتخبی از پلتفرم‌ها و پروژه‌هایی که از ایده تا اجرا طراحی، توسعه و راه‌اندازی کرده‌ایم.
                  </p>
                </div>
                <Link

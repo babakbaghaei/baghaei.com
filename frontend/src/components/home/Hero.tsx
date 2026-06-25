@@ -6,10 +6,26 @@ import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import Magnetic from '@/components/effects/Magnetic';
 import GlobalUniverse from '@/components/effects/GlobalUniverseLazy';
+import { DEFAULT_SCALE, type SolarScale } from '@/components/effects/solarScale';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 
 export default function Hero({ children }: { children?: React.ReactNode }) {
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Foreground solar-system scale. Defaults to the locked DEFAULT_SCALE; an
+  // override tuned in the admin «منظومه شمسی» panel is saved to localStorage and
+  // applied here on the same browser. Lazy init reads it once; it only feeds
+  // GlobalUniverse (ssr:false), so there is no hydration mismatch.
+  const [solarScale] = useState<SolarScale>(() => {
+    if (typeof window === 'undefined') return DEFAULT_SCALE;
+    try {
+      const raw = window.localStorage.getItem('solar-scale-dev');
+      if (raw) return { ...DEFAULT_SCALE, ...JSON.parse(raw) };
+    } catch {
+      /* ignore */
+    }
+    return DEFAULT_SCALE;
+  });
   const [displayTextLine1, setDisplayTextLine1] = useState('');
   const [displayTextLine2, setDisplayTextLine2] = useState('');
   const [phase, setTypingPhase] = useState<'line1' | 'line2'>('line1');
@@ -100,7 +116,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
             card behind the copy. Negative inset cancels the Card's padding so it
             reaches the true card corners. */}
         <div className="pointer-events-none absolute -inset-6 sm:-inset-9 lg:-inset-14 overflow-hidden rounded-[1.75rem] sm:rounded-[2.25rem] lg:rounded-[3rem]">
-          <GlobalUniverse />
+          <GlobalUniverse scale={solarScale} />
         </div>
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-12 min-h-[320px] sm:min-h-[420px] lg:min-h-[540px]">
           <motion.div
