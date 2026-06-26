@@ -20,11 +20,14 @@ export class CreateContactDto {
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(30)
-  // Accepts international and Iranian formats: optional leading +, then digits
-  // with optional spaces, dashes, dots, or parentheses (at least 7 digits).
-  @Matches(/^\+?[\d\s().-]{7,}$/, {
-    message: 'phone must be a valid phone number',
+  @MaxLength(254)
+  // The form field is "شماره تماس یا ایمیل" (phone OR email), so accept either:
+  //  - phone: optional leading +, then ≥7 digits with spaces/dashes/dots/parens
+  //  - email: a standard local@domain.tld
+  // Rejecting one or the other 400s real users who legitimately gave the form
+  // exactly what it asked for.
+  @Matches(/^(\+?[\d\s().-]{7,}|[^\s@]+@[^\s@]+\.[^\s@]+)$/, {
+    message: 'لطفاً یک شماره تماس یا ایمیل معتبر وارد کنید',
   })
   phone: string;
 
