@@ -177,7 +177,10 @@ export function CommandMenu() {
             />
           </div>
 
-          <Command.List className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2 scrollbar-hide [-webkit-overflow-scrolling:touch]">
+          <Command.List
+            data-lenis-prevent
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2 scrollbar-hide [-webkit-overflow-scrolling:touch]"
+          >
             <Command.Empty className="py-6 text-center text-sm text-muted-foreground font-display">
               نتیجه‌ای یافت نشد.
             </Command.Empty>

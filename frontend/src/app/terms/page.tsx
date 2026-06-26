@@ -11,7 +11,13 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
  return (
-  <LegalLayout title="شرایط" titleAccent="استفاده." lastUpdated="۲ دی ۱۴۰۴">
+  <LegalLayout
+   title="شرایط"
+   titleAccent="استفاده."
+   lastUpdated="۲ دی ۱۴۰۴"
+   contactLabel="برای امور حقوقی با ما در تماس باشید:"
+   contactEmail="legal@baghaei.com"
+  >
      <section className="space-y-4">
       <p>
        به وب‌سایت گروه فناوری بقایی خوش آمدید. دسترسی و استفاده شما از خدمات ما مشروط به پذیرش و رعایت شرایط زیر است. این توافق‌نامه تمامی بازدیدکنندگان، کاربران و سایر افرادی که به خدمات دسترسی دارند را شامل می‌شود.
@@ -59,12 +65,6 @@ export default function TermsPage() {
       <h2 className="text-2xl font-bold text-foreground font-display border-s-2 border-primary ps-4">۵. قانون حاکم</h2>
       <p className="text-muted-foreground">
        این شرایط بر اساس قوانین جمهوری اسلامی ایران تفسیر و اجرا می‌شود. هرگونه اختلاف ناشی از این شرایط در صلاحیت دادگاه‌های تهران خواهد بود.
-      </p>
-     </section>
-
-     <section className="pt-8 border-t border-border">
-      <p className="text-sm text-muted-foreground text-center">
-       تماس حقوقی: <a href="mailto:legal@baghaei.com" dir="ltr" className="text-foreground font-mono inline-block hover:underline">legal@baghaei.com</a>
       </p>
      </section>
   </LegalLayout>

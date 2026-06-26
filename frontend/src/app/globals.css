@@ -240,6 +240,21 @@ select:focus-visible {
     scrollbar-width: none;
 }
 
+/* Custom cursor visibility: on desktop fine-pointer devices the bespoke
+   CustomCursor (mounted globally, md:block only) is the pointer — hide the
+   native system cursor so it doesn't sit on top of the custom dot. Touch /
+   coarse-pointer devices keep the native cursor (the custom one is hidden there).
+   The text-insertion caret in inputs is unaffected by `cursor: none`. */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+  html,
+  body,
+  *,
+  *::before,
+  *::after {
+    cursor: none !important;
+  }
+}
+
 /* Accessibility: honor the user's reduced-motion preference.
    Near-instant durations keep transitionend events firing while
    removing the heavy motion (sun pulse, tilt, preloader, etc.). */
@@ -265,10 +280,16 @@ select:focus-visible {
   scroll-behavior: auto !important;
 }
 
-/* Print: produce a clean PDF (e.g. of a tool result) by stripping site chrome,
-   decorative canvases and any element opted out via `.no-print`, and forcing
-   readable black-on-white. */
+/* Print: produce a clean, OFFICIAL-looking PDF (e.g. of a tool result) by
+   stripping site chrome, decorative canvases and any element opted out via
+   `.no-print`, forcing readable black-on-white, and adding a formal letterhead
+   + footer (the `.print-letterhead` / `.print-footer` blocks rendered by
+   ToolShell, hidden on screen and revealed only here). */
 @media print {
+  @page {
+    margin: 18mm 16mm;
+  }
+
   nav,
   footer,
   canvas,
@@ -276,13 +297,67 @@ select:focus-visible {
   .no-print {
     display: none !important;
   }
+
   html,
   body {
     background: #fff !important;
     color: #000 !important;
   }
+
   * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    box-shadow: none !important;
+  }
+
+  /* The tool page wraps everything in <main> with heavy top/bottom padding for
+     the fixed navbar — collapse it for print so the document starts at the top. */
+  main {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Result + input panels: flatten the glass to a crisp bordered card on white
+     so the figures read like an official statement, not a UI screenshot. */
+  .bg-card\/40,
+  .bg-card\/30,
+  .bg-card,
+  .backdrop-blur-xl {
+    background: #fff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #d4d4d8 !important;
+  }
+
+  /* Stack the two-pane (inputs | result) so nothing is clipped on the page. */
+  .grid {
+    display: block !important;
+  }
+  .grid > * + * {
+    margin-top: 14px;
+  }
+
+  /* Formal letterhead shown only in print. */
+  .print-letterhead {
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #000;
+  }
+
+  /* Formal footer note shown only in print. */
+  .print-footer {
+    margin-top: 22px;
+    padding-top: 10px;
+    border-top: 1px solid #999;
+    font-size: 10px;
+    line-height: 1.7;
+    text-align: center;
+    color: #444 !important;
+  }
+
+  /* Avoid awkward breaks inside a result block. */
+  .print-letterhead,
+  .print-footer {
+    break-inside: avoid;
   }
 }

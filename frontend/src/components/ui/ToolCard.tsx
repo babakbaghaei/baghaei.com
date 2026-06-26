@@ -7,83 +7,135 @@ import { Card } from './Card';
 import { getCategoryMeta, type Tool } from '@/lib/data/tools';
 
 /**
- * Tool card for the dense /tools grid.
- * Built on the shared <Card> so it inherits the exact house physics — glass
- * blur, 3D mouse-tilt, and corner radial-lighting — identical to ProjectCard
- * and the home page's SquareToolCard. Content is layered with translateZ for
- * the 3D pop. The bespoke local pointer-tracking lived here before and diverged
- * from the shared lighting; Card now owns all of it.
+ * The single, canonical tool card — used both in the dense /tools grid AND the
+ * home page's featured row, so the two can never drift in size or style again.
+ * Built on the shared <Card> so it inherits the house physics (glass blur, 3D
+ * mouse-tilt, corner radial-lighting) identical to ProjectCard. Content is
+ * layered with translateZ for the 3D pop.
+ *
+ * Shape: the card always fills its parent (h-full). The PARENT decides the
+ * footprint — the /tools grid wraps each cell in `aspect-square`; the home row
+ * gives each tile a fixed height. Either way every tool tile is square and
+ * identical.
+ *
+ * Accent defaults to the tool's CATEGORY colour so each category reads as one
+ * coherent hue. Pass `accent` to override with a per-tool mix — used by the
+ * «پرطرفدار» section and the home row, which are deliberately varied/colourful.
  */
-export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
+export const ToolCard: React.FC<{
+  tool: Tool;
+  accent?: string;
+  /** Short tiles (home row) — no hover expansion so content never spills the
+      fixed-height tile. The /tools grid is square/tall, so it stays rich. */
+  compact?: boolean;
+  /** Reveal the category line on hover — only the «پرطرفدار» section wants it. */
+  showCategory?: boolean;
+}> = ({ tool, accent: accentProp, compact = false, showCategory = false }) => {
   const Icon = tool.icon;
   const isSoon = tool.status === 'soon';
   const isBeta = tool.status === 'beta';
-  const accent = getCategoryMeta(tool.category).color;
+  const accent = accentProp ?? getCategoryMeta(tool.category).color;
+  const CatIcon = getCategoryMeta(tool.category).icon;
+  // Hover-reveal (desc expand + category) is disabled in compact tiles and for
+  // locked tools, so short fixed-height tiles never overflow.
+  const canReveal = !isSoon && !compact;
+  const revealCategory = canReveal && showCategory;
 
   const card = (
     <Card
       glowColor={`rgba(${accent}, 0.22)`}
-      roundedClass="rounded-3xl"
-      contentClassName="p-6"
-      className="min-h-[168px]"
+      roundedClass="rounded-[1.75rem]"
+      contentClassName="p-4 md:p-5"
+      className="h-full"
       isHoverable={!isSoon}
       colorOnHoverOnly
     >
       <div
-        className="flex h-full flex-col text-right"
+        className="relative flex h-full flex-col text-right"
         dir="rtl"
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* top row: icon + status / arrow */}
+        {/* «آزمایشی» corner tag — pinned to the top-leading (left) corner edge.
+            Subtle muted glass so it doesn't shout. */}
+        {isBeta && (
+          <span
+            className="absolute -top-2 -left-2 z-10 inline-flex items-center rounded-full bg-muted/70 px-2 py-0.5 text-[9px] font-bold font-display leading-tight text-muted-foreground/90 backdrop-blur-sm"
+            style={{ transform: 'translateZ(50px)' }}
+          >
+            آزمایشی
+          </span>
+        )}
+        {/* top row: open affordance / soon status. The tool icon now lives at the
+            BOTTOM next to the title (like the project cards' brand mark). */}
         <div
-          className="flex items-start justify-between"
+          className="flex items-start justify-end"
           style={{ transform: 'translateZ(40px)' }}
         >
-          <div
-            className="flex h-11 w-11 items-center justify-center rounded-2xl"
-            style={{
-              background: `rgba(${accent}, 0.1)`,
-              color: `rgb(${accent})`,
-            }}
-          >
-            <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
-          </div>
           {isSoon ? (
-            <span className="inline-flex max-w-[60%] items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-[11px] font-bold font-display leading-tight text-muted-foreground text-right">
+            <span className="inline-flex max-w-[80%] items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-[11px] font-bold font-display leading-tight text-muted-foreground text-right">
               <Lock className="h-3 w-3 shrink-0" aria-hidden />
               {tool.lockNote ?? 'به‌زودی'}
             </span>
           ) : (
-            <div className="flex items-center gap-2">
-              {isBeta && (
-                <span
-                  className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-black font-display leading-tight"
-                  style={{
-                    background: `rgba(${accent}, 0.12)`,
-                    color: `rgb(${accent})`,
-                    border: `1px solid rgba(${accent}, 0.25)`,
-                  }}
-                >
-                  آزمایشی
-                </span>
-              )}
-              <ArrowUpLeft
-                className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
-                style={{ color: `rgb(${accent})` }}
-                aria-hidden
-              />
-            </div>
+            <ArrowUpLeft
+              className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+              style={{ color: `rgb(${accent})` }}
+              aria-hidden
+            />
           )}
         </div>
 
-        {/* title + description anchored to the bottom */}
-        <div className="mt-auto pt-5" style={{ transform: 'translateZ(30px)' }}>
-          <h3 className="font-display text-base font-black leading-snug text-foreground">
-            {tool.title}
-          </h3>
-          <p className="mt-1.5 line-clamp-3 font-sans text-[13px] leading-relaxed text-muted-foreground">
-            {tool.desc}
-          </p>
+        {/* title + icon + description anchored to the bottom — same spot as the
+            project cards' brand mark + title. The «آزمایشی» tag sits on its own
+            line UNDER the title. */}
+        <div className="mt-auto pt-4" style={{ transform: 'translateZ(30px)' }}>
+          <div className="flex items-center gap-2.5">
+            <span
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+              style={{
+                background: `rgba(${accent}, 0.12)`,
+                color: `rgb(${accent})`,
+              }}
+            >
+              <Icon className="h-5 w-5" strokeWidth={1.75} />
+            </span>
+            <h3 className="font-display text-sm md:text-base font-black leading-snug text-foreground">
+              {tool.title}
+            </h3>
+          </div>
+          {/* Description — 2 lines at rest, smoothly grows (real max-height
+              animation, not a clamp jump) to reveal more on hover. Compact tiles
+              stay clamped so they never overflow. */}
+          {canReveal ? (
+            <p
+              className="mt-1.5 overflow-hidden font-sans text-xs leading-relaxed text-muted-foreground transition-[max-height] duration-300 ease-out [max-height:2.6rem] group-hover:[max-height:7rem] max-md:[max-height:7rem] motion-reduce:transition-none"
+            >
+              {tool.desc}
+            </p>
+          ) : (
+            <p className="mt-1.5 line-clamp-2 font-sans text-xs leading-relaxed text-muted-foreground">
+              {tool.desc}
+            </p>
+          )}
+
+          {/* Category — hidden at rest, slides open on hover (like the project
+              cards). Only for «پرطرفدار» tools. Always open on touch (max-md). */}
+          {revealCategory && (
+            <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-out group-hover:grid-rows-[1fr] group-hover:opacity-100 max-md:grid-rows-[1fr] max-md:opacity-100 motion-reduce:transition-none">
+              <div className="min-h-0 overflow-hidden">
+                <span
+                  className="mt-3 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold font-display leading-tight"
+                  style={{
+                    background: `rgba(${accent}, 0.1)`,
+                    color: `rgb(${accent})`,
+                  }}
+                >
+                  <CatIcon className="h-3 w-3 shrink-0" strokeWidth={2} />
+                  {tool.category}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Card>
@@ -96,7 +148,7 @@ export const ToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
   return (
     <Link
       href={`/tools/${tool.slug}`}
-      className="block h-full rounded-3xl outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+      className="group block h-full rounded-[1.75rem] outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
     >
       {card}
     </Link>

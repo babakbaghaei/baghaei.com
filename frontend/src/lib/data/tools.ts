@@ -15,7 +15,6 @@ import {
   Percent,
   Wrench,
   Gamepad2,
-  Type,
   FileText,
   Gift,
   Languages,
@@ -38,6 +37,25 @@ import {
   Calculator,
   FileSpreadsheet,
   BookHeart,
+  HandCoins,
+  Gavel,
+  Banknote,
+  TicketPercent,
+  TrendingUp,
+  FileSignature,
+  Repeat,
+  WholeWord,
+  LetterText,
+  SpellCheck,
+  Pilcrow,
+  PersonStanding,
+  Disc3,
+  CircleDollarSign,
+  Feather,
+  Star,
+  Rabbit,
+  Hand,
+  Sparkles,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -58,10 +76,12 @@ export interface Tool {
   lockNote?: string;
   /** در صفحهٔ اصلی به‌عنوان منتخب نمایش داده شود. */
   featured?: boolean;
+  /** در صفحهٔ ابزارها در دستهٔ «پرطرفدار» (بالای همه) نمایش داده شود. */
+  popular?: boolean;
 }
 
 /* ───────────── دسته‌بندی‌های کلان ─────────────
- * هفت دستهٔ بزرگ به‌جای دسته‌های ریز و پراکنده. هر ابزار دقیقاً در یک دسته قرار
+ * هشت دستهٔ بزرگ به‌جای دسته‌های ریز و پراکنده. هر ابزار دقیقاً در یک دسته قرار
  * می‌گیرد و ترتیب نمایش از کلیدهای CATEGORY_META تبعیت می‌کند (نه ترتیب آرایه).
  */
 export const CAT_LEGAL = 'حقوقی و قضایی';
@@ -71,6 +91,7 @@ export const CAT_UTILITY = 'محاسبه و ابزار';
 export const CAT_TEXT = 'متن و نوشتار';
 export const CAT_HEALTH = 'سلامت و زندگی';
 export const CAT_FUN = 'سرگرمی';
+export const CAT_ASTRO = 'فال و طالع‌بینی';
 
 export const TOOLS: Tool[] = [
   {
@@ -78,18 +99,19 @@ export const TOOLS: Tool[] = [
     title: 'خسارت تأخیر تأدیه',
     desc: 'محاسبهٔ دقیق کاهش ارزش پول بر اساس شاخص رسمی بانک مرکزی و ماده ۵۲۲ آیین دادرسی مدنی.',
     category: CAT_LEGAL,
-    icon: Scale,
+    icon: HandCoins,
     accent: '245, 158, 11',
     status: 'beta',
+    popular: true,
   },
   {
     slug: 'diyeh',
     title: 'ماشین‌حساب دیه',
     desc: 'محاسبهٔ دیهٔ کامل و دیهٔ اعضا و جراحات بر اساس نرخ رسمی قوهٔ قضاییه و مادهٔ ۵۴۹ قانون مجازات اسلامی.',
     category: CAT_LEGAL,
-    icon: HeartPulse,
+    icon: Gavel,
     accent: '190, 18, 60',
-    status: 'new',
+    status: 'beta',
   },
   {
     slug: 'taghsim-ers',
@@ -108,7 +130,7 @@ export const TOOLS: Tool[] = [
     category: CAT_LEGAL,
     icon: Landmark,
     accent: '79, 70, 229',
-    status: 'new',
+    status: 'beta',
   },
   {
     slug: 'mohlat-ghanuni',
@@ -122,7 +144,7 @@ export const TOOLS: Tool[] = [
   {
     slug: 'mahriyeh',
     title: 'مهریه به نرخ روز',
-    desc: 'محاسبهٔ ارزش روز مهریه بر اساس تعداد سکه و قیمت روز، یا مبلغ وجه نقد تعدیل‌شده با شاخص.',
+    desc: 'محاسبهٔ ارزش روز مهریه بر اساس تعداد و نوع سکه و قیمت روز، یا مبلغ وجه نقد تعدیل‌شده با شاخص بانک مرکزی.',
     category: CAT_LEGAL,
     icon: Gem,
     accent: '190, 18, 60',
@@ -136,16 +158,16 @@ export const TOOLS: Tool[] = [
     category: CAT_LEGAL,
     icon: Stamp,
     accent: '79, 70, 229',
-    status: 'new',
+    status: 'beta',
   },
   {
     slug: 'khesarat-cheque',
     title: 'خسارت تأخیر چک برگشتی',
-    desc: 'برآورد خسارت تأخیر تأدیه مبلغ چک برگشتی بر مبنای نرخ شاخص و تعداد روز تأخیر.',
+    desc: 'برآورد خسارت تأخیر تأدیه مبلغ چک برگشتی بر مبنای شاخص رسمی بانک مرکزی و تعداد روز تأخیر.',
     category: CAT_LEGAL,
     icon: ReceiptText,
     accent: '245, 158, 11',
-    status: 'new',
+    status: 'beta',
   },
 
   {
@@ -153,10 +175,11 @@ export const TOOLS: Tool[] = [
     title: 'محاسبه‌گر اقساط وام',
     desc: 'محاسبهٔ قسط ماهانه، سود کل و جدول بازپرداخت وام بانکی بر پایهٔ فرمول اقساط مساوی.',
     category: CAT_FINANCE,
-    icon: Wallet,
+    icon: Banknote,
     accent: '217, 119, 6',
     status: 'new',
     featured: true,
+    popular: true,
   },
   {
     slug: 'sood-sepordeh',
@@ -183,8 +206,9 @@ export const TOOLS: Tool[] = [
     category: CAT_FINANCE,
     icon: Wallet,
     accent: '5, 150, 105',
-    status: 'new',
+    status: 'beta',
     featured: true,
+    popular: true,
   },
   {
     slug: 'maliyat-arzesh-afzoodeh',
@@ -193,7 +217,7 @@ export const TOOLS: Tool[] = [
     category: CAT_FINANCE,
     icon: Receipt,
     accent: '217, 119, 6',
-    status: 'new',
+    status: 'beta',
   },
   {
     slug: 'leasing-khodro',
@@ -211,14 +235,14 @@ export const TOOLS: Tool[] = [
     category: CAT_FINANCE,
     icon: Coins,
     accent: '234, 179, 8',
-    status: 'new',
+    status: 'beta',
   },
   {
     slug: 'mohasebe-takhfif',
     title: 'محاسبه‌گر تخفیف',
     desc: 'محاسبهٔ مبلغ پس از تخفیف، میزان صرفه‌جویی و قیمت نهایی به‌همراه مالیات بر ارزش‌افزوده.',
     category: CAT_FINANCE,
-    icon: Percent,
+    icon: TicketPercent,
     accent: '217, 119, 6',
     status: 'new',
   },
@@ -227,7 +251,7 @@ export const TOOLS: Tool[] = [
     title: 'قیمت تمام‌شده و سود',
     desc: 'محاسبهٔ قیمت فروش، حاشیهٔ سود و نقطهٔ سربه‌سر بر اساس بهای تمام‌شده و درصد سود.',
     category: CAT_FINANCE,
-    icon: Calculator,
+    icon: TrendingUp,
     accent: '217, 119, 6',
     status: 'new',
   },
@@ -255,9 +279,9 @@ export const TOOLS: Tool[] = [
     title: 'تبدیل رهن و اجاره',
     desc: 'تبدیل ودیعه (رهن) به اجارهٔ ماهانه و برعکس با نرخ تبدیل دلخواه، بر پایهٔ عرف بازار مسکن.',
     category: CAT_REALESTATE,
-    icon: ArrowRightLeft,
+    icon: Repeat,
     accent: '2, 132, 199',
-    status: 'new',
+    status: 'beta',
     featured: true,
   },
   {
@@ -276,16 +300,16 @@ export const TOOLS: Tool[] = [
     category: CAT_REALESTATE,
     icon: Handshake,
     accent: '13, 148, 136',
-    status: 'new',
+    status: 'beta',
   },
   {
     slug: 'maliyat-naghl-melk',
     title: 'مالیات نقل‌وانتقال ملک',
     desc: 'برآورد مالیات نقل‌وانتقال املاک بر اساس ارزش معاملاتی و نرخ قابل تنظیم.',
     category: CAT_REALESTATE,
-    icon: Building2,
+    icon: FileSignature,
     accent: '13, 148, 136',
-    status: 'new',
+    status: 'beta',
   },
 
   {
@@ -297,6 +321,7 @@ export const TOOLS: Tool[] = [
     accent: '139, 92, 246',
     status: 'new',
     featured: true,
+    popular: true,
   },
   {
     slug: 'tabdil-vahed',
@@ -316,6 +341,7 @@ export const TOOLS: Tool[] = [
     accent: '124, 58, 237',
     status: 'new',
     featured: true,
+    popular: true,
   },
   {
     slug: 'faseleh-tarikh',
@@ -377,7 +403,7 @@ export const TOOLS: Tool[] = [
     title: 'مبدل عدد به حروف',
     desc: 'تبدیل مبلغ عددی به حروف فارسی برای نوشتن چک، قرارداد و اسناد مالی.',
     category: CAT_TEXT,
-    icon: Type,
+    icon: WholeWord,
     accent: '99, 102, 241',
     status: 'new',
   },
@@ -386,7 +412,7 @@ export const TOOLS: Tool[] = [
     title: 'شمارنده کلمات',
     desc: 'شمارش لحظه‌ای کلمات، کاراکترها، خطوط و تخمین زمان مطالعهٔ متن فارسی.',
     category: CAT_TEXT,
-    icon: FileText,
+    icon: LetterText,
     accent: '139, 92, 246',
     status: 'new',
   },
@@ -395,7 +421,7 @@ export const TOOLS: Tool[] = [
     title: 'اصلاح نیم‌فاصله و متن فارسی',
     desc: 'نرمال‌سازی متن فارسی: اصلاح نیم‌فاصله، تبدیل ي/ك عربی به ی/ک، حذف فاصله‌های اضافی و یکدست‌سازی اعداد.',
     category: CAT_TEXT,
-    icon: Type,
+    icon: SpellCheck,
     accent: '139, 92, 246',
     status: 'new',
     featured: true,
@@ -414,7 +440,7 @@ export const TOOLS: Tool[] = [
     title: 'مولد لورم ایپسوم فارسی',
     desc: 'تولید متن نمونهٔ فارسی (پاراگراف، جمله یا کلمه) برای طراحی و صفحه‌آرایی.',
     category: CAT_TEXT,
-    icon: FileText,
+    icon: Pilcrow,
     accent: '139, 92, 246',
     status: 'new',
   },
@@ -428,6 +454,7 @@ export const TOOLS: Tool[] = [
     accent: '244, 63, 94',
     status: 'new',
     featured: true,
+    popular: true,
   },
   {
     slug: 'bmi',
@@ -437,6 +464,7 @@ export const TOOLS: Tool[] = [
     icon: HeartPulse,
     accent: '16, 185, 129',
     status: 'new',
+    popular: true,
   },
   {
     slug: 'kalori-roozane',
@@ -462,7 +490,7 @@ export const TOOLS: Tool[] = [
     title: 'وزن ایده‌آل',
     desc: 'برآورد محدودهٔ وزن سالم بر پایهٔ قد (شاخص تودهٔ بدنی) و فرمول‌های مرجع.',
     category: CAT_HEALTH,
-    icon: Scale,
+    icon: PersonStanding,
     accent: '5, 150, 105',
     status: 'new',
   },
@@ -475,15 +503,73 @@ export const TOOLS: Tool[] = [
     icon: Keyboard,
     accent: '239, 68, 68',
     featured: true,
+    popular: true,
   },
   {
     slug: 'spin-win',
     title: 'چرخونه تصمیم',
     desc: 'ابزاری مدرن برای قرعه‌کشی، انتخاب تصادفی و حل تردیدهای روزمره.',
     category: CAT_FUN,
-    icon: Dices,
+    icon: Disc3,
     accent: '139, 92, 246',
     featured: false,
+  },
+  {
+    slug: 'sher-ya-khat',
+    title: 'شیر یا خط',
+    desc: 'پرتاب سکهٔ شیر یا خط برای تصمیم‌گیری سریع و منصفانه، با انیمیشن و شمارش نتایج.',
+    category: CAT_FUN,
+    icon: CircleDollarSign,
+    accent: '234, 179, 8',
+    status: 'new',
+  },
+  {
+    slug: 'tas',
+    title: 'تاس بینداز',
+    desc: 'تاس بیندازید؛ از یک تا چند تاس هم‌زمان، با جمع خودکار و تاریخچهٔ پرتاب‌ها.',
+    category: CAT_FUN,
+    icon: Dices,
+    accent: '139, 92, 246',
+    status: 'new',
+  },
+  {
+    slug: 'sang-kaghaz-gheychi',
+    title: 'سنگ کاغذ قیچی',
+    desc: 'بازی سنگ، کاغذ، قیچی در برابر رایانه؛ با امتیازشماری و نتیجهٔ آنی.',
+    category: CAT_FUN,
+    icon: Hand,
+    accent: '244, 63, 94',
+    status: 'new',
+  },
+
+  {
+    slug: 'fal-hafez',
+    title: 'فال حافظ',
+    desc: 'تفأل به دیوان حافظ شیرازی؛ یک غزل کامل به‌همراه تفسیر و معنی فال، با نیّت قلبی.',
+    category: CAT_ASTRO,
+    icon: Feather,
+    accent: '217, 70, 239',
+    status: 'new',
+    featured: true,
+    popular: true,
+  },
+  {
+    slug: 'borj-tavalod',
+    title: 'طالع‌بینی برج تولد',
+    desc: 'برج فلکی (طالع) خود را از روی تاریخ تولد بیابید؛ به‌همراه عنصر، ویژگی‌های شخصیتی و سازگاری با برج‌های دیگر.',
+    category: CAT_ASTRO,
+    icon: Star,
+    accent: '124, 58, 237',
+    status: 'new',
+  },
+  {
+    slug: 'hayvan-sal',
+    title: 'حیوان سال تولد',
+    desc: 'حیوان سال تولد شما در گاه‌شماری دوازده‌حیوانی (طالع چینی/ترکی) و ویژگی‌های منسوب به آن.',
+    category: CAT_ASTRO,
+    icon: Rabbit,
+    accent: '236, 72, 153',
+    status: 'new',
   },
 ];
 
@@ -499,13 +585,14 @@ export interface CategoryMeta {
 }
 
 export const CATEGORY_META: Record<string, CategoryMeta> = {
-  [CAT_LEGAL]: { color: '99, 102, 241', icon: Scale }, // indigo
-  [CAT_FINANCE]: { color: '217, 119, 6', icon: Wallet }, // amber
-  [CAT_REALESTATE]: { color: '13, 148, 136', icon: Building2 }, // teal
-  [CAT_UTILITY]: { color: '124, 58, 237', icon: Calculator }, // violet
-  [CAT_TEXT]: { color: '139, 92, 246', icon: FileText }, // violet-light
-  [CAT_HEALTH]: { color: '5, 150, 105', icon: HeartPulse }, // emerald
-  [CAT_FUN]: { color: '244, 63, 94', icon: Gamepad2 }, // rose
+  [CAT_LEGAL]: { color: '176, 110, 64', icon: Scale }, // قهوه‌ای (caramel)
+  [CAT_FINANCE]: { color: '16, 185, 129', icon: Wallet }, // سبز (emerald)
+  [CAT_REALESTATE]: { color: '124, 78, 48', icon: Building2 }, // قهوه‌ای تیره (coffee)
+  [CAT_UTILITY]: { color: '234, 130, 40', icon: Calculator }, // نارنجی (orange)
+  [CAT_TEXT]: { color: '139, 92, 246', icon: FileText }, // بنفش (violet)
+  [CAT_HEALTH]: { color: '34, 197, 94', icon: HeartPulse }, // سبز سلامت (green)
+  [CAT_FUN]: { color: '249, 88, 12', icon: Gamepad2 }, // نارنجی تیز (sharp orange)
+  [CAT_ASTRO]: { color: '217, 70, 239', icon: Sparkles }, // بنفش فانتزی (fuchsia)
 };
 
 const FALLBACK_META: CategoryMeta = { color: '120, 120, 130', icon: Wrench };
@@ -521,5 +608,8 @@ export const getCategoryMeta = (category: string): CategoryMeta =>
 export const TOOL_CATEGORIES = Object.keys(CATEGORY_META).filter((c) =>
   TOOLS.some((t) => t.category === c),
 );
+
+/** ابزارهای پرطرفدار (برای دستهٔ «پرطرفدار» در بالای صفحهٔ ابزارها). */
+export const POPULAR_TOOLS = TOOLS.filter((t) => t.popular && t.status !== 'soon');
 
 export const getTool = (slug: string) => TOOLS.find((t) => t.slug === slug);

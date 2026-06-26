@@ -3,12 +3,11 @@
 import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useLenis } from 'lenis/react';
-import Link from 'next/link';
 import ProjectModal from './ProjectModal';
 import { Project, ProjectCard } from '../ui/ProjectCard';
-import { Card } from '../ui/Card';
+import { ToolCard } from '../ui/ToolCard';
 import { Section, Heading } from '../ui/Layout';
-import { Box, ArrowUpLeft } from 'lucide-react';
+import { Box } from 'lucide-react';
 import { PROJECTS_DATA } from '@/lib/data/projects';
 import { TOOLS, type Tool } from '@/lib/data/tools';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
@@ -35,52 +34,6 @@ for (let i = 0; i < FEATURED_TOOLS.length; i += 2) {
 // RTL: scrolling forward should reveal cards toward the left, so the row
 // translates in the +X (rightward) physical direction as progress goes 0→1.
 const RTL_SIGN = 1;
-
-// Square tool tile built on the shared Card so it inherits the exact 3D tilt,
-// glass and corner-lighting physics of the project cards.
-function SquareToolCard({ tool }: { tool: Tool }) {
-  const Icon = tool.icon;
-  const accent = tool.accent;
-  return (
-    <Link
-      href={`/tools/${tool.slug}`}
-      className="block h-full w-full rounded-[1.75rem] outline-none focus-visible:ring-2 focus-visible:ring-foreground/60"
-    >
-      <Card
-        glowColor={`rgba(${accent}, 0.22)`}
-        roundedClass="rounded-[1.75rem]"
-        className="p-2 md:p-3"
-        contentClassName="p-4 md:p-5"
-        isHoverable
-        colorOnHoverOnly
-      >
-        <div className="flex h-full w-full flex-col text-right" dir="rtl" style={{ transformStyle: 'preserve-3d' }}>
-          <div className="flex items-start justify-between" style={{ transform: 'translateZ(40px)' }}>
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-2xl"
-              style={{ background: `rgba(${accent}, 0.12)`, color: `rgb(${accent})` }}
-            >
-              <Icon className="h-5 w-5" strokeWidth={1.75} />
-            </div>
-            <ArrowUpLeft
-              className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
-              style={{ color: `rgb(${accent})` }}
-              aria-hidden
-            />
-          </div>
-          <div className="mt-auto" style={{ transform: 'translateZ(30px)' }}>
-            <h3 className="font-display text-sm md:text-base font-black leading-snug text-foreground">
-              {tool.title}
-            </h3>
-            <p className="mt-1 line-clamp-2 font-sans text-xs leading-relaxed text-muted-foreground">
-              {tool.desc}
-            </p>
-          </div>
-        </div>
-      </Card>
-    </Link>
-  );
-}
 
 // Desktop sticky-pin: a tall track pins an inner viewport while vertical scroll
 // progress translates the card row horizontally. No wheel hijack, no mode
@@ -263,12 +216,14 @@ export default function Projects() {
    </div>
 
    {/* Most-used tools continuing the same horizontal scroll — two square tiles
-       per column so a pair fits the exact height of one project card. */}
+       per column so a pair fits the exact height of one project card. Tiles use
+       a FIXED height (not flex-1) so a lone tile in an odd-length column can
+       never stretch to full height — every tool tile stays the same size. */}
    {TOOL_COLUMNS.map((col, ci) => (
-    <div key={ci} className="w-[210px] md:w-[240px] h-[360px] md:h-[380px] shrink-0 flex flex-col">
+    <div key={ci} className="w-[210px] md:w-[240px] h-[360px] md:h-[380px] shrink-0 flex flex-col gap-5 md:gap-6">
      {col.map((tool) => (
-      <div key={tool.slug} className="flex-1 min-h-0">
-       <SquareToolCard tool={tool} />
+      <div key={tool.slug} className="h-[170px] md:h-[178px]">
+       <ToolCard tool={tool} accent={tool.accent} compact />
       </div>
      ))}
     </div>
@@ -297,7 +252,7 @@ export default function Projects() {
     ))}
     {FEATURED_TOOLS.map((tool) => (
      <div key={tool.slug} className="w-full max-w-[420px] h-[200px]">
-      <SquareToolCard tool={tool} />
+      <ToolCard tool={tool} accent={tool.accent} compact />
      </div>
     ))}
    </div>

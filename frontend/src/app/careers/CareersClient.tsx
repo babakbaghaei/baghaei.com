@@ -5,12 +5,15 @@ import { Section, Heading } from '@/components/ui/Layout';
 import { JobCard } from '@/components/ui/JobCard';
 import { CareerModal } from '@/components/ui/CareerModal';
 import { motion } from 'framer-motion';
+import { Code2, BrainCircuit } from 'lucide-react';
 
 const detailedJobs = [
  {
   id: 'fullstack',
   title: 'توسعه‌دهنده ارشد Full-stack',
   type: 'تمام وقت / دورکاری',
+  icon: Code2,
+  accent: '99, 102, 241',
   desc: 'تسلط کامل به Next.js، NestJS و معماری میکروسرویس. تجربه کار با سیستم‌های توزیع شده و دیتابیس‌های مقیاس‌پذیر.',
   requirements: [
    'حداقل ۵ سال سابقه کار حرفه‌ای در اکوسیستم JavaScript/TypeScript',
@@ -30,6 +33,8 @@ const detailedJobs = [
   id: 'ai-eng',
   title: 'مهندس هوش مصنوعی (LLM)',
   type: 'تمام وقت / حضوری',
+  icon: BrainCircuit,
+  accent: '217, 70, 239',
   desc: 'تجربه در پیاده‌سازی مدل‌های زبانی بزرگ، RAG و بهینه‌سازی مدل‌ها برای کاربردهای تجاری.',
   requirements: [
    'تسلط بر مفاهیم یادگیری عمیق و معماری ترنسفورمرها',

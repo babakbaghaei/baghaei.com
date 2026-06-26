@@ -1,70 +1,46 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { ReceiptText, Scale, Percent, CalendarClock, Info } from 'lucide-react';
+import { ReceiptText, Scale, Gavel, CalendarClock, TrendingUp, Info } from 'lucide-react';
 import {
   ToolShell,
   TwoPane,
   Panel,
   VerdictPanel,
   MoneyField,
-  Field,
+  SelectField,
   Row,
   Headline,
   EmptyState,
+  ErrorState,
   Notice,
   ShareButton,
   useShareResult,
   AnimatePresence,
   motion,
-  faNum,
-  fmtMoney,
-  fmtPct,
   toWords,
   cleanNum,
-  normalizeDigits,
   unitLabel,
   type Unit,
 } from '@/components/tools/shell';
+import { toPersianDigits } from '@/lib/utils/format';
 import {
-  PersianDatePicker,
-  pdateFromGregorian,
-  pdateToDate,
-  type PDate,
-} from '@/components/tools/DatePicker';
+  CPI_YEARS,
+  CPI_SOURCE,
+  CPI_LAST_YEAR,
+  CPI_LAST_COMPLETE_YEAR,
+  getAnnualIndex,
+  isProvisionalYear,
+} from '@/lib/data/cpi-index';
 
 const ACCENT = '245, 158, 11'; // amber-500
 
-/** اختلاف روزِ بین دو PDate؛ اگر یکی null بود null. */
-function daysBetween(from: PDate | null, to: PDate | null): number | null {
-  if (!from || !to) return null;
-  return Math.round((pdateToDate(to).getTime() - pdateToDate(from).getTime()) / 86400000);
-}
-
-/** PDate به‌صورت ISO میلادی (yyyy-mm-dd) برای پارامترهای URL. */
-function pdateToISO(p: PDate): string {
-  return `${p.gy}-${String(p.gm).padStart(2, '0')}-${String(p.gd).padStart(2, '0')}`;
-}
-
-/** PDate از یک رشتهٔ ISO میلادی؛ اگر نامعتبر بود null. */
-function pdateFromISO(s: string): PDate | null {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
-  if (!m) return null;
-  return pdateFromGregorian(Number(m[1]), Number(m[2]), Number(m[3]));
-}
-
-const inputClass =
-  'w-full bg-background border-2 border-border rounded-xl py-3 px-4 font-display text-lg text-center focus:border-primary outline-none transition-all';
-
 export default function KhesaratCheque() {
   const [principal, setPrincipal] = useState('');
-  const [rate, setRate] = useState('30'); // نرخ شاخص سالانه — نمونه و قابل ویرایش
   const [unit, setUnit] = useState<Unit>('toman');
 
-  // حالت ورودی روز: مستقیم یا از روی تاریخ سررسید/پرداخت
-  const [days, setDays] = useState('');
-  const [dueDate, setDueDate] = useState<PDate | null>(null);
-  const [payDate, setPayDate] = useState<PDate | null>(null);
+  const [dueYear, setDueYear] = useState<number>(1400); // سال سررسید چک
+  const [payYear, setPayYear] = useState<number>(CPI_LAST_YEAR); // سال وصول/حکم
 
   const { share, copied } = useShareResult();
 
@@ -73,62 +49,69 @@ export default function KhesaratCheque() {
     const p = new URLSearchParams(window.location.search);
     const pr = p.get('principal');
     if (pr && /^\d+$/.test(pr)) setPrincipal(Number(pr).toLocaleString('en-US'));
-    const rt = p.get('rate');
-    if (rt && /^\d*\.?\d+$/.test(rt)) setRate(rt);
-    const dy = p.get('days');
-    if (dy && /^\d+$/.test(dy)) setDays(dy);
-    const dd = p.get('due');
-    if (dd) {
-      const pdd = pdateFromISO(dd);
-      if (pdd) setDueDate(pdd);
-    }
-    const pd = p.get('pay');
-    if (pd) {
-      const ppd = pdateFromISO(pd);
-      if (ppd) setPayDate(ppd);
-    }
     const u = p.get('unit');
     if (u === 'rial' || u === 'toman') setUnit(u);
+    const d = Number(p.get('due'));
+    if (d && CPI_YEARS.includes(d)) setDueYear(d);
+    const pa = Number(p.get('pay'));
+    if (pa && CPI_YEARS.includes(pa)) setPayYear(pa);
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const principalNum = cleanNum(principal);
-  const annualRate = Math.max(0, Number(normalizeDigits(rate)) || 0);
-
-  // روزهای محاسبه‌شده از تاریخ‌ها (در صورت معتبر بودن) بر روزِ دستی اولویت دارد.
-  const datesDays = daysBetween(dueDate, payDate);
-  const manualDays = Math.max(0, Math.floor(Number(normalizeDigits(days)) || 0));
-  const effectiveDays =
-    datesDays != null && datesDays > 0 ? datesDays : datesDays != null && datesDays <= 0 ? 0 : manualDays;
-  const usingDates = datesDays != null;
 
   const calc = useMemo(() => {
-    if (principalNum <= 0 || effectiveDays <= 0) return null;
-    // ماده ۵۲۲ ق.آ.د.م: خسارت تأخیر تأدیه = اصل × نرخ شاخص سالانه × (روز تأخیر / ۳۶۵)
-    const damage = (principalNum * (annualRate / 100) * effectiveDays) / 365;
-    const total = principalNum + damage;
-    const dailyDamage = (principalNum * (annualRate / 100)) / 365;
-    return {
-      damage: Math.round(damage),
-      total: Math.round(total),
-      dailyDamage: Math.round(dailyDamage),
-    };
-  }, [principalNum, annualRate, effectiveDays]);
+    if (principalNum <= 0) return null;
 
+    const indexDue = getAnnualIndex(dueYear);
+    const indexPay = getAnnualIndex(payYear);
+
+    if (indexDue == null || indexPay == null || indexDue <= 0) {
+      return { error: 'شاخص این بازه هنوز منتشر نشده است.' as string };
+    }
+    if (payYear < dueYear) {
+      return { error: 'سال وصول باید بعد از سال سررسید باشد.' as string };
+    }
+
+    const updated = Math.round(principalNum * (indexPay / indexDue));
+    const damage = updated - principalNum;
+    const growthPct = (indexPay / indexDue - 1) * 100;
+    const years = payYear - dueYear;
+    const provisional = isProvisionalYear(payYear) || isProvisionalYear(dueYear);
+
+    return { indexDue, indexPay, updated, damage, growthPct, years, provisional };
+  }, [principalNum, dueYear, payYear]);
+
+  const fmt = (n: number) => toPersianDigits(Math.round(n).toLocaleString('en-US'));
+  const fmtPct = (n: number) =>
+    toPersianDigits((Math.round(n * 10) / 10).toLocaleString('en-US')) + '٪';
+  const fmtIndex = (n: number) => {
+    const maxFrac = n >= 100 ? 1 : n >= 10 ? 2 : n >= 1 ? 3 : 4;
+    return toPersianDigits(n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: maxFrac }));
+  };
   const u = unitLabel(unit);
 
+  const yearOptions = [...CPI_YEARS].reverse().map((y) => (
+    <option key={y} value={y}>
+      {toPersianDigits(y)}
+      {isProvisionalYear(y) ? ' (جاری)' : ''}
+    </option>
+  ));
+
   const onShare = () => {
-    if (!calc) return;
+    if (!calc || 'error' in calc) return;
     share({
       title: 'خسارت تأخیر چک برگشتی',
-      text: `چک ${fmtMoney(principalNum)} ${u} با نرخ شاخص ${faNum(String(annualRate))}٪ و ${faNum(String(effectiveDays))} روز تأخیر — خسارت تأخیر: ${fmtMoney(calc.damage)} ${u}`,
+      text:
+        `خسارت تأخیر چک برگشتی\n` +
+        `مبلغ چک: ${fmt(principalNum)} ${u}\n` +
+        `از سال ${toPersianDigits(dueYear)} تا ${toPersianDigits(payYear)}\n` +
+        `جمع کل قابل مطالبه: ${fmt(calc.updated)} ${u}`,
       params: {
         principal: String(principalNum),
-        rate: String(annualRate),
-        days: String(effectiveDays),
-        ...(usingDates && dueDate ? { due: pdateToISO(dueDate) } : {}),
-        ...(usingDates && payDate ? { pay: pdateToISO(payDate) } : {}),
         unit,
+        due: String(dueYear),
+        pay: String(payYear),
       },
     });
   };
@@ -136,41 +119,35 @@ export default function KhesaratCheque() {
   return (
     <ToolShell
       title="خسارت تأخیر چک برگشتی"
-      subtitle="برآورد خسارت تأخیر تأدیه مبلغ چک برگشتی بر مبنای نرخ شاخص و تعداد روز تأخیر"
+      subtitle="برآورد خسارت تأخیر تأدیه مبلغ چک برگشتی بر مبنای شاخص رسمی بانک مرکزی (ماده ۵۲۲ و رأی وحدت رویه ۸۵۰)"
       icon={ReceiptText}
       accent={ACCENT}
       info={[
         {
           icon: <Scale className="w-4 h-4" />,
           title: 'مبنای محاسبه (ماده ۵۲۲)',
-          body: 'این برآورد بر پایهٔ منطق مادهٔ ۵۲۲ قانون آیین دادرسی مدنی انجام می‌شود؛ خسارت تأخیر تأدیه برابر است با اصل مبلغ ضرب در نرخ شاخص سالانه ضرب در نسبت روزهای تأخیر به ۳۶۵. مبدأ تأخیر معمولاً تاریخ سررسید چک (یا تاریخ مطالبه) است.',
+          body: 'خسارت تأخیر تأدیهٔ مبلغ چک برگشتی طبق مادهٔ ۵۲۲ قانون آیین دادرسی مدنی بر اساس تغییر شاخص قیمت بانک مرکزی محاسبه می‌شود: مبلغ روزآمدشده = مبلغ چک × (شاخص سال وصول ÷ شاخص سال سررسید).',
         },
         {
-          icon: <Percent className="w-4 h-4" />,
-          title: 'نرخ شاخص سالانه',
-          body: 'نرخ را به‌صورت «سالانه» وارد کنید. مرجع رسمی، شاخص بهای کالا و خدمات مصرفی اعلامی بانک مرکزی است که سالانه تغییر می‌کند. نرخ پیش‌فرض صرفاً نمونه است و باید با نرخ رسمی دورهٔ موردنظر شما جایگزین شود؛ این عدد قابل ویرایش است.',
+          icon: <Gavel className="w-4 h-4" />,
+          title: 'رأی وحدت رویه شماره ۸۵۰',
+          body: 'طبق رأی وحدت رویه شماره ۸۵۰ هیأت عمومی دیوان عالی کشور (۱۴۰۳/۵/۳۱)، ملاک محاسبه «متوسط شاخص سالانه» است؛ همان مبنایی که این ابزار به‌کار می‌برد.',
         },
         {
-          icon: <CalendarClock className="w-4 h-4" />,
-          title: 'تعداد روز تأخیر',
-          body: 'می‌توانید تعداد روز را مستقیم وارد کنید یا تاریخ سررسید و تاریخ پرداخت را بدهید تا روزها خودکار محاسبه شود. اگر هر دو تاریخ معتبر باشند، روزِ محاسبه‌شده از تاریخ‌ها مبنا قرار می‌گیرد و ورودی دستی نادیده گرفته می‌شود.',
+          icon: <TrendingUp className="w-4 h-4" />,
+          title: 'شاخص خودکار بانک مرکزی',
+          body: `کافی است سال سررسید چک و سال وصول/حکم را انتخاب کنید؛ شاخص بهای مصرف‌کننده از جدول رسمی ${CPI_SOURCE} به‌صورت خودکار اعمال می‌شود و نیازی به وارد کردن دستی نرخ نیست.`,
         },
         {
           icon: <Info className="w-4 h-4" />,
           title: 'مواردِ خارج از این برآورد',
-          body: 'این محاسبه فقط خسارت تأخیر تأدیه اصل مبلغ چک را پوشش می‌دهد؛ هزینهٔ دادرسی، حق‌الوکاله، خسارت قراردادی توافقی و سایر مطالبات احتمالی در آن لحاظ نشده است. تعیین رقم قطعی و نرخ شاخصِ هر دوره با مرجع قضایی است.',
+          body: 'این محاسبه فقط خسارت تأخیر تأدیهٔ اصل مبلغ چک را پوشش می‌دهد؛ هزینهٔ دادرسی، حق‌الوکاله و سایر مطالبات احتمالی در آن لحاظ نشده است. تعیین رقم قطعی با مرجع قضایی است.',
         },
       ]}
-      disclaimer={
-        <>
-          این یک <strong>برآورد</strong> است و رقم قطعی را دادگاه بر مبنای نرخ شاخص رسمی اعلامی بانک
-          مرکزی برای دورهٔ تأخیر تعیین می‌کند. نرخ شاخص را خودِ کاربر وارد می‌کند؛ پیش از استناد،
-          نرخ رسمی روز را راستی‌آزمایی کنید.
-        </>
-      }
+      disclaimer="این محاسبه صرفاً جنبهٔ راهنما و تخمینی دارد و بر پایهٔ شاخص رسمی بانک مرکزی است. مبنای قطعی خسارت، نظر کارشناس رسمی و حکم دادگاه است."
     >
       <TwoPane>
-        <Panel className="space-y-7">
+        <Panel className="space-y-9">
           <MoneyField
             label="مبلغ چک"
             amount={principal}
@@ -179,87 +156,93 @@ export default function KhesaratCheque() {
             setUnit={setUnit}
           />
 
-          <Field label="نرخ شاخص سالانه" hint="نرخ رسمی بانک مرکزی برای دورهٔ تأخیر را وارد کنید (نمونه، قابل ویرایش)">
-            <div className="relative">
-              <input
-                type="text"
-                inputMode="decimal"
-                value={faNum(rate)}
-                onChange={(e) => setRate(normalizeDigits(e.target.value).replace(/[^\d.]/g, ''))}
-                dir="ltr"
-                aria-label="نرخ شاخص سالانه به درصد"
-                className="w-full bg-background border-2 border-border rounded-xl py-3 px-4 pl-10 font-display text-lg text-center focus:border-primary outline-none transition-all"
-              />
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground/50">
-                ٪
-              </span>
-            </div>
-          </Field>
-
-          <Field label="تعداد روز تأخیر" hint="می‌توانید مستقیم وارد کنید یا با دو تاریخ زیر محاسبه شود">
-            <input
-              type="text"
-              inputMode="numeric"
-              value={faNum(days)}
-              onChange={(e) => setDays(normalizeDigits(e.target.value).replace(/[^\d]/g, ''))}
-              disabled={usingDates}
-              dir="ltr"
-              aria-label="تعداد روز تأخیر"
-              className={`${inputClass} disabled:opacity-50 disabled:cursor-not-allowed`}
-            />
-          </Field>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Field label="تاریخ سررسید" hint="مبدأ تأخیر (اختیاری)">
-              <PersianDatePicker
-                value={dueDate}
-                onChange={(p) => setDueDate(p)}
-                onClear={() => setDueDate(null)}
-                clearable
-                placeholder="انتخاب تاریخ سررسید"
-                ariaLabel="تاریخ سررسید چک"
-              />
-            </Field>
-            <Field label="تاریخ پرداخت" hint="پایان تأخیر (اختیاری)">
-              <PersianDatePicker
-                value={payDate}
-                onChange={(p) => setPayDate(p)}
-                onClear={() => setPayDate(null)}
-                clearable
-                placeholder="انتخاب تاریخ پرداخت"
-                ariaLabel="تاریخ پرداخت"
-              />
-            </Field>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <SelectField
+              icon={<Gavel className="w-4 h-4" />}
+              label="سال وصول"
+              hint="سالی که چک وصول یا حکم صادر می‌شود"
+              value={payYear}
+              onChange={(v) => setPayYear(Number(v))}
+            >
+              {yearOptions}
+            </SelectField>
+            <SelectField
+              icon={<CalendarClock className="w-4 h-4" />}
+              label="سال سررسید"
+              hint="سال سررسید چک (مبدأ تأخیر)"
+              value={dueYear}
+              onChange={(v) => setDueYear(Number(v))}
+            >
+              {yearOptions}
+            </SelectField>
           </div>
+
+          <p className="flex items-center gap-2 text-xs text-muted-foreground/70 font-display">
+            <Info className="w-3.5 h-3.5 shrink-0" />
+            مبنا «متوسط شاخص سالانه» است؛ آخرین سال قطعی {toPersianDigits(CPI_LAST_COMPLETE_YEAR)} و سال {toPersianDigits(CPI_LAST_YEAR)} تخمینی است.
+          </p>
         </Panel>
 
         <VerdictPanel accent={ACCENT}>
           <AnimatePresence mode="wait">
             {!calc ? (
               <EmptyState accent={ACCENT} icon={<ReceiptText className="w-6 h-6" />}>
-                مبلغ چک، نرخ شاخص و تعداد روز تأخیر (یا تاریخ‌ها) را وارد کنید تا خسارت تأخیر برآورد شود.
+                مبلغ چک را وارد و سال سررسید و وصول را انتخاب کنید تا خسارت تأخیر برآورد شود.
               </EmptyState>
+            ) : 'error' in calc ? (
+              <ErrorState>{calc.error}</ErrorState>
             ) : (
               <motion.div key="r" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-7">
                 <Headline
                   accent={ACCENT}
-                  label="خسارت تأخیر تأدیه"
-                  value={fmtMoney(calc.damage)}
+                  label="جمع کل قابل مطالبه"
+                  value={fmt(calc.updated)}
                   suffix={u}
-                  sub={`${toWords(calc.damage)} ${u}`}
+                  sub={`${toWords(calc.updated)} ${u}`}
                 />
                 <div className="space-y-2.5">
-                  <Row label="مبلغ چک" value={`${fmtMoney(principalNum)} ${u}`} />
-                  <Row label="نرخ شاخص سالانه" value={fmtPct(annualRate)} />
-                  <Row label="تعداد روز تأخیر" value={`${faNum(String(effectiveDays))} روز`} />
-                  <Row label="خسارت روزانه" value={`${fmtMoney(calc.dailyDamage)} ${u}`} />
+                  <Row label="مبلغ چک" value={`${fmt(principalNum)} ${u}`} />
+                  <Row
+                    label="خسارت تأخیر تأدیه"
+                    value={
+                      <span style={{ color: `rgb(${ACCENT})` }}>
+                        {'+ '}
+                        {fmt(calc.damage)} {u}
+                      </span>
+                    }
+                    strong
+                  />
                   <div className="h-px bg-border/60 my-1" />
-                  <Row label="خسارت تأخیر تأدیه" value={`${fmtMoney(calc.damage)} ${u}`} strong />
-                  <Row label="مجموع قابل مطالبه (اصل + خسارت)" value={`${fmtMoney(calc.total)} ${u}`} strong />
+                  <Row label="جمع کل قابل مطالبه" value={`${fmt(calc.updated)} ${u}`} strong />
                 </div>
-                <Notice accent={ACCENT}>
-                  نرخ شاخص واردشده نمونه است؛ رقم قطعی بر مبنای نرخ رسمی اعلامی بانک مرکزی و رأی دادگاه تعیین می‌شود.
-                </Notice>
+
+                <div className="space-y-2.5 pt-4 border-t border-border/60">
+                  <Row
+                    label="رشد شاخص قیمت"
+                    value={
+                      <span className="inline-flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5" /> {fmtPct(calc.growthPct)}
+                      </span>
+                    }
+                  />
+                  <Row
+                    label="مدت تأخیر"
+                    value={calc.years > 0 ? `${toPersianDigits(calc.years)} سال` : 'کمتر از یک سال'}
+                  />
+                  <Row label="شاخص سال سررسید" value={fmtIndex(calc.indexDue)} />
+                  <Row label="شاخص سال وصول" value={fmtIndex(calc.indexPay)} />
+                  <Row
+                    label="ضریب روزآمدسازی"
+                    value={`× ${toPersianDigits((calc.indexPay / calc.indexDue).toFixed(2))}`}
+                  />
+                </div>
+
+                {calc.provisional && (
+                  <Notice accent={ACCENT}>
+                    شاخص سال {toPersianDigits(CPI_LAST_YEAR)} تخمینی است (بر پایهٔ آخرین نرخ تورم نقطه‌به‌نقطه)؛ متوسط سالانهٔ قطعی آن هنوز منتشر نشده است.
+                  </Notice>
+                )}
+
                 <ShareButton accent={ACCENT} copied={copied} onClick={onShare} />
               </motion.div>
             )}

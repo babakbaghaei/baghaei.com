@@ -110,14 +110,14 @@ const ProjectContent = ({ project }: { project: Project }) => {
   });
   const sheen = useMotionTemplate`linear-gradient(${sheenAngle}deg, rgba(255,255,255,0.16) 0%, transparent 55%)`;
 
-  // The project's assigned colour IS the card — FULLY coloured, no black base.
-  // A bright lit corner (solid accent) melts into the deep brand body, darkening
-  // toward the bottom-leading edge where the title sits so white copy stays crisp.
+  // The project's colour is a SUBTLE tint over the neutral glass — same balanced
+  // intensity as the tool cards (a lit accent corner fading into a faint brand
+  // wash), not a fully-saturated panel. White copy stays crisp on the dark glass.
   const base = rgbTriplet(project.color);
   const bright = rgbTriplet(project.borderColor);
   const panelBg =
-    `radial-gradient(135% 115% at 82% -12%, rgba(${bright}, 0.92) 0%, rgba(${bright}, 0) 56%),` +
-    `linear-gradient(152deg, rgb(${base}) 0%, rgb(${shade(base, 0.5)}) 100%)`;
+    `radial-gradient(135% 115% at 82% -12%, rgba(${bright}, 0.30) 0%, rgba(${bright}, 0) 58%),` +
+    `linear-gradient(152deg, rgba(${base}, 0.20) 0%, rgba(${shade(base, 0.5)}, 0.10) 100%)`;
 
   return (
     <div className="relative h-full w-full rounded-[2rem]" style={{ transformStyle: "preserve-3d" }}>
@@ -134,14 +134,6 @@ const ProjectContent = ({ project }: { project: Project }) => {
         {/* Project colour — hidden at rest on desktop (neutral like the tool
             cards), fades in on hover; always on for touch (md: gate). */}
         <div className="absolute inset-0 opacity-100 transition-opacity duration-500 ease-out md:opacity-0 md:group-hover/card:opacity-100 motion-reduce:transition-none" style={{ background: panelBg }} />
-
-        {/* Faint oversized brand watermark — gives the flat colour depth + texture. */}
-        <div
-          className="pointer-events-none absolute -bottom-6 -left-6 text-white/[0.06] transition-transform duration-700 ease-out group-hover/card:scale-110 group-hover/card:-rotate-6 motion-reduce:transition-none"
-          aria-hidden
-        >
-          <BrandIcon project={project} className="h-44 w-44" />
-        </div>
 
         {/* Tilt-reactive glass reflection (signature sheen) — gated to hover like
             the colour, so the neutral rest card shows NO gradient overlay. The
@@ -233,9 +225,13 @@ const ProjectContent = ({ project }: { project: Project }) => {
 };
 
 export const ProjectCard: React.FC<{ project: Project, onClick: (e: React.MouseEvent<HTMLDivElement>) => void, isActive?: boolean }> = ({ project, onClick, isActive = false }) => {
+  // Match the tool cards' balanced hover tint: feed the Card a LOW-alpha accent
+  // (0.22, same as ToolCard) instead of the heavy ~0.8α borderColor, so the
+  // hover colour-fill is a subtle wash, not a saturated flood.
+  const glow = `rgba(${rgbTriplet(project.borderColor)}, 0.22)`;
   return (
     <Card
-      glowColor={project.borderColor}
+      glowColor={glow}
       roundedClass="rounded-[2rem]"
       className={isActive ? "ring-1 ring-white/15" : ""}
       isHoverable={true}

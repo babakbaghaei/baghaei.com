@@ -6,10 +6,12 @@
  * جلوگیری از تکرار قالب در هر صفحه.
  */
 
-import React, { useState, useCallback, useSyncExternalStore, useId } from 'react';
+import React, { useState, useEffect, useCallback, useSyncExternalStore, useId } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import Logo from '@/components/layout/Logo';
+import { todayPDate, formatPDate } from '@/components/tools/DatePicker';
 import {
   ChevronRight,
   ChevronDown,
@@ -57,6 +59,52 @@ export interface ToolInfo {
   icon: React.ReactNode;
   title: string;
   body: React.ReactNode;
+}
+
+/**
+ * سربرگِ رسمیِ مخصوص چاپ/PDF — فقط هنگام چاپ دیده می‌شود (print:block).
+ * لوگو و نام شرکت + عنوان ابزار و تاریخ روز، تا خروجی PDF حالت یک سند رسمی پیدا کند.
+ */
+function PrintLetterhead({ title, subtitle }: { title: string; subtitle: string }) {
+  const [date, setDate] = useState('');
+  // تاریخ روز فقط سمت کلاینت محاسبه می‌شود تا hydration ناسازگار نشود.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    try {
+      setDate(formatPDate(todayPDate()));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
+  return (
+    <div className="hidden print:block print-letterhead">
+      <div className="flex items-start justify-between gap-6">
+        <div className="flex items-center gap-3">
+          <Logo className="w-12 h-12 text-black" />
+          <div>
+            <div className="text-lg font-black font-display leading-tight">گروه فناوری بقایی</div>
+            <div className="text-[11px] tracking-wide">baghaei.com</div>
+          </div>
+        </div>
+        <div className="text-left text-[11px] leading-relaxed">
+          <div className="font-black font-display text-sm">{title}</div>
+          <div className="text-muted-foreground">{subtitle}</div>
+          {date && <div className="mt-1">تاریخ صدور: {date}</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** پاورقیِ رسمیِ مخصوص چاپ — یادداشت حقوقی و نشانی سایت. */
+function PrintFooter() {
+  return (
+    <div className="hidden print:block print-footer">
+      این برگه توسط جعبه‌ابزار آنلاین «گروه فناوری بقایی» (baghaei.com) تولید شده و صرفاً جنبهٔ برآوردی و
+      راهنما دارد؛ مبنای قطعی، مراجع رسمی و حکم مرجع صالح است.
+    </div>
+  );
 }
 
 export function ToolShell({
@@ -110,10 +158,13 @@ export function ToolShell({
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
+        {/* سربرگ رسمی فقط در چاپ */}
+        <PrintLetterhead title={title} subtitle={subtitle} />
+
         {/* breadcrumb */}
         <Link
           href="/tools"
-          className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-xs font-display mb-8"
+          className="no-print inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-xs font-display mb-8"
         >
           <ChevronRight className="w-4 h-4" /> جعبه ابزار
         </Link>
@@ -165,7 +216,7 @@ export function ToolShell({
         )}
 
         {/* offline + back */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div className="no-print mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <span className="inline-flex items-center gap-2 text-muted-foreground font-medium">
             <Info className="w-4 h-4 text-primary" />
             تمامی محاسبات آفلاین در مرورگر شما انجام می‌شود.
@@ -177,6 +228,9 @@ export function ToolShell({
             <ChevronRight className="w-4 h-4" /> سایر ابزارها
           </Link>
         </div>
+
+        {/* پاورقی رسمی فقط در چاپ */}
+        <PrintFooter />
       </div>
     </main>
   );
@@ -752,7 +806,7 @@ export function ShareButton({
     <button
       onClick={onClick}
       aria-label="اشتراک‌گذاری نتیجه"
-      className="w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-black font-display transition-all"
+      className="no-print w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-black font-display transition-all"
       style={{
         background: `rgba(${accent}, ${copied ? 0.15 : 0.1})`,
         color: `rgb(${accent})`,

@@ -2,26 +2,40 @@
 
 import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Wrench, SearchX, Bug, Mail, ArrowUpLeft } from 'lucide-react';
+import { Search, Wrench, SearchX, Bug, Mail, ArrowUpLeft, Flame } from 'lucide-react';
 import { ToolCard } from '@/components/ui/ToolCard';
-import { TOOLS, TOOL_CATEGORIES, getCategoryMeta, type Tool } from '@/lib/data/tools';
+import { TOOLS, TOOL_CATEGORIES, POPULAR_TOOLS, getCategoryMeta, type Tool } from '@/lib/data/tools';
 import { toPersianDigits } from '@/lib/utils/format';
 
 const REPORT_EMAIL = 'baabakbaghaaei@gmail.com';
+
+// دستهٔ ویژهٔ «پرطرفدار» که بالای همهٔ دسته‌ها می‌نشیند (نه یک دستهٔ واقعی در رجیستری).
+const POPULAR_TAB = 'پرطرفدار';
+const POPULAR_ACCENT = '245, 158, 11'; // amber — «داغ/پرطرفدار»
 
 export default function ToolsIndex() {
   const [query, setQuery] = useState('');
   const [active, setActive] = useState<string>('همه');
 
+  const matchesQuery = (t: Tool, q: string) =>
+    !q || t.title.includes(q) || t.desc.includes(q) || t.category.includes(q);
+
   const filtered = useMemo(() => {
     const q = query.trim();
+    if (active === POPULAR_TAB) {
+      return POPULAR_TOOLS.filter((t) => matchesQuery(t, q));
+    }
     return TOOLS.filter((t) => {
       const matchCat = active === 'همه' || t.category === active;
-      const matchQ =
-        !q || t.title.includes(q) || t.desc.includes(q) || t.category.includes(q);
-      return matchCat && matchQ;
+      return matchCat && matchesQuery(t, q);
     });
   }, [query, active]);
+
+  // فهرست پرطرفدارها برای نمایش در بالای نمای «همه» (با اعمال جستجو).
+  const popularInAll = useMemo(() => {
+    const q = query.trim();
+    return POPULAR_TOOLS.filter((t) => matchesQuery(t, q));
+  }, [query]);
 
   // در نمای «همه» ابزارها بر اساس دسته گروه‌بندی می‌شوند؛ در نمای یک دسته، شبکهٔ ساده.
   const grouped = useMemo(() => {
@@ -32,7 +46,7 @@ export default function ToolsIndex() {
     })).filter((g) => g.tools.length > 0);
   }, [active, filtered]);
 
-  const tabs = ['همه', ...TOOL_CATEGORIES];
+  const tabs = ['همه', POPULAR_TAB, ...TOOL_CATEGORIES];
 
   return (
     <main className="relative overflow-x-hidden pt-24 pb-32" dir="rtl">
@@ -100,7 +114,12 @@ export default function ToolsIndex() {
           <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-6 px-6 lg:mx-0 lg:px-0 lg:flex-wrap snap-x">
             {tabs.map((tab) => {
               const isActive = active === tab;
-              const color = tab === 'همه' ? null : getCategoryMeta(tab).color;
+              const color =
+                tab === 'همه'
+                  ? null
+                  : tab === POPULAR_TAB
+                  ? POPULAR_ACCENT
+                  : getCategoryMeta(tab).color;
               return (
                 <button
                   key={tab}
@@ -155,6 +174,28 @@ export default function ToolsIndex() {
           </div>
         ) : grouped ? (
           <div className="space-y-14">
+            {/* پرطرفدار — بالای همهٔ دسته‌ها */}
+            {popularInAll.length > 0 && (
+              <section>
+                <div className="flex items-center gap-3 mb-5">
+                  <div
+                    className="flex h-9 w-9 items-center justify-center rounded-xl shrink-0"
+                    style={{
+                      background: `rgba(${POPULAR_ACCENT}, 0.12)`,
+                      color: `rgb(${POPULAR_ACCENT})`,
+                    }}
+                  >
+                    <Flame className="h-[18px] w-[18px]" strokeWidth={1.9} />
+                  </div>
+                  <h2 className="font-display text-lg font-black text-foreground">پرطرفدار</h2>
+                  <span className="text-xs text-muted-foreground/70 font-display">
+                    {toPersianDigits(popularInAll.length)} ابزار
+                  </span>
+                  <div className="flex-1 h-px bg-border/60" />
+                </div>
+                <ToolGrid tools={popularInAll} mixed />
+              </section>
+            )}
             {grouped.map((group) => {
               const meta = getCategoryMeta(group.cat);
               const CatIcon = meta.icon;
@@ -184,7 +225,7 @@ export default function ToolsIndex() {
             })}
           </div>
         ) : (
-          <ToolGrid tools={filtered} />
+          <ToolGrid tools={filtered} mixed={active === POPULAR_TAB} />
         )}
 
         {/* Report a problem */}
@@ -225,19 +266,19 @@ export default function ToolsIndex() {
   );
 }
 
-/** شبکهٔ کارت ابزارها با انیمیشن ورود ملایم. */
-function ToolGrid({ tools }: { tools: Tool[] }) {
+/** شبکهٔ کارت ابزارها — کارت‌ها مربعی (مثل صفحهٔ اصلی) با انیمیشن ورود ملایم. */
+function ToolGrid({ tools, mixed }: { tools: Tool[]; mixed?: boolean }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       {tools.map((tool, i) => (
         <motion.div
           key={tool.slug}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3, ease: 'easeOut' }}
-          className="h-full"
+          className="aspect-square"
         >
-          <ToolCard tool={tool} />
+          <ToolCard tool={tool} accent={mixed ? tool.accent : undefined} showCategory={mixed} />
         </motion.div>
       ))}
     </div>

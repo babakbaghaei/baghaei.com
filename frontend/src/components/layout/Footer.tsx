@@ -9,9 +9,7 @@ const footerLinks = {
   { label: 'خانه', href: '/' },
   { label: 'ابزارها', href: '/tools' },
   { label: 'نمونه‌کار', href: '/projects' },
-  { label: 'بلاگ', href: '/blog' },
   { label: 'استخدام', href: '/careers' },
-  { label: 'خوراک RSS', href: '/feed.xml' },
  ],
  legal: [
   { label: 'قوانین و مقررات', href: '/terms' },

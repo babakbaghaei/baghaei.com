@@ -11,7 +11,13 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
  return (
-  <LegalLayout title="حریم" titleAccent="خصوصی." lastUpdated="۲ دی ۱۴۰۴">
+  <LegalLayout
+   title="حریم"
+   titleAccent="خصوصی."
+   lastUpdated="۲ دی ۱۴۰۴"
+   contactLabel="سوالی دارید؟ با ما در تماس باشید:"
+   contactEmail="privacy@baghaei.com"
+  >
      <section className="space-y-4">
       <p>
        در گروه فناوری بقایی، امنیت اطلاعات و حریم خصوصی شما اولویت اصلی ماست. این سند شرح می‌دهد که چگونه اطلاعات شما را جمع‌آوری، استفاده و محافظت می‌کنیم. ما متعهد به شفافیت کامل در پردازش داده‌های شما هستیم.
@@ -53,12 +59,6 @@ export default function PrivacyPage() {
       <h2 className="text-2xl font-bold text-foreground font-display border-s-2 border-primary ps-4">۴. حقوق کاربر</h2>
       <p className="text-muted-foreground">
        شما حق دارید در هر زمان درخواست کنید که اطلاعات شخصی شما از پایگاه داده‌های ما حذف شود یا نسخه‌ای از آن را دریافت کنید. برای اعمال این حق، لطفاً با ایمیل رسمی ما مکاتبه کنید.
-      </p>
-     </section>
-
-     <section className="pt-8 border-t border-border">
-      <p className="text-sm text-muted-foreground text-center">
-       سوالی دارید؟ با ما تماس بگیرید: <a href="mailto:privacy@baghaei.com" dir="ltr" className="text-foreground font-mono inline-block hover:underline">privacy@baghaei.com</a>
       </p>
      </section>
   </LegalLayout>

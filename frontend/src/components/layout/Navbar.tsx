@@ -24,6 +24,14 @@ const PROJECT_ICON: Record<string, React.ComponentType<{ className?: string }>> 
 // dropdown can never drift from the cards again. First six fill the 2-col grid.
 const featuredProjects = PROJECTS_DATA.filter((p) => !p.hidden).slice(0, 6);
 
+// Pull the "r, g, b" triplet out of a project's `rgba(r, g, b, a)` color so the
+// dropdown cards can wear the SAME category-accent system as ToolCard (colored
+// icon tile + accent border/glow on hover) instead of a flat grey hover.
+const projectAccent = (color?: string): string => {
+  const m = color?.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  return m ? `${m[1]}, ${m[2]}, ${m[3]}` : 'var(--primary-rgb, 59, 130, 246)';
+};
+
 export default function Navbar() {
  const [scrolled, setScrolled] = useState(false);
  const [activeSection, setActiveSection] = useState('hero');
@@ -61,6 +69,8 @@ export default function Navbar() {
  const isSolid = isSubPage || scrolled;
  const currentActive = pathname.startsWith('/tools')
   ? 'tools'
+  : pathname.startsWith('/projects')
+  ? 'projects'
   : pathname.startsWith('/about')
   ? 'about'
   : activeSection;
@@ -225,21 +235,26 @@ export default function Navbar() {
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                {featuredProjects.map((project) => {
                  const FallbackIcon = (project.icon && PROJECT_ICON[project.icon]) || Layout;
+                 const accent = projectAccent(project.color);
                  return (
                    <button
                      key={project.slug ?? project.id}
                      onClick={() => { setOpenMenu(null); router.push('/projects'); }}
-                     className="p-4 rounded-2xl bg-secondary/30 border border-transparent hover:bg-secondary hover:border-border transition-all cursor-pointer group flex items-start gap-3.5 text-right"
+                     style={{ '--accent': accent } as React.CSSProperties}
+                     className="p-4 rounded-2xl bg-secondary/30 border border-transparent transition-all cursor-pointer group flex items-start gap-3.5 text-right hover:bg-[rgba(var(--accent),0.06)] hover:border-[rgba(var(--accent),0.35)] hover:shadow-[0_8px_30px_-12px_rgba(var(--accent),0.5)]"
                    >
-                     <div className="w-10 h-10 rounded-xl bg-muted/10 flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-110 transition-transform">
+                     <div
+                       className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden transition-transform group-hover:scale-110"
+                       style={{ background: `rgba(${accent}, 0.12)`, color: `rgb(${accent})` }}
+                     >
                        {project.logo ? (
                          <Image src={project.logo} alt="" aria-hidden width={24} height={24} sizes="24px" className="w-6 h-6 object-contain" />
                        ) : (
-                         <FallbackIcon className="w-5 h-5 text-foreground" />
+                         <FallbackIcon className="w-5 h-5" />
                        )}
                      </div>
                      <div>
-                       <div className="font-bold text-sm text-foreground mb-1 group-hover:text-primary transition-colors">{project.title}</div>
+                       <div className="font-bold text-sm text-foreground mb-1 transition-colors group-hover:text-[rgb(var(--accent))]">{project.title}</div>
                        <div className="text-xs text-foreground/70 leading-relaxed line-clamp-2">{project.desc}</div>
                      </div>
                    </button>

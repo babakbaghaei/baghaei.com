@@ -120,8 +120,6 @@ import { DEFAULT_SCALE, type SolarScale } from './solarScale';
 // each body sweeps its orbit at its true rate: Mercury laps many times, Neptune
 // barely crawls. The outer giants' orbits run off-frame — only their in-view arc
 // shows, which is what a top-down map seen through a window does.
-const ORBIT_IDLE_DEG = 2;  // tiny continuous sway so the system breathes even at rest
-
 // Axial spin period (s) per planet — giants whirl fast, the inner worlds turn
 // slow, matching the real qualitative ordering. The surface scrolls under the
 // fixed terminator, so the lit side never moves while the planet visibly turns.
@@ -748,10 +746,38 @@ const PlanetBody = ({ planet, size, sunDirDeg, moonRotate = 0, moonEclipse, spin
 // sweeps its orbit around the Sun (inner worlds fast, giants slow). Because the
 // Sun is the pivot, the planet is always lit from the inner end (local 180°), so
 // the sphere lighting never needs recomputing. Purely decorative (no interaction).
-const Planet = ({ planet, date, frame, reduced }: { planet: PlanetData; date: Date; frame: Frame; reduced: boolean }) => {
+const Planet = ({ planet, date, frame, reduced, boost, onBoost, onDragStart, onDragEnd }: { planet: PlanetData; date: Date; frame: Frame; reduced: boolean; boost: number; onBoost: (id: string, delta: number) => void; onDragStart: (id: string) => void; onDragEnd: (id: string) => void }) => {
   const { sizeBase, distSpan, zoom, sunCx, sunCy, sizeExp } = frame.scale;
   const size = Math.max(SIZE_FLOOR, Math.pow(planet.diameter / EARTH_DIAMETER_KM, sizeExp) * sizeBase * zoom) * frame.k;
-  const r = orbitRadius(planet.au, Math.hypot(frame.W, frame.H), distSpan, zoom);
+  // Base orbit radius, then the live drag-boost grows/shrinks the axis. boost is
+  // a fraction (−0.5..1.2) accumulated by the heavily-damped radial drag below.
+  const r = orbitRadius(planet.au, Math.hypot(frame.W, frame.H), distSpan, zoom) * (1 + boost);
+
+  // Dragging is intentionally VERY stiff: a radial drag barely nudges the orbit.
+  // Pointer delta is projected onto the planet's outward direction and scaled by
+  // a tiny factor, so you have to haul a long way to move it even a little — and
+  // the orbit "axis" (radius, drawn ring included) grows/shrinks as you pull.
+  const dragging = useRef(false);
+  const dirRef = useRef<{ x: number; y: number }>({ x: 1, y: 0 });
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    dragging.current = true;
+    const a = norm360(-planetLongitude(planet.id, date)) * DEG; // outward screen dir
+    dirRef.current = { x: Math.cos(a), y: Math.sin(a) };
+    onDragStart(planet.id);
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* noop */ }
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging.current) return;
+    const d = dirRef.current;
+    const radial = d.x * e.movementX + d.y * e.movementY; // px along outward axis
+    onBoost(planet.id, radial * 0.0006); // heavy resistance
+  };
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    onDragEnd(planet.id); // release → magnetic spring back to origin
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* noop */ }
+  };
   // Orbital angle = real heliocentric longitude, 1:1 around the Sun, so
   // the planets' relative configuration is astronomically exact. The arm puts the
   // planet at local +x, so screen angle = −longitude gives the real prograde
@@ -765,26 +791,25 @@ const Planet = ({ planet, date, frame, reduced }: { planet: PlanetData; date: Da
   const m = planet.id === 'earth' ? earthMoon(date) : null;
   const moonEclipse = { isSolar: m?.isSolar ?? false, isLunar: m?.isLunar ?? false };
 
-  // Inner planets sway faster (Kepler); the per-planet duration also desyncs them.
-  const orbitDur = 24 + Math.pow(planet.au, 0.7) * 32;
-
   return (
     <div className="absolute" style={{ left: sx, top: sy, width: 0, height: 0, zIndex: 2 }}>
-      {/* Orbital angle (real longitude → visible quadrant). */}
+      {/* Orbital angle (real longitude → visible quadrant). The body holds this
+          scroll-derived angle EXACTLY at rest — no idle sway — so the system is
+          perfectly still when the user is not scrolling. Revolution comes solely
+          from the scroll-advanced date feeding restAngle. */}
       <div style={{ transformOrigin: '0px 0px', transform: `rotate(${restAngle}deg)` }}>
-        {/* Tiny continuous idle sway so the system still breathes at rest (the real
-            revolution comes from the scroll-driven restAngle above). */}
-        <motion.div
-          className="will-change-transform"
-          style={{ transformOrigin: '0px 0px' }}
-          animate={reduced ? { rotate: 0 } : { rotate: [-ORBIT_IDLE_DEG, ORBIT_IDLE_DEG, -ORBIT_IDLE_DEG] }}
-          transition={reduced ? undefined : { duration: orbitDur, repeat: Infinity, ease: 'easeInOut' }}
+        {/* Planet centred on its orbit at distance r; lit from the Sun (local 180°).
+            pointer-events-auto so this disc is the one draggable bit of the field. */}
+        <div
+          className="absolute -translate-x-1/2 -translate-y-1/2"
+          style={{ left: r, top: 0, pointerEvents: 'auto', cursor: 'grab', touchAction: 'none' }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
         >
-          {/* Planet centred on its orbit at distance r; lit from the Sun (local 180°). */}
-          <div className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: r, top: 0 }}>
-            <PlanetBody planet={planet} size={size} sunDirDeg={180} moonRotate={m?.moonRotate ?? 0} moonEclipse={moonEclipse} spin={!reduced} spinSeconds={SPIN_SECONDS[planet.id] ?? 30} />
-          </div>
-        </motion.div>
+          <PlanetBody planet={planet} size={size} sunDirDeg={180} moonRotate={m?.moonRotate ?? 0} moonEclipse={moonEclipse} spin={!reduced} spinSeconds={SPIN_SECONDS[planet.id] ?? 30} />
+        </div>
       </div>
     </div>
   );
@@ -816,6 +841,56 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
  const { scrollYProgress } = useScroll();
  const [progress, setProgress] = useState(0);
  const prefersReducedMotion = usePrefersReducedMotion();
+
+ // Per-planet orbit-radius boost, accumulated by the heavily-damped planet drag.
+ // Clamped so a body can't be hauled into the Sun or off to infinity. On release
+ // it eases back to 0 — the planet snaps magnetically to its real orbit.
+ const [orbitBoost, setOrbitBoost] = useState<Record<string, number>>({});
+ const boostRef = useRef<Record<string, number>>({});   // synchronous mirror of state
+ const velRef = useRef<Record<string, number>>({});      // per-planet spring velocity
+ const draggingRef = useRef<Set<string>>(new Set());
+ const decayRafRef = useRef(0);
+ // STRETCH_LIMIT is the asymptote; pulling resistance climbs as |boost| nears it
+ // (the more stretched, the less each pixel stretches it — no hard wall to hit).
+ const STRETCH_LIMIT = 1.0;
+ const handleBoost = (id: string, delta: number) => {
+   const cur = boostRef.current[id] ?? 0;
+   // Progressive resistance: gain fades toward 0 as the stretch approaches the
+   // limit, so it asymptotes smoothly instead of slamming into a clamp.
+   const give = Math.max(0, 1 - Math.abs(cur) / STRETCH_LIMIT);
+   const v = cur + delta * give;
+   boostRef.current = { ...boostRef.current, [id]: v };
+   velRef.current = { ...velRef.current, [id]: delta * give }; // momentum into the spring
+   setOrbitBoost(boostRef.current);
+ };
+ const startDecay = () => {
+   if (decayRafRef.current) return;
+   // Underdamped spring pulling each boost back to 0: a = −k·x − c·v. Carries the
+   // release momentum, settles with a tiny bounce, never stops abruptly mid-air.
+   const K = 0.07, C = 0.2;
+   const step = () => {
+     const next: Record<string, number> = { ...boostRef.current };
+     const vel: Record<string, number> = { ...velRef.current };
+     let alive = false;
+     for (const id in next) {
+       if (draggingRef.current.has(id)) { alive = true; continue; }
+       const x = next[id];
+       let v = (vel[id] ?? 0) + (-K * x - C * (vel[id] ?? 0));
+       const nx = x + v;
+       if (Math.abs(nx) < 0.0004 && Math.abs(v) < 0.0004) { next[id] = 0; v = 0; }
+       else { next[id] = nx; alive = true; }
+       vel[id] = v;
+     }
+     boostRef.current = next;
+     velRef.current = vel;
+     setOrbitBoost(next);
+     decayRafRef.current = alive ? requestAnimationFrame(step) : 0;
+   };
+   decayRafRef.current = requestAnimationFrame(step);
+ };
+ const handleDragStart = (id: string) => { draggingRef.current.add(id); velRef.current = { ...velRef.current, [id]: 0 }; };
+ const handleDragEnd = (id: string) => { draggingRef.current.delete(id); startDecay(); };
+ useEffect(() => () => { if (decayRafRef.current) cancelAnimationFrame(decayRafRef.current); }, []);
 
  // Update on every scroll change so the system advances smoothly with scroll.
  useEffect(() => {
@@ -881,7 +956,7 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
      {/* Faint concentric orbit rings centred on the Sun — make the real circular
          orbits explicit; the outer ones run off-frame and only their in-view arc shows. */}
      {PLANETS_DATA.map((planet) => {
-       const rr = orbitRadius(planet.au, Math.hypot(frame.W, frame.H), activeScale.distSpan, activeScale.zoom);
+       const rr = orbitRadius(planet.au, Math.hypot(frame.W, frame.H), activeScale.distSpan, activeScale.zoom) * (1 + (orbitBoost[planet.id] ?? 0));
        return (
          <div key={`ring-${planet.id}`} aria-hidden className="absolute rounded-full"
            style={{ left: activeScale.sunCx * frame.W, top: activeScale.sunCy * frame.H, width: rr * 2, height: rr * 2, transform: 'translate(-50%, -50%)', border: `1px solid rgba(255,255,255,${activeScale.orbitOpacity})` }} />
@@ -889,7 +964,7 @@ export default function GlobalUniverse({ renderBackground = false, scrollProgres
      })}
      <Sun frame={frame} reduced={prefersReducedMotion} />
      {date && PLANETS_DATA.map((planet) => (
-      <Planet key={planet.id} planet={planet} date={date} frame={frame} reduced={prefersReducedMotion} />
+      <Planet key={planet.id} planet={planet} date={date} frame={frame} reduced={prefersReducedMotion} boost={orbitBoost[planet.id] ?? 0} onBoost={handleBoost} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
      ))}
     </>
    )}

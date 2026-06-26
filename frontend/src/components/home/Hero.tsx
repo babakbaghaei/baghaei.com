@@ -107,6 +107,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
           roundedClass="rounded-[1.75rem] sm:rounded-[2.25rem] lg:rounded-[3rem]"
           className="mb-8"
           contentClassName="p-6 sm:p-9 lg:p-14"
+          bgClassName="bg-white/[0.025]"
         >
         <div className="relative">
         {/* Full-bleed live solar system: the Sun blazes from the card's
