@@ -7,7 +7,7 @@ import { PROJECTS_DATA } from '@/lib/data/projects';
 // Mirrors the root src/app/opengraph-image.tsx (gradient bg, embedded YekanBakh
 // font, accent line) but shows the project TITLE so social previews are specific.
 export const runtime = 'nodejs';
-export const alt = 'نمونه‌کار گروه فناوری بقایی';
+export const alt = 'نمونه‌کار گروه فناوری بقائی';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -31,7 +31,7 @@ const yekanRegular = readFileSync(
 
 export default async function Image({ params }: { params: { slug: string } }) {
   const project = getProject(params.slug);
-  const title = project?.title || 'نمونه‌کار گروه فناوری بقایی';
+  const title = project?.title || 'نمونه‌کار گروه فناوری بقائی';
   const category = project?.category || '';
   const accent = project?.borderColor || 'rgba(255,255,255,0.6)';
 

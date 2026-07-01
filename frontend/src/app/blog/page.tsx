@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/blog' },
   openGraph: {
     type: 'website',
-    title: 'وبلاگ گروه فناوری بقایی',
+    title: 'وبلاگ گروه فناوری بقائی',
     description: 'مقالات تخصصی درباره معماری نرم‌افزار، هوش مصنوعی، امنیت سایبری و زیرساخت‌های ابری.',
     url: '/blog',
   },

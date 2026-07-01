@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Wallet, ShieldCheck, Percent, Layers, Info } from 'lucide-react';
+import { Wallet, ShieldCheck, Percent, Layers, Info, Users, Baby } from 'lucide-react';
 import {
   ToolShell,
   TwoPane,
@@ -9,6 +9,8 @@ import {
   VerdictPanel,
   MoneyField,
   Field,
+  SelectField,
+  Stepper,
   Row,
   Headline,
   EmptyState,
@@ -27,8 +29,12 @@ import {
   unitLabel,
   type Unit,
 } from '@/components/tools/shell';
+import { MIN_WAGE, MIN_WAGE_LATEST_YEAR } from '@/lib/data/legal-rates';
 
 const ACCENT = '5, 150, 105'; // emerald-600
+
+// حق اولاد ماهانهٔ هر فرزند (ریال) از جدید‌ترین سال حداقل دستمزد — معاف از مالیات و بیمه.
+const CHILD_RATE_RIAL = MIN_WAGE[MIN_WAGE_LATEST_YEAR].childPerKid;
 
 /**
  * پلکان نمونهٔ مالیات حقوق (قابل ویرایش). هر ردیف سقف ماهانهٔ پلکان و نرخ آن را
@@ -57,6 +63,8 @@ export default function HoghooghKhales() {
   const [exemption, setExemption] = useState(DEFAULT_EXEMPTION);
   const [brackets, setBrackets] = useState<Bracket[]>(DEFAULT_BRACKETS);
   const [unit, setUnit] = useState<Unit>('toman');
+  const [married, setMarried] = useState(false);
+  const [childCount, setChildCount] = useState(0);
 
   const { share, copied } = useShareResult();
 
@@ -71,6 +79,9 @@ export default function HoghooghKhales() {
     if (ex && /^\d+$/.test(ex)) setExemption(Number(ex).toLocaleString('en-US'));
     const u = p.get('unit');
     if (u === 'rial' || u === 'toman') setUnit(u);
+    if (p.get('m') === '1') setMarried(true);
+    const kids = p.get('kids');
+    if (kids && /^\d+$/.test(kids)) setChildCount(Math.min(20, Number(kids)));
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -113,15 +124,21 @@ export default function HoghooghKhales() {
       if (!hasCap) break;
     }
 
-    const net = Math.max(0, grossNum - insurance - tax);
+    // حق اولاد معاف از مالیات و بیمه است؛ روی خالص افزوده می‌شود (نه کسر).
+    const childRateUnit = unit === 'toman' ? CHILD_RATE_RIAL / 10 : CHILD_RATE_RIAL;
+    const childAllowance = married ? childCount * childRateUnit : 0;
+    const baseNet = Math.max(0, grossNum - insurance - tax);
+    const net = baseNet + childAllowance;
     return {
       insurance: Math.round(insurance),
       taxable: Math.round(taxable),
       tax: Math.round(tax),
+      childAllowance: Math.round(childAllowance),
+      baseNet: Math.round(baseNet),
       net: Math.round(net),
       tiers,
     };
-  }, [grossNum, insRate, exemptNum, brackets]);
+  }, [grossNum, insRate, exemptNum, brackets, married, childCount, unit]);
 
   const u = unitLabel(unit);
 
@@ -129,12 +146,14 @@ export default function HoghooghKhales() {
     if (!calc) return;
     share({
       title: 'محاسبهٔ حقوق خالص',
-      text: `حقوق ناخالص ${fmtMoney(grossNum)} ${u} — خالص دریافتی: ${fmtMoney(calc.net)} ${u} (بیمه ${fmtMoney(calc.insurance)}، مالیات ${fmtMoney(calc.tax)})`,
+      text: `حقوق ناخالص ${fmtMoney(grossNum)} ${u} — خالص دریافتی: ${fmtMoney(calc.net)} ${u} (بیمه ${fmtMoney(calc.insurance)}، مالیات ${fmtMoney(calc.tax)}${calc.childAllowance > 0 ? `، حق اولاد ${fmtMoney(calc.childAllowance)}` : ''})`,
       params: {
         gross: String(grossNum),
         ins: String(insRate),
         exempt: String(exemptNum),
         unit,
+        m: married ? '1' : '0',
+        kids: String(childCount),
       },
     });
   };
@@ -175,9 +194,14 @@ export default function HoghooghKhales() {
           body: 'مالیات حقوق به‌صورت تصاعدی پلکانی محاسبه می‌شود: هر بخش از مبلغ مشمول با نرخ پلکان خود مالیات می‌خورد. سقف هر پله و نرخ آن قابل ویرایش است و آخرین ردیف بدون سقف (مازاد) در نظر گرفته می‌شود.',
         },
         {
+          icon: <Baby className="w-4 h-4" />,
+          title: 'حق اولاد',
+          body: 'حق اولاد کمک‌هزینه‌ای است که به کارمند بیمه‌شدهٔ دارای فرزند پرداخت می‌شود و از مالیات و بیمه معاف است. مبلغ هر فرزند بر پایهٔ حداقل دستمزد مصوب سال جاری محاسبه و به خالص دریافتی افزوده می‌شود.',
+        },
+        {
           icon: <Info className="w-4 h-4" />,
           title: 'موارد لحاظ‌نشده',
-          body: 'این محاسبه پایه است و مزایای معاف از مالیات/بیمه (مانند حق اولاد، بن، خواروبار، عیدی و سنوات در سقف معاف) و کسورات اختیاری مثل وام را جداگانه لحاظ نمی‌کند. رقم فیش حقوقی ممکن است اندکی متفاوت باشد.',
+          body: 'حق اولاد (برای کارمند متأهل) به‌صورت معاف در محاسبه افزوده می‌شود؛ اما سایر مزایای معاف مانند بن، خواروبار، مسکن، عیدی و سنوات در سقف معاف و کسورات اختیاری مثل وام جداگانه لحاظ نمی‌شوند. رقم فیش حقوقی ممکن است اندکی متفاوت باشد.',
         },
       ]}
       disclaimer="نرخ معافیت و پلکان مالیات حقوق هر سال در قانون بودجه تغییر می‌کند؛ مقادیر پیش‌فرض این ابزار صرفاً نمونه و قابل ویرایش‌اند. این یک برآورد است؛ ارقام دقیق را با جدول مصوب سال جاری و واحد حقوق و دستمزد بررسی کنید."
@@ -191,6 +215,28 @@ export default function HoghooghKhales() {
             unit={unit}
             setUnit={setUnit}
           />
+
+          <SelectField
+            icon={<Users className="w-4 h-4" />}
+            label="وضعیت تأهل"
+            hint="برای محاسبهٔ حق اولاد (کمک‌هزینهٔ عائله‌مندی)"
+            value={married ? 'married' : 'single'}
+            onChange={(v) => setMarried(v === 'married')}
+          >
+            <option value="single">مجرد</option>
+            <option value="married">متأهل</option>
+          </SelectField>
+
+          {married && (
+            <Stepper
+              label="تعداد فرزندان"
+              hint={`حق اولاد هر فرزند ${fmtMoney(unit === 'toman' ? CHILD_RATE_RIAL / 10 : CHILD_RATE_RIAL)} ${u}/ماه — معاف از مالیات و بیمه`}
+              value={childCount}
+              onChange={setChildCount}
+              min={0}
+              max={20}
+            />
+          )}
 
           <Field label="سهم بیمهٔ کارمند" hint="نمونه ۷٪ — قابل ویرایش؛ مطابق بخشنامهٔ سال جاری">
             <div className="relative">
@@ -328,6 +374,13 @@ export default function HoghooghKhales() {
                   <div className="h-px bg-border/60 my-1" />
                   <Row label="سهم بیمه" value={`${fmtMoney(calc.insurance)} ${u}`} strong />
                   <Row label="مالیات حقوق" value={`${fmtMoney(calc.tax)} ${u}`} strong />
+                  {calc.childAllowance > 0 && (
+                    <Row
+                      label={`حق اولاد (${faNum(childCount)} فرزند، معاف)`}
+                      value={`+${fmtMoney(calc.childAllowance)} ${u}`}
+                      strong
+                    />
+                  )}
                   <Row label="خالص دریافتی" value={`${fmtMoney(calc.net)} ${u}`} strong />
                 </div>
                 <Notice accent={ACCENT}>

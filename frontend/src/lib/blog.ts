@@ -109,7 +109,7 @@ export function getAllPostsMeta(): BlogPostMeta[] {
         date: data.date ?? '',
         excerpt: data.excerpt ?? '',
         coverImage: data.coverImage,
-        author: data.author ?? 'گروه فناوری بقایی',
+        author: data.author ?? 'گروه فناوری بقائی',
         tags: data.tags ?? [],
         readingTime: Math.ceil(readingTime(content).minutes) + ' دقیقه مطالعه',
       } as BlogPostMeta;

@@ -22,6 +22,7 @@ import { HealthModule } from './health/health.module';
 import { ServicesModule } from './services/services.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { UploadModule } from './upload/upload.module';
+import { ToolFeedbackModule } from './tool-feedback/tool-feedback.module';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { UploadModule } from './upload/upload.module';
     HealthModule,
     ServicesModule,
     DashboardModule,
+    ToolFeedbackModule,
   ],
   controllers: [AppController],
   providers: [

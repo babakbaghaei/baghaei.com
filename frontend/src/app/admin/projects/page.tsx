@@ -86,7 +86,7 @@ export default function AdminProjectsPage() {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-2">
             <h1 className="text-4xl font-black font-display uppercase tracking-tight">پروژه‌ها</h1>
-            <p className="text-muted-foreground font-display">مدیریت و ویرایش نمونه کارهای گروه فناوری بقایی</p>
+            <p className="text-muted-foreground font-display">مدیریت و ویرایش نمونه کارهای گروه فناوری بقائی</p>
           </div>
           <Link href="/admin/projects/new">
             <Button className="rounded-full px-8 py-6 gap-2">

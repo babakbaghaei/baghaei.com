@@ -10,7 +10,7 @@ import {
   ShieldCheck,
   Cloud,
   BrainCircuit,
-  Sparkles,
+  Users,
   ArrowUpLeft,
   Target,
   Gem,
@@ -71,7 +71,7 @@ const VALUES = [
 ];
 
 const STATS = [
-  { value: '۱۰+', label: 'سال تجربه' },
+  { value: '۱۱', label: 'سال تجربه' },
   { value: '۵۰+', label: 'پروژهٔ موفق' },
   { value: '۹۹.۹٪', label: 'پایداری سرویس' },
   { value: '۲۴/۷', label: 'پشتیبانی' },
@@ -94,7 +94,7 @@ export default function AboutPage() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 text-primary text-xs font-black font-display bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full mb-8"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Users className="w-3.5 h-3.5" />
             درباره ما
           </motion.div>
 
@@ -115,7 +115,7 @@ export default function AboutPage() {
             transition={{ delay: 0.1 }}
             className="mt-8 max-w-2xl text-muted-foreground text-base md:text-lg leading-relaxed"
           >
-            گروه فناوری بقایی تیمی از مهندسان نرم‌افزار است که با تمرکز بر معماری
+            گروه فناوری بقائی تیمی از مهندسان نرم‌افزار است که با تمرکز بر معماری
             سیستم‌های سازمانی مقیاس‌پذیر، راهکارهایی پایدار و دقیق برای پیچیده‌ترین
             چالش‌های فنی طراحی می‌کند. ما باور داریم که نرم‌افزار خوب، نامرئی است؛
             بی‌صدا کار می‌کند و اعتماد می‌سازد.
@@ -164,7 +164,7 @@ export default function AboutPage() {
               پذیرفتنی نیست. این سخت‌گیری، امروز به امضای ما تبدیل شده است.
             </p>
             <p className="text-foreground font-medium">
-              امروز، گروه فناوری بقایی پلی است میان ایده‌های بزرگ و اجرای بی‌نقص.
+              امروز، گروه فناوری بقائی پلی است میان ایده‌های بزرگ و اجرای بی‌نقص.
             </p>
           </div>
         </div>

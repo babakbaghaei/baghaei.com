@@ -171,7 +171,7 @@ export function CommandMenu() {
             <Search className="me-2 h-5 w-5 shrink-0 text-muted-foreground" />
             <Command.Input
               ref={inputRef}
-              placeholder="جستجو در بخش‌ها (برای انتخاب Enter بزنید)..."
+              placeholder="جستجوی ابزارها و بخش‌ها (برای انتخاب Enter بزنید)..."
               className="flex h-14 w-full rounded-md bg-transparent py-3 text-lg outline-none placeholder:text-muted-foreground text-foreground font-display text-right ps-4"
               dir="rtl"
             />
@@ -185,7 +185,20 @@ export function CommandMenu() {
               نتیجه‌ای یافت نشد.
             </Command.Empty>
 
-            <Command.Group heading={<span className="text-xs font-bold text-muted-foreground px-2 mb-2 block text-right font-display">صفحات اصلی</span>}>
+            {/* ابزارها اول — پالت اساساً برای جستجوی جعبه‌ابزار است (R27b) */}
+            <Command.Group heading={<span className="text-xs font-bold text-muted-foreground px-2 mb-2 block text-right font-display">ابزارها</span>}>
+              {TOOLS.filter((t) => t.status !== 'soon' && !t.hidden).map((tool) => (
+                <CommandItem
+                  key={tool.slug}
+                  icon={tool.icon ?? Laptop}
+                  text={tool.title}
+                  value={`${tool.title} ${tool.category ?? ''} ${tool.desc ?? ''}`}
+                  onSelect={() => runCommand(() => router.push(`/tools/${tool.slug}`))}
+                />
+              ))}
+            </Command.Group>
+
+            <Command.Group heading={<span className="text-xs font-bold text-muted-foreground px-2 mt-4 mb-2 block text-right font-display">صفحات اصلی</span>}>
               {navLinks.map((link) => {
                 const meta = NAV_COMMAND_META[link.id];
                 if (!meta) return null;
@@ -201,18 +214,6 @@ export function CommandMenu() {
               })}
               <CommandItem icon={FileText} text="وبلاگ" onSelect={() => runCommand(() => { play('pop'); router.push('/blog'); })} onHover={() => play('hover')} />
               <CommandItem icon={Phone} text="تماس با ما" onSelect={() => runCommand(() => { play('pop'); router.push('/#contact'); })} onHover={() => play('hover')} />
-            </Command.Group>
-
-            <Command.Group heading={<span className="text-xs font-bold text-muted-foreground px-2 mt-4 mb-2 block text-right font-display">ابزارها</span>}>
-              {TOOLS.filter((t) => t.status !== 'soon').map((tool) => (
-                <CommandItem
-                  key={tool.slug}
-                  icon={tool.icon ?? Laptop}
-                  text={tool.title}
-                  value={`${tool.title} ${tool.category ?? ''} ${tool.desc ?? ''}`}
-                  onSelect={() => runCommand(() => router.push(`/tools/${tool.slug}`))}
-                />
-              ))}
             </Command.Group>
 
             {posts.length > 0 && (

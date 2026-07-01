@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence, cubicBezier } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 
-const words = ["مهندسی", "دقت", "امنیت", "مقیاس‌پذیری", "خلاقیت", "گروه فناوری بقایی"];
+const words = ["مهندسی", "دقت", "امنیت", "مقیاس‌پذیری", "خلاقیت", "گروه فناوری بقائی"];
 
 // Session guard: the full word sequence plays only on the first load of a
 // session. Later loads within the same tab/session skip the intro entirely.

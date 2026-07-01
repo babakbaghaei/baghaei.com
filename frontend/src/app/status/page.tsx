@@ -3,7 +3,7 @@ import StatusClient from './StatusClient';
 
 export const metadata: Metadata = {
  title: 'وضعیت استقرار',
- description: 'پیشرفت زنده‌ی استقرار و سلامت سرویس‌های گروه فناوری بقایی.',
+ description: 'پیشرفت زنده‌ی استقرار و سلامت سرویس‌های گروه فناوری بقائی.',
  alternates: { canonical: '/status' },
  robots: { index: false, follow: false },
 };

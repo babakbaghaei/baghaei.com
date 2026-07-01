@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/tools' },
   openGraph: {
     type: 'website',
-    title: 'جعبه ابزار | گروه فناوری بقایی',
+    title: 'جعبه ابزار | گروه فناوری بقائی',
     description:
       'مجموعه ابزارهای رایگان آنلاین: ماشین‌حساب‌های حقوقی، مالی، ملکی و کمکی. همه محاسبات در مرورگر شما.',
     url: '/tools',

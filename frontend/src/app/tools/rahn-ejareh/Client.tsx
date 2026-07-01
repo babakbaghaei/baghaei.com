@@ -8,7 +8,7 @@ import {
   Panel,
   VerdictPanel,
   MoneyField,
-  Field,
+  RateField,
   Row,
   Headline,
   EmptyState,
@@ -134,22 +134,15 @@ export default function RahnEjareh() {
           <MoneyField label="ودیعهٔ فعلی (رهن)" amount={deposit} setAmount={setDeposit} unit={unit} setUnit={setUnit} />
           <MoneyField label="اجارهٔ ماهانهٔ فعلی" amount={rent} setAmount={setRent} unit={unit} />
 
-          <Field label="نرخ تبدیل ماهانه" hint="عرف بازار ۱۴۰۴ حدود ۳٪ است">
-            <div className="relative">
-              <input
-                type="text"
-                inputMode="decimal"
-                value={faNum(rate)}
-                onChange={(e) => setRate(normalizeDigits(e.target.value).replace(/[^\d.]/g, ''))}
-                dir="ltr"
-                aria-label="نرخ تبدیل ماهانه به درصد"
-                className="w-full bg-background border-2 border-border rounded-xl py-3 px-4 pl-10 font-display text-lg text-center focus:border-primary outline-none transition-all"
-              />
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground/50">
-                ٪
-              </span>
-            </div>
-          </Field>
+          <RateField
+            label="نرخ تبدیل ماهانه"
+            official={RAHN_TO_RENT_MONTHLY_RATE * 100}
+            value={rate}
+            onChange={setRate}
+            source="عرف بازار ۱۴۰۴"
+            officialLabel="عرف بازار"
+            hint="نرخ رایج بازار حدود ۳٪ ماهانه است؛ برای منطقه/توافق خاص «نرخ دلخواه» را بزنید."
+          />
 
           <MoneyField label="ودیعهٔ دلخواه (اختیاری)" amount={desired} setAmount={setDesired} unit={unit} />
         </Panel>

@@ -131,6 +131,12 @@ const ProjectContent = ({ project }: { project: Project }) => {
           full colour (md: gate). The text layer is a separate sibling, so this
           never dims the white copy. */}
       <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
+        {/* Light-mode legibility base: the copy/chips are always white, so in
+            light mode the neutral rest glass (near-white) would swallow them.
+            Keep portfolio tiles on a dark substrate in light mode; dark mode is
+            already dark → transparent, so it stays pixel-identical. */}
+        <div aria-hidden className="absolute inset-0 bg-neutral-900 dark:bg-transparent" />
+
         {/* Project colour — hidden at rest on desktop (neutral like the tool
             cards), fades in on hover; always on for touch (md: gate). */}
         <div className="absolute inset-0 opacity-100 transition-opacity duration-500 ease-out md:opacity-0 md:group-hover/card:opacity-100 motion-reduce:transition-none" style={{ background: panelBg }} />
@@ -150,14 +156,22 @@ const ProjectContent = ({ project }: { project: Project }) => {
             rest) without it. */}
       </div>
 
-      {/* Category chip (top, leading edge in RTL) — lifts further forward on hover. */}
+      {/* Category chip + publishing status (top, leading edge in RTL) — the
+          "در حال انتشار" pill now sits beside the category, not at the bottom.
+          The whole row lifts further forward on hover. */}
       <div
-        className="absolute right-4 top-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(60px)] motion-reduce:transition-none"
+        className="absolute right-4 top-4 z-10 flex items-center gap-2 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(60px)] motion-reduce:transition-none"
         style={{ transform: "translateZ(24px)" }}
       >
         <span className="rounded-full bg-black/35 md:bg-transparent md:group-hover/card:bg-black/35 transition-colors duration-500 ease-out motion-reduce:transition-none px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
           {project.category}
         </span>
+        {project.imagesLockReason === 'publishing' && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/40 md:bg-transparent md:group-hover/card:bg-black/40 transition-colors duration-500 ease-out motion-reduce:transition-none px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400 motion-safe:animate-pulse" aria-hidden />
+            در حال انتشار
+          </span>
+        )}
       </div>
 
       {/* Open affordance — appears + pops forward on hover. */}
@@ -170,15 +184,9 @@ const ProjectContent = ({ project }: { project: Project }) => {
         </span>
       </div>
 
-      {/* Lock / status badge (bottom-leading). NDA → lock icon; publishing →
-          a soft "being published" pill so users know images aren't viewable yet. */}
-      {project.imagesLockReason === 'publishing' ? (
-        <div className="absolute left-4 bottom-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(55px)] motion-reduce:transition-none" style={{ transform: "translateZ(24px)" }}>
-          <span className="rounded-full bg-black/40 md:bg-transparent md:group-hover/card:bg-black/40 transition-colors duration-500 ease-out motion-reduce:transition-none px-3 py-1 text-[11px] font-display font-bold text-white/90 ring-1 ring-white/15 backdrop-blur-md">
-            در حال انتشار
-          </span>
-        </div>
-      ) : project.isLocked && (
+      {/* Lock badge (bottom-leading) — NDA lock icon only. The "در حال انتشار"
+          status moved up beside the category chip. */}
+      {project.isLocked && project.imagesLockReason !== 'publishing' && (
         <div className="absolute left-4 bottom-4 z-10 transition-transform duration-300 ease-out group-hover/card:[transform:translateZ(55px)] motion-reduce:transition-none" style={{ transform: "translateZ(24px)" }}>
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 md:bg-transparent md:group-hover/card:bg-black/40 transition-colors duration-500 ease-out motion-reduce:transition-none text-white/80 ring-1 ring-white/15 backdrop-blur-md">
             <Lock className="h-3.5 w-3.5" aria-hidden />

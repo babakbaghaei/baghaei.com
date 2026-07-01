@@ -14,6 +14,7 @@ import Logo from '@/components/layout/Logo';
 import { todayPDate, formatPDate } from '@/components/tools/DatePicker';
 import {
   ChevronRight,
+  ChevronLeft,
   ChevronDown,
   X,
   Share2,
@@ -25,10 +26,13 @@ import {
   Printer,
   History as HistoryIcon,
   Trash2,
+  Lock,
   type LucideIcon,
 } from 'lucide-react';
 import { toPersianDigits } from '@/lib/utils/format';
 import { numToPersian } from '@/lib/utils/num-to-persian';
+import ToolFeedback from './ToolFeedback';
+import { fetchToolReviews, type ReviewSummary } from '@/lib/toolFeedback';
 
 /* ───────────── helpers ───────────── */
 
@@ -83,7 +87,7 @@ function PrintLetterhead({ title, subtitle }: { title: string; subtitle: string 
         <div className="flex items-center gap-3">
           <Logo className="w-12 h-12 text-black" />
           <div>
-            <div className="text-lg font-black font-display leading-tight">گروه فناوری بقایی</div>
+            <div className="text-lg font-black font-display leading-tight">گروه فناوری بقائی</div>
             <div className="text-[11px] tracking-wide">baghaei.com</div>
           </div>
         </div>
@@ -101,7 +105,7 @@ function PrintLetterhead({ title, subtitle }: { title: string; subtitle: string 
 function PrintFooter() {
   return (
     <div className="hidden print:block print-footer">
-      این برگه توسط جعبه‌ابزار آنلاین «گروه فناوری بقایی» (baghaei.com) تولید شده و صرفاً جنبهٔ برآوردی و
+      این برگه توسط جعبه‌ابزار آنلاین «گروه فناوری بقائی» (baghaei.com) تولید شده و صرفاً جنبهٔ برآوردی و
       راهنما دارد؛ مبنای قطعی، مراجع رسمی و حکم مرجع صالح است.
     </div>
   );
@@ -128,7 +132,22 @@ export function ToolShell({
   // free, offline, in-browser web app — emitting this lets the calculators
   // qualify for rich results on their (high-intent, Persian) search queries.
   const pathname = usePathname();
-  const softwareLd = {
+  const slug = (pathname || '').split('/').filter(Boolean).pop() || '';
+
+  // یک بار خواندن خلاصهٔ دیدگاه‌ها — هم برای AggregateRating (سئو) و هم برای پنلِ
+  // دیدگاهِ پایین صفحه؛ نتیجه از راهِ initialSummary به ToolFeedback داده می‌شود تا
+  // درخواستِ شبکه دوبار نرود (سقفِ نرخِ ۶/۶۰ثانیه روی این مسیر).
+  const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(null);
+  useEffect(() => {
+    if (!slug || slug === 'tools') return;
+    let alive = true;
+    fetchToolReviews(slug)
+      .then((s) => { if (alive) setReviewSummary(s); })
+      .catch(() => { if (alive) setReviewSummary({ toolSlug: slug, count: 0, average: 0, reviews: [] }); });
+    return () => { alive = false; };
+  }, [slug]);
+
+  const softwareLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: title,
@@ -139,8 +158,19 @@ export function ToolShell({
     inLanguage: 'fa-IR',
     isAccessibleForFree: true,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'IRR' },
-    publisher: { '@type': 'Organization', name: 'گروه فناوری بقایی', url: 'https://baghaei.com' },
+    publisher: { '@type': 'Organization', name: 'گروه فناوری بقائی', url: 'https://baghaei.com' },
   };
+  // AggregateRating فقط وقتی ≥۱ دیدگاهِ واقعی باشد؛ انتشارش با صفر دیدگاه اسکیمای
+  // نامعتبر و مشمولِ اقدامِ دستیِ گوگل است، پس پشتِ این شرط قفل شده.
+  if (reviewSummary && reviewSummary.count > 0) {
+    softwareLd.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: reviewSummary.average,
+      reviewCount: reviewSummary.count,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
   return (
     <main
       className="relative overflow-x-hidden px-4 md:px-6 pt-24 pb-28"
@@ -215,6 +245,12 @@ export function ToolShell({
           </div>
         )}
 
+        {/* دیدگاه، امتیاز و گزارش مشکل (R23) — اسلاگ از مسیر صفحهٔ ابزار؛
+            خلاصهٔ از پیش‌خوانده‌شده را می‌دهیم تا درخواست تکراری نشود. */}
+        {slug && slug !== 'tools' ? (
+          <ToolFeedback slug={slug} initialSummary={reviewSummary} />
+        ) : null}
+
         {/* offline + back */}
         <div className="no-print mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <span className="inline-flex items-center gap-2 text-muted-foreground font-medium">
@@ -223,9 +259,10 @@ export function ToolShell({
           </span>
           <Link
             href="/tools"
-            className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-display"
+            className="group inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-display"
           >
-            <ChevronRight className="w-4 h-4" /> سایر ابزارها
+            سایر ابزارها
+            <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
           </Link>
         </div>
 
@@ -441,7 +478,7 @@ function MoneyInput({
         placeholder="۰"
         dir="ltr"
         aria-label={label}
-        className="w-full bg-background border-2 border-border rounded-2xl py-5 px-5 pl-14 font-bold font-display text-center focus:border-foreground/40 transition-all outline-none text-2xl md:text-4xl placeholder:text-muted/30"
+        className="w-full bg-background border-2 border-border rounded-2xl py-5 px-5 pl-14 font-bold font-display text-center focus:border-foreground transition-all outline-none text-2xl md:text-4xl placeholder:text-muted/30"
       />
       <span className="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-muted-foreground/40">
         {unitLabel(unit)}
@@ -478,7 +515,7 @@ export function Select({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={ariaLabel}
-        className="w-full bg-background border-2 border-border rounded-xl py-3 pr-3 pl-8 font-display text-sm focus:border-foreground/40 outline-none transition-all text-foreground appearance-none cursor-pointer text-center min-h-11"
+        className="w-full bg-background border-2 border-border rounded-xl py-3 pr-3 pl-8 font-display text-sm focus:border-foreground outline-none transition-all text-foreground appearance-none cursor-pointer text-center min-h-11"
       >
         {children}
       </select>
@@ -601,6 +638,93 @@ export function Toggle({
         />
       </span>
     </button>
+  );
+}
+
+/**
+ * فیلد نرخ رسمی با قفل (R37): مقدار رسمی/مصوب به‌صورت پیش‌فرض «قفل» و فقط‌خواندنی
+ * نشان داده می‌شود (نشان «رسمی» + منبع)، و با کلید «نرخ دلخواه» می‌توان آن را باز و
+ * دستی ویرایش کرد. بازگشت به حالت قفل، مقدار را دوباره روی نرخ رسمی می‌نشاند تا
+ * کاربر همیشه بداند رقم مبنا رسمی است یا شخصیِ خودش.
+ *
+ * `official` بر حسب «درصد» است (مثلاً ۵ برای ۵٪). `value`/`onChange` رشتهٔ درصد را
+ * مثل سایر ورودی‌های نرخ مدیریت می‌کنند تا محاسبهٔ صفحهٔ ابزار دست‌نخورده بماند.
+ */
+export function RateField({
+  label,
+  official,
+  value,
+  onChange,
+  source,
+  hint,
+  customLabel = 'نرخ دلخواه',
+  officialLabel = 'نرخ رسمی',
+}: {
+  label: string;
+  official: number;
+  value: string;
+  onChange: (v: string) => void;
+  source?: string;
+  hint?: string;
+  customLabel?: string;
+  officialLabel?: string;
+}) {
+  const officialStr = String(official);
+  const [custom, setCustom] = useState(() => normalizeDigits(value) !== officialStr);
+
+  const toggle = () => {
+    const next = !custom;
+    setCustom(next);
+    if (!next) onChange(officialStr); // قفل مجدد → بازنشانی به نرخ رسمی
+  };
+
+  return (
+    <Field
+      label={label}
+      hint={hint}
+      action={
+        <button
+          type="button"
+          onClick={toggle}
+          aria-pressed={custom}
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-black font-display transition-colors ${
+            custom
+              ? 'border-primary/40 bg-primary/10 text-primary'
+              : 'border-border bg-muted/40 text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          {custom ? officialLabel : customLabel}
+        </button>
+      }
+    >
+      {custom ? (
+        <div className="relative">
+          <input
+            type="text"
+            inputMode="decimal"
+            value={faNum(value)}
+            onChange={(e) => onChange(normalizeDigits(e.target.value).replace(/[^\d.]/g, ''))}
+            dir="ltr"
+            aria-label={`${label} به درصد`}
+            className="w-full bg-background border-2 border-border rounded-xl py-3 px-4 pl-10 font-display text-lg text-center focus:border-primary outline-none transition-all"
+          />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground/50">
+            ٪
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-3 rounded-xl border-2 border-border bg-muted/30 py-3 px-4">
+          <span className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground">
+            <Lock className="w-3.5 h-3.5 text-primary" />
+            {officialLabel}
+            {source && <span className="text-muted-foreground/60 font-display">· {source}</span>}
+          </span>
+          <span className="font-display text-lg font-black text-foreground" dir="ltr">
+            {faNum(officialStr)}٪
+          </span>
+        </div>
+      )}
+    </Field>
   );
 }
 

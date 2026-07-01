@@ -9,6 +9,8 @@ import {
   Palette,
   Sparkles,
   Wrench,
+  Smartphone,
+  Globe,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -16,8 +18,8 @@ export const PROJECTS_DATA: Project[] = [
   {
    id: 2,
    slug: 'ravro-platform',
-   title: 'پلتفرم راورو',
-   category: 'امنیت سایبری',
+   title: 'سایت راورو',
+   category: 'وبسایت',
    role: 'طراح ارشد رابط کاربری',
    desc: 'توسعه پلتفرم باگ‌بانتی با هدف شناسایی شکاف‌های امنیتی توسط هکرهای کلاه سفید در مقیاس ملی.',
    metrics: [{ label: 'باگ کشف شده', value: '۱K+' }, { label: 'شرکت فعال', value: '۵۰+' }],
@@ -32,8 +34,8 @@ export const PROJECTS_DATA: Project[] = [
   {
    id: 1,
    slug: 'kish-airport-fids',
-   title: 'FIDS و Counter فرودگاه کیش',
-   category: 'زیرساخت و SaaS',
+   title: 'طراحی FIDS فرودگاه کیش',
+   category: 'سرویس',
    role: 'طراح ارشد رابط کاربری',
    desc: 'طراحی سیستم‌های FIDS و رابط کاربری کانترهای فرودگاه بین‌المللی کیش با استانداردهای نوین بصری.',
    metrics: [{ label: 'دقت نمایش', value: '۹۹.۹٪' }, { label: 'ترافیک روزانه', value: '۲۰K+' }],
@@ -49,8 +51,8 @@ export const PROJECTS_DATA: Project[] = [
   {
    id: 9,
    slug: 'kevany-tuning',
-   title: 'تیونینگ کیوانی',
-   category: 'برند و طراحی',
+   title: 'سایت تیونینگ کیوانی',
+   category: 'وبسایت',
    role: 'طراح رابط کاربری',
    desc: 'طراحی پلتفرم اختصاصی و سیستم پیکربندی خودروهای فوق‌لوکس تیونینگ شده با استانداردهای جهانی برای برند جهانی Kevany.',
    metrics: [{ label: 'خودرو اختصاصی', value: '۱۰۰+' }, { label: 'بازدید جهانی', value: '۱M+' }],
@@ -83,8 +85,8 @@ export const PROJECTS_DATA: Project[] = [
   {
    id: 11,
    slug: 'online-backgammon',
-   title: 'بازی آنلاین تخت نرد',
-   category: 'بازی و سرگرمی',
+   title: 'بازی تخت‌نرد آنلاین',
+   category: 'بازی',
    role: 'توسعه‌دهنده بازی و طراح مکانیک',
    desc: 'طراحی و پیاده‌سازی بازی کلاسیک تخت نرد با فیزیک واقعی، هوش مصنوعی پیشرفته و قابلیت بازی آنلاین بلادرنگ.',
    metrics: [{ label: 'تأخیر', value: '<۵۰ms' }, { label: 'مدل فیزیک', value: 'Custom' }],
@@ -141,8 +143,8 @@ export const PROJECTS_DATA: Project[] = [
   {
    id: 4,
    slug: 'pixel-ball',
-   title: 'پیکسل بال',
-   category: 'بازی و سرگرمی',
+   title: 'بازی پیکسل‌بال',
+   category: 'بازی',
    role: 'طراح بازی و صداساز',
    desc: 'طراحی و توسعه بازی موبایل پیکسلی با تمرکز بر تجربه کاربری رقابتی و صداسازی منحصر به فرد.',
    metrics: [{ label: 'نصب فعال', value: '۱۰۰۰' }, { label: 'امتیاز کاربر', value: '۴.۷' }],
@@ -165,6 +167,7 @@ export const PROJECTS_DATA: Project[] = [
    color: 'rgba(14, 165, 233, 0.3)',
    borderColor: 'rgba(14, 165, 233, 0.8)',
    isLocked: false,
+   hidden: true,
    imagesLocked: true,
    imagesLockReason: 'publishing',
    tech: ['Next.js', 'Go', 'Redis', 'Kubernetes']
@@ -172,8 +175,8 @@ export const PROJECTS_DATA: Project[] = [
   {
    id: 8,
    slug: 'dardodel-bot',
-   title: 'دردودل بات',
-   category: 'هوش مصنوعی',
+   title: 'ربات تلگرام دردودل',
+   category: 'سرویس',
    role: 'بنیان‌گذار و توسعه‌دهنده',
    desc: 'پلتفرم هوشمند گفتگو و همدلی ناشناس با محوریت هوش مصنوعی برای ایجاد ارتباطات انسانی عمیق‌تر.',
    metrics: [{ label: 'کاربر فعال', value: '۱۰۰۰' }, { label: 'پیام روزانه', value: '۱۰۰' }],
@@ -185,8 +188,8 @@ export const PROJECTS_DATA: Project[] = [
   {
    id: 3,
    slug: 'darso-platform',
-   title: 'پلتفرم درسو',
-   category: 'آموزش',
+   title: 'سایت درسو',
+   category: 'وبسایت',
    role: 'طراح ارشد رابط کاربری',
    desc: 'طراحی پلتفرم مدرن آموزش از راه دور با تمرکز بر تجربه کاربری بصری و تعامل دانشجو-استاد.',
    metrics: [{ label: 'دانشجو فعال', value: '۵۰K+' }, { label: 'دوره آموزشی', value: '۲۰۰+' }],
@@ -217,8 +220,8 @@ export const PROJECTS_DATA: Project[] = [
   {
    id: 7,
    slug: 'royal-aghdasieh-club',
-   title: 'باشگاه رویال اقدسیه',
-   category: 'برند و طراحی',
+   title: 'سایت باشگاه رویال اقدسیه',
+   category: 'وبسایت',
    role: 'طراح ارشد رابط کاربری',
    desc: 'طراحی هویت دیجیتال و پلتفرم مدیریت مشتریان برای یکی از لوکس‌ترین مجموعه‌های ورزشی کشور.',
    metrics: [{ label: 'افزایش عضویت', value: '۴۵٪' }, { label: 'رضایت لوکس', value: '۹۸٪' }],
@@ -240,6 +243,10 @@ export interface ProjectCategoryMeta {
 }
 
 export const PROJECT_CATEGORY_META: Record<string, ProjectCategoryMeta> = {
+  'وبسایت': { color: '56, 189, 248', icon: Globe },
+  'اپ': { color: '168, 85, 247', icon: Smartphone },
+  'سرویس': { color: '34, 197, 94', icon: Server },
+  'بازی': { color: '245, 158, 11', icon: Gamepad2 },
   'امنیت سایبری': { color: '245, 158, 11', icon: Shield },
   'زیرساخت و SaaS': { color: '34, 197, 94', icon: Server },
   'تجارت الکترونیک': { color: '14, 165, 233', icon: ShoppingCart },

@@ -1,13 +1,19 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Wrench, SearchX, Bug, Mail, ArrowUpLeft, Flame } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Wrench, SearchX, Bug, Flame } from 'lucide-react';
+import { ReportForm } from '@/components/tools/ToolFeedback';
 import { ToolCard } from '@/components/ui/ToolCard';
-import { TOOLS, TOOL_CATEGORIES, POPULAR_TOOLS, getCategoryMeta, type Tool } from '@/lib/data/tools';
+import {
+  VISIBLE_TOOLS,
+  TOOL_CATEGORIES,
+  POPULAR_TOOLS,
+  getCategoryMeta,
+  getToolKeywords,
+  type Tool,
+} from '@/lib/data/tools';
 import { toPersianDigits } from '@/lib/utils/format';
-
-const REPORT_EMAIL = 'baabakbaghaaei@gmail.com';
 
 // دستهٔ ویژهٔ «پرطرفدار» که بالای همهٔ دسته‌ها می‌نشیند (نه یک دستهٔ واقعی در رجیستری).
 const POPULAR_TAB = 'پرطرفدار';
@@ -16,16 +22,21 @@ const POPULAR_ACCENT = '245, 158, 11'; // amber — «داغ/پرطرفدار»
 export default function ToolsIndex() {
   const [query, setQuery] = useState('');
   const [active, setActive] = useState<string>('همه');
+  const [reportOpen, setReportOpen] = useState(false);
 
   const matchesQuery = (t: Tool, q: string) =>
-    !q || t.title.includes(q) || t.desc.includes(q) || t.category.includes(q);
+    !q ||
+    t.title.includes(q) ||
+    t.desc.includes(q) ||
+    t.category.includes(q) ||
+    getToolKeywords(t.slug).some((k) => k.includes(q) || q.includes(k));
 
   const filtered = useMemo(() => {
     const q = query.trim();
     if (active === POPULAR_TAB) {
       return POPULAR_TOOLS.filter((t) => matchesQuery(t, q));
     }
-    return TOOLS.filter((t) => {
+    return VISIBLE_TOOLS.filter((t) => {
       const matchCat = active === 'همه' || t.category === active;
       return matchCat && matchesQuery(t, q);
     });
@@ -250,15 +261,30 @@ export default function ToolsIndex() {
                   </p>
                 </div>
               </div>
-              <a
-                href={`mailto:${REPORT_EMAIL}?subject=${encodeURIComponent('گزارش مشکل در جعبه ابزار')}`}
+              <button
+                type="button"
+                onClick={() => setReportOpen((v) => !v)}
+                aria-expanded={reportOpen}
                 className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-foreground px-5 py-3.5 text-sm font-black font-display text-background transition-transform hover:scale-[1.02]"
               >
-                <Mail aria-hidden="true" className="h-4 w-4" />
-                گزارش مشکل
-                <ArrowUpLeft aria-hidden="true" className="h-4 w-4 -translate-x-1 opacity-70 transition-transform group-hover:translate-x-0" />
-              </a>
+                <Bug aria-hidden="true" className="h-4 w-4" />
+                {reportOpen ? 'بستن فرم' : 'گزارش مشکل'}
+              </button>
             </div>
+            <AnimatePresence initial={false}>
+              {reportOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="relative overflow-hidden"
+                >
+                  <div className="max-w-xl pt-6">
+                    <ReportForm slug="general" />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </section>
       </div>

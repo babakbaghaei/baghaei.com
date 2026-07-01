@@ -139,7 +139,7 @@ export default function JsonFormatter() {
             dir="ltr"
             rows={14}
             spellCheck={false}
-            placeholder={'{\n  "name": "باقایی",\n  "active": true\n}'}
+            placeholder={'{\n  "name": "بقائی",\n  "active": true\n}'}
             aria-label="ورودی JSON"
             className={inputClass}
           />

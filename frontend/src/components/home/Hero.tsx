@@ -131,7 +131,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/30 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              <span className="text-muted-foreground text-xs uppercase tracking-wider font-display" style={{ fontWeight: 500 }}>
+              <span className="text-muted-foreground text-xs tracking-normal font-display" style={{ fontWeight: 500 }}>
                 پیشرو در معماری سیستم‌های سازمانی
               </span>
             </motion.div>
@@ -172,7 +172,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
             </motion.h1>
 
             <motion.p variants={itemVariants} className="max-w-2xl text-xl md:text-2xl text-muted-foreground font-sans leading-relaxed text-right">
-              گروه فناوری بقایی؛ طراحی و توسعه نرم‌افزارهای مقیاس‌پذیر و زیرساخت‌های مهندسی شده برای کسب‌وکارهای مدرن.
+              گروه فناوری بقائی؛ طراحی و توسعه نرم‌افزارهای مقیاس‌پذیر و زیرساخت‌های مهندسی شده برای کسب‌وکارهای مدرن.
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-wrap justify-start gap-4 pt-2">

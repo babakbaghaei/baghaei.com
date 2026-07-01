@@ -8,7 +8,7 @@ import {
   Panel,
   VerdictPanel,
   MoneyField,
-  Field,
+  RateField,
   SelectField,
   Row,
   Headline,
@@ -159,22 +159,14 @@ export default function MaliyatArzeshAfzoodeh() {
             ))}
           </SelectField>
 
-          <Field label="نرخ مالیات بر ارزش‌افزوده" hint="نرخ پیش‌فرض ۱۰٪ نمونه و قابل ویرایش است؛ نرخ مصوب جاری را وارد کنید">
-            <div className="relative">
-              <input
-                type="text"
-                inputMode="decimal"
-                value={faNum(rate)}
-                onChange={(e) => setRate(normalizeDigits(e.target.value).replace(/[^\d.]/g, ''))}
-                dir="ltr"
-                aria-label="نرخ مالیات بر ارزش‌افزوده به درصد"
-                className="w-full bg-background border-2 border-border rounded-xl py-3 px-4 pl-10 font-display text-lg text-center focus:border-primary outline-none transition-all"
-              />
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground/50">
-                ٪
-              </span>
-            </div>
-          </Field>
+          <RateField
+            label="نرخ مالیات بر ارزش‌افزوده"
+            official={10}
+            value={rate}
+            onChange={setRate}
+            source="سازمان امور مالیاتی"
+            hint="نرخ عمومی رسمی ۱۰٪ است؛ برای کالا/خدمت با نرخ یا معافیت متفاوت «نرخ دلخواه» را بزنید."
+          />
         </Panel>
 
         <VerdictPanel accent={ACCENT}>

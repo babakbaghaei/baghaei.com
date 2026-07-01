@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { HeartPulse, CalendarClock, BookOpen, Info, Moon, Scale } from 'lucide-react';
+import { HeartPulse, BookOpen, Info, Moon, Scale } from 'lucide-react';
 import {
   ToolShell,
   TwoPane,
@@ -32,9 +32,8 @@ import {
 
 const ACCENT = '190, 18, 60'; // crimson
 
-const DIYEH_YEARS = Object.keys(DIYEH_FULL_RIAL)
-  .map(Number)
-  .sort((a, b) => b - a);
+/** فقط سال ۱۴۰۵ — جدیدترین نرخ دیهٔ کامل (بخشنامهٔ قوهٔ قضاییه). */
+const YEAR = DIYEH_LATEST_YEAR;
 
 /** کسر هر عضو/جراحت نسبت به دیهٔ کامل (فقه و قانون مجازات اسلامی). */
 const PARTS: { key: string; label: string; frac: number | null }[] = [
@@ -49,7 +48,6 @@ const PARTS: { key: string; label: string; frac: number | null }[] = [
 ];
 
 export default function Diyeh() {
-  const [year, setYear] = useState(DIYEH_LATEST_YEAR);
   const [haram, setHaram] = useState(false);
   const [part, setPart] = useState('full');
   const [qty, setQty] = useState(1);
@@ -60,8 +58,6 @@ export default function Diyeh() {
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
-    const y = Number(p.get('year'));
-    if (y && DIYEH_FULL_RIAL[y]) setYear(y);
     if (p.get('haram') === '1') setHaram(true);
     const pt = p.get('part');
     if (pt && PARTS.some((x) => x.key === pt)) setPart(pt);
@@ -73,28 +69,31 @@ export default function Diyeh() {
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const calc = useMemo(() => {
-    const fullRial = DIYEH_FULL_RIAL[year];
+    const fullRial = DIYEH_FULL_RIAL[YEAR];
     if (!fullRial) return null;
     const base = haram && part === 'full' ? fullRial * DIYEH_HARAM_FACTOR : fullRial;
     const selected = PARTS.find((p) => p.key === part)!;
     const frac = selected.frac ?? Math.max(0, Math.min(100, Number(pct) || 0)) / 100;
     if (frac <= 0) return null;
-    const totalRial = base * frac * qty;
+    const baseRial = base;
+    const totalRial = Math.round(baseRial * frac * qty);
     return {
-      baseToman: base / 10,
+      baseToman: baseRial / 10,
+      baseRial,
       frac,
       qty,
       totalToman: Math.round(totalRial / 10),
+      totalRial,
       label: selected.label,
     };
-  }, [year, haram, part, qty, pct]);
+  }, [haram, part, qty, pct]);
 
   const onShare = () => {
     if (!calc) return;
     share({
       title: 'محاسبهٔ دیه',
-      text: `دیه (${calc.label}) سال ${faNum(year)}${haram ? ' - ماه حرام' : ''}: ${fmtMoney(calc.totalToman)} تومان`,
-      params: { year: String(year), haram: haram ? '1' : '0', part, qty: String(qty), pct },
+      text: `دیه (${calc.label}) سال ${faNum(YEAR)}${haram ? ' - ماه حرام' : ''}: ${fmtMoney(calc.totalToman)} تومان`,
+      params: { haram: haram ? '1' : '0', part, qty: String(qty), pct },
     });
   };
 
@@ -130,19 +129,12 @@ export default function Diyeh() {
     >
       <TwoPane>
         <Panel className="space-y-6">
-          <SelectField
-            icon={<CalendarClock className="w-4 h-4" />}
-            label="سال وقوع"
-            hint="سالی که حادثه/جنایت واقع شده است"
-            value={year}
-            onChange={(v) => setYear(Number(v))}
-          >
-            {DIYEH_YEARS.map((y) => (
-              <option key={y} value={y}>
-                {faNum(y)}
-              </option>
-            ))}
-          </SelectField>
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-muted/30 px-4 py-3">
+            <span className="font-display text-sm font-bold text-foreground">سال نرخ دیه</span>
+            <span className="font-display text-sm font-black" style={{ color: `rgb(${ACCENT})` }}>
+              {faNum(YEAR)}
+            </span>
+          </div>
 
           {part === 'full' && (
             <Toggle
@@ -211,17 +203,21 @@ export default function Diyeh() {
                   label="مبلغ دیه"
                   value={fmtMoney(calc.totalToman)}
                   suffix="تومان"
-                  sub={`${toWords(calc.totalToman)} تومان`}
+                  sub={`${fmtMoney(calc.totalRial)} ریال`}
                 />
                 <div className="space-y-2.5">
-                  <Row label="سال وقوع" value={faNum(year)} />
+                  <Row label="سال نرخ دیه" value={faNum(YEAR)} />
                   <Row label="نوع ماه" value={haram ? 'حرام (تغلیظ)' : 'عادی'} />
                   <Row label="دیهٔ کامل مبنا" value={`${fmtMoney(calc.baseToman)} تومان`} />
                   <Row label="عضو / آسیب" value={calc.label} />
                   <Row label="کسر دیه" value={fmtPctFrac(calc.frac)} />
                   <Row label="تعداد" value={faNum(calc.qty)} />
                   <div className="h-px bg-border/60 my-1" />
-                  <Row label="جمع دیه" value={`${fmtMoney(calc.totalToman)} تومان`} strong />
+                  <Row label="جمع دیه (تومان)" value={`${fmtMoney(calc.totalToman)} تومان`} strong />
+                  <Row label="جمع دیه (ریال)" value={`${fmtMoney(calc.totalRial)} ریال`} />
+                  <p className="pt-1 text-xs font-display text-muted-foreground/70">
+                    {toWords(calc.totalToman)} تومان
+                  </p>
                 </div>
                 {haram && (
                   <Notice accent={ACCENT}>

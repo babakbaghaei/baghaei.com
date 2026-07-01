@@ -58,7 +58,7 @@ export default async function ServicesAdmin() {
             <EmptyState
               icon={Layers}
               title="هنوز خدمتی ثبت نشده است"
-              subtitle="اولین خدمت گروه فناوری بقایی را اضافه کنید."
+              subtitle="اولین خدمت گروه فناوری بقائی را اضافه کنید."
             />
           )}
         </div>

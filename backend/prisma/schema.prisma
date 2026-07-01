@@ -79,6 +79,33 @@ model Service {
   @@index([published, order])
 }
 
+// دیدگاه و امتیاز کاربران روی هر ابزارِ جعبه‌ابزار. عمومی است (approved=true
+// پیش‌فرض)؛ ادمین می‌تواند مخفی/حذف کند. toolSlug همان اسلاگِ صفحهٔ ابزار است.
+model ToolReview {
+  id        Int      @id @default(autoincrement())
+  toolSlug  String
+  name      String?
+  rating    Int
+  body      String?
+  approved  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([toolSlug, approved, createdAt])
+}
+
+// گزارش مشکل/خطای یک ابزار — از پنل داخل صفحه (نه ایمیل). به تلگرام هشدار می‌دهد.
+model ToolReport {
+  id        Int      @id @default(autoincrement())
+  toolSlug  String
+  issue     String
+  contact   String?
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([toolSlug, createdAt])
+  @@index([resolved, createdAt])
+}
+
 enum Role {
   USER
   ADMIN

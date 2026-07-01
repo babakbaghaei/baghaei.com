@@ -1,4 +1,3 @@
-import path from 'path';
 import { withSentryConfig } from '@sentry/nextjs';
 import createNextIntlPlugin from 'next-intl/plugin';
 
@@ -22,9 +21,11 @@ const nextConfig = {
   // is NOT nested under a subpath — the Docker runner runs `node server.js`
   // from /app. (Pointing this at the parent nests it under /app/app/server.js.)
   outputFileTracingRoot: process.cwd(),
-  // Add empty turbopack config to satisfy Next.js 16 and silence root warning
+  // Turbopack drives dev+build. Its root MUST equal outputFileTracingRoot or
+  // Next 16 warns and the standalone trace root is ambiguous — pin both to the
+  // frontend dir so `.next/standalone/server.js` lands at /app (Docker runner).
   turbopack: {
-    root: path.join(process.cwd(), '../'),
+    root: process.cwd(),
   },
 };
 

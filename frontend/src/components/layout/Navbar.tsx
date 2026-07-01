@@ -4,11 +4,12 @@ import Image from 'next/image';
 import Logo from './Logo';
 import { AnimatePresence, motion } from 'framer-motion';
 import { NavItem } from '../ui/NavItem';
-import { Menu, ChevronDown, Layout, Globe, Sparkles, Dumbbell, Gamepad2, Cpu, Shield, Smartphone, Palette, ArrowLeft, Search } from 'lucide-react';
+import { Menu, ChevronDown, Layout, Globe, Wrench, Dumbbell, Gamepad2, Cpu, Shield, Smartphone, Palette, ArrowLeft, Search } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { TOOLS, TOOL_CATEGORIES, getCategoryMeta } from '@/lib/data/tools';
 import { PROJECTS_DATA } from '@/lib/data/projects';
 import { Button } from '../ui/Button';
+import CollaborationModal from './CollaborationModal';
 import { navLinks } from '@/lib/nav';
 
 import Link from 'next/link';
@@ -38,6 +39,7 @@ export default function Navbar() {
  const [openMenu, setOpenMenu] = useState<string | null>(null);
  const pathname = usePathname();
  const router = useRouter();
+ const [collabOpen, setCollabOpen] = useState(false);
 
  const isSubPage = pathname !== '/';
 
@@ -103,23 +105,38 @@ export default function Navbar() {
    }`}
   >
    <div className="max-w-7xl mx-auto px-6 lg:px-16 flex items-center justify-between">
-    {/* Brand — internal home link so staging/localhost/preview route home. */}
-    <Link
-     href="/"
-     onClick={(e) => {
-      if (pathname === '/') {
-       e.preventDefault();
-       window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-       });
-      }
-     }}
-     className="flex items-center gap-4 group cursor-pointer relative z-[110]"
-    >
-     <Logo className="w-8 h-8 text-foreground" />
-     <span className="text-base md:text-lg font-bold text-foreground uppercase hidden sm:inline-block font-display">گروه فناوری بقایی</span>
-    </Link>
+    {/* Brand + search cluster — search sits right after the Baghaei name (RTL right). */}
+    <div className="flex items-center gap-4">
+     {/* Brand — internal home link so staging/localhost/preview route home. */}
+     <Link
+      href="/"
+      onClick={(e) => {
+       if (pathname === '/') {
+        e.preventDefault();
+        window.scrollTo({
+         top: 0,
+         behavior: 'smooth'
+        });
+       }
+      }}
+      className="flex items-center gap-4 group cursor-pointer relative z-[110]"
+     >
+      <Logo className="w-8 h-8 text-foreground" />
+      <span className="text-base md:text-lg font-bold text-foreground uppercase hidden sm:inline-block font-display">گروه فناوری بقائی</span>
+     </Link>
+
+     {/* Search field (opens the ⌘K palette) — placed next to the brand name. */}
+     <button
+      type="button"
+      onClick={() => window.dispatchEvent(new CustomEvent('command-menu:open'))}
+      aria-label="جستجوی ابزارها و سرویس‌ها"
+      title="جستجوی ابزارها و سرویس‌ها"
+      className="group hidden md:flex h-9 w-44 lg:w-60 items-center gap-2 rounded-full border border-border bg-secondary/40 ps-3 pe-3 text-muted-foreground outline-none transition-colors hover:border-foreground/25 hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+     >
+      <Search aria-hidden="true" className="h-[1.05rem] w-[1.05rem] shrink-0" strokeWidth={1.8} />
+      <span className="flex-1 truncate text-right text-[12px] font-display">جستجوی ابزار، سرویس…</span>
+     </button>
+    </div>
 
     {/* Center Links */}
     <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
@@ -158,27 +175,20 @@ export default function Navbar() {
     {/* Actions */}
     <div className="hidden md:flex items-center gap-6">
      <div className="flex items-center gap-3">
-      <div className="h-6 w-px bg-border" />
-      <button
-       type="button"
-       onClick={() => window.dispatchEvent(new CustomEvent('command-menu:open'))}
-       aria-label="جستجو"
-       className="flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full px-2.5 text-muted-foreground outline-none transition-colors hover:text-foreground hover:bg-secondary focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      >
-       <Search aria-hidden="true" className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.8} />
-      </button>
       <ThemeToggle />
       <div className="h-6 w-px bg-border" />
      </div>
 
      <Button
-      onClick={() => { scrollTo('contact'); }}
+      onClick={() => { if (pathname === '/') scrollTo('contact'); else setCollabOpen(true); }}
       size="sm"
       className="uppercase"
      >
       شروع همکاری
      </Button>
     </div>
+
+    <CollaborationModal open={collabOpen} onClose={() => setCollabOpen(false)} />
 
     <div className="md:hidden flex items-center gap-2 relative z-[210]">
      <ThemeToggle />
@@ -269,7 +279,7 @@ export default function Navbar() {
              <div className="flex flex-col justify-between gap-6 md:border-e md:border-border/50 md:pe-10">
                <div className="space-y-3">
                  <div className="flex items-center gap-2.5">
-                   <Sparkles className="w-4 h-4 text-primary" />
+                   <Wrench className="w-4 h-4 text-primary" />
                    <h4 className="text-sm font-black uppercase text-foreground">جعبه ابزار</h4>
                  </div>
                  <p className="text-[12px] text-muted-foreground leading-relaxed">
@@ -290,7 +300,7 @@ export default function Navbar() {
                {TOOL_CATEGORIES.map((cat) => {
                  const meta = getCategoryMeta(cat);
                  const CatIcon = meta.icon;
-                 const items = TOOLS.filter((t) => t.category === cat && t.status !== 'soon');
+                 const items = TOOLS.filter((t) => t.category === cat && t.status !== 'soon' && !t.hidden);
                  if (items.length === 0) return null;
                  return (
                    <div key={cat} className="space-y-3">

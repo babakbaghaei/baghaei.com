@@ -21,6 +21,7 @@ export const DIYEH_FULL_RIAL: Record<number, number> = {
   1402: 9_000_000_000, // ۹۰۰ میلیون تومان
   1403: 12_000_000_000, // ۱٬۲۰۰ میلیون تومان
   1404: 16_000_000_000, // ۱٬۶۰۰ میلیون تومان
+  1405: 21_000_000_000, // ۲٬۱۰۰ میلیون تومان (۲٫۱ میلیارد تومان) — بخشنامهٔ ۱۴۰۵ قوهٔ قضاییه
 };
 
 export const DIYEH_LATEST_YEAR = Math.max(...Object.keys(DIYEH_FULL_RIAL).map(Number));

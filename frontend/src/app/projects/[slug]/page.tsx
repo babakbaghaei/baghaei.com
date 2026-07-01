@@ -37,7 +37,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   const ogImage = ogSource.startsWith('http') ? ogSource : `${SITE_URL}${ogSource}`;
 
   return {
-    title: `${project.title} | نمونه‌کار گروه فناوری بقایی`,
+    title: `${project.title} | نمونه‌کار گروه فناوری بقائی`,
     description: project.desc,
     alternates: { canonical: `/projects/${project.slug}` },
     openGraph: {
@@ -69,7 +69,7 @@ export default async function ProjectCaseStudy(props: { params: Promise<{ slug: 
     name: project.title,
     description: project.desc,
     about: project.category,
-    creator: { '@type': 'Organization', name: 'گروه فناوری بقایی' },
+    creator: { '@type': 'Organization', name: 'گروه فناوری بقائی' },
     url: `${SITE_URL}/projects/${project.slug}`,
     keywords: (project.tech || []).join(', '),
     ...(jsonLdImage ? { image: jsonLdImage } : {}),

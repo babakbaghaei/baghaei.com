@@ -17,6 +17,8 @@ import ProgressBar from "@/components/effects/ProgressBar";
 import CustomCursor from "@/components/effects/CustomCursor";
 import Preloader from "@/components/effects/Preloader";
 import ChatWidget from "@/components/layout/ChatWidget";
+import StickyCTA from "@/components/layout/StickyCTA";
+import ExitIntentModal from "@/components/layout/ExitIntentModal";
 
 const CommandMenu = dynamic(() =>
  import("@/components/ui/CommandMenu").then((mod) => mod.CommandMenu)
@@ -48,15 +50,15 @@ import GlobalUniverse from "@/components/effects/GlobalUniverseLazy";
 
 export const metadata: Metadata = {
  title: {
-  default: "گروه فناوری بقایی | معماری نرم‌افزار و هوش مصنوعی",
-  template: "%s | گروه فناوری بقایی"
+  default: "گروه فناوری بقائی | معماری نرم‌افزار و هوش مصنوعی",
+  template: "%s | گروه فناوری بقائی"
  },
  description: "پیشرو در معماری سیستم‌های سازمانی مقیاس‌پذیر و مهندسی نرم‌افزار دقیق. ارائه راهکارهای نوین در هوش مصنوعی، امنیت سایبری و زیرساخت‌های ابری.",
  applicationName: "Baghaei Tech Group",
  manifest: "/manifest.json",
  authors: [{ name: "Babak Baghaei", url: "https://baghaei.com" }],
  generator: "Next.js",
- keywords: ["گروه فناوری بقایی", "بابک بقایی", "مهندسی نرم‌افزار", "معماری سیستم", "هوش مصنوعی", "امنیت سایبری", "طراحی وب", "توسعه دهنده ارشد", "ایران", "تکنولوژی لوکس"],
+ keywords: ["گروه فناوری بقائی", "بابک بقائی", "مهندسی نرم‌افزار", "معماری سیستم", "هوش مصنوعی", "امنیت سایبری", "طراحی وب", "توسعه دهنده ارشد", "ایران", "تکنولوژی لوکس"],
  referrer: "origin-when-cross-origin",
  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://baghaei.com'),
  alternates: {
@@ -73,14 +75,14 @@ export const metadata: Metadata = {
   type: "website",
   locale: "fa_IR",
   url: "https://baghaei.com",
-  title: "گروه فناوری بقایی | مهندسی فراتر از مرز کدها",
+  title: "گروه فناوری بقائی | مهندسی فراتر از مرز کدها",
   description: "طراحی و توسعه زیرساخت‌های نرم‌افزاری مدرن با تمرکز بر پایداری، امنیت و مقیاس‌پذیری در مقیاس جهانی.",
-  siteName: "گروه فناوری بقایی",
+  siteName: "گروه فناوری بقائی",
   // og:image is provided automatically by src/app/opengraph-image.tsx.
  },
  twitter: {
   card: "summary_large_image",
-  title: "گروه فناوری بقایی | مهندسی دقیق",
+  title: "گروه فناوری بقائی | مهندسی دقیق",
   description: "معماری آینده با قدرت هوش مصنوعی و مهندسی دقیق نرم‌افزار.",
   creator: "@babakbaghaei",
   // twitter:image is provided automatically by src/app/twitter-image.tsx.
@@ -141,7 +143,7 @@ export default async function RootLayout({
         "@graph": [
          {
           "@type": "Organization",
-          "name": "گروه فناوری بقایی",
+          "name": "گروه فناوری بقائی",
           "url": "https://baghaei.com",
           "logo": "https://baghaei.com/logo.svg",
           "sameAs": [
@@ -158,13 +160,13 @@ export default async function RootLayout({
          },
          {
           "@type": "Person",
-          "name": "بابک بقایی",
+          "name": "بابک بقائی",
           "url": "https://baghaei.com",
           "image": "https://baghaei.com/logo.svg",
           "jobTitle": "Lead Software Architect",
           "worksFor": {
            "@type": "Organization",
-           "name": "گروه فناوری بقایی"
+           "name": "گروه فناوری بقائی"
           },
           "sameAs": [
            "https://linkedin.com/in/babakbaghaei",
@@ -175,7 +177,7 @@ export default async function RootLayout({
           "@type": "WebSite",
           "@id": "https://baghaei.com/#website",
           "url": "https://baghaei.com",
-          "name": "گروه فناوری بقایی",
+          "name": "گروه فناوری بقائی",
           "inLanguage": "fa-IR"
          }
         ]
@@ -205,6 +207,8 @@ export default async function RootLayout({
         </div>
       </SmoothScrollProvider>
       <ChatWidget />
+      <StickyCTA />
+      <ExitIntentModal />
       <CommandMenu />
       <CookieConsent />
       <RootMobileMenu />

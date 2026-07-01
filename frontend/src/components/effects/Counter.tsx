@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useInView, animate } from 'framer-motion';
+import { animate } from 'framer-motion';
 import { useRef } from 'react';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
+import { useInViewOnce } from '@/lib/utils/useInViewOnce';
 
 interface CounterProps {
  value: string;
@@ -14,7 +15,7 @@ const toFa = (n: number) => Math.floor(n).toString().replace(/\d/g, d => '۰۱۲
 export function Counter({ value }: CounterProps) {
  const [displayValue, setDisplayValue] = useState('۰');
  const ref = useRef(null);
- const isInView = useInView(ref, { once: true });
+ const isInView = useInViewOnce(ref, { once: true });
  const prefersReducedMotion = usePrefersReducedMotion();
 
  // Normalize value: convert Persian digits to English for calculation

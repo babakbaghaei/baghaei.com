@@ -18,6 +18,8 @@ export class NotificationsProcessor extends WorkerHost {
         return this.handleContactMessage(job.data);
       case 'job-application':
         return this.handleJobApplication(job.data);
+      case 'tool-report':
+        return this.handleToolReport(job.data);
       default:
         this.logger.warn(`Unknown job name: ${job.name}`);
     }
@@ -103,6 +105,37 @@ export class NotificationsProcessor extends WorkerHost {
       });
     } catch (error) {
       this.logger.error('Failed to send email notification', error);
+    }
+
+    return { sent: true };
+  }
+
+  private async handleToolReport(data: any) {
+    this.logger.log(`Processing tool report for: ${data.toolSlug}`);
+
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+
+    if (token && chatId) {
+      try {
+        const contactLine = data.contact
+          ? `\n📞 راه ارتباطی: ${data.contact}`
+          : '';
+        const text = `🛠 *گزارش مشکل ابزار*\n\n🔧 ابزار: ${data.toolSlug}${contactLine}\n\n📝 شرح مشکل:\n${data.issue}`;
+        await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
+          chat_id: chatId,
+          text: text,
+          parse_mode: 'Markdown',
+        });
+        this.logger.log('Telegram notification sent successfully.');
+      } catch (error) {
+        this.logger.error('Failed to send Telegram notification', error);
+        throw error;
+      }
+    } else {
+      this.logger.warn(
+        'Telegram credentials not found, skipping notification.',
+      );
     }
 
     return { sent: true };

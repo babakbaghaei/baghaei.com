@@ -9,6 +9,7 @@ import {
   VerdictPanel,
   MoneyField,
   Field,
+  RateField,
   Row,
   Headline,
   EmptyState,
@@ -17,7 +18,6 @@ import {
   useShareResult,
   AnimatePresence,
   motion,
-  faNum,
   fmtMoney,
   fmtPct,
   toWords,
@@ -26,27 +26,25 @@ import {
   unitLabel,
   type Unit,
 } from '@/components/tools/shell';
+import { REAL_ESTATE_COMMISSION } from '@/lib/data/legal-rates';
 
 const ACCENT = '13, 148, 136'; // teal-600
 
 type Mode = 'sale' | 'rent';
 
-const inputClass =
-  'w-full bg-background border-2 border-border rounded-xl py-3 px-4 pl-10 font-display text-lg text-center focus:border-primary outline-none transition-all';
-
 export default function KomisionAmlak() {
   const [mode, setMode] = useState<Mode>('sale');
 
-  // خرید و فروش
+  // خرید و فروش — نرخ رسمی هر طرف از تعرفهٔ اتحادیه (تک‌منبع)
   const [price, setPrice] = useState('');
-  const [saleRate, setSaleRate] = useState('0.25'); // نرخ نمونهٔ هر طرف (٪)
+  const [saleRate, setSaleRate] = useState(String(REAL_ESTATE_COMMISSION.salePerSide * 100));
 
-  // رهن و اجاره
+  // رهن و اجاره — درصد رسمیِ یک ماه اجاره از تعرفهٔ اتحادیه
   const [rent, setRent] = useState('');
-  const [rentRate, setRentRate] = useState('25'); // نرخ نمونه: درصد یک ماه اجاره
+  const [rentRate, setRentRate] = useState(String(REAL_ESTATE_COMMISSION.rentPerSide * 100));
 
-  // ارزش‌افزوده (مشترک، قابل ویرایش)
-  const [vatRate, setVatRate] = useState('9');
+  // ارزش‌افزوده رسمی (۱۰٪) — تک‌منبع؛ با «نرخ دلخواه» قابل تغییر
+  const [vatRate, setVatRate] = useState(String(REAL_ESTATE_COMMISSION.vat * 100));
 
   const [unit, setUnit] = useState<Unit>('toman');
 
@@ -191,27 +189,14 @@ export default function KomisionAmlak() {
                 setUnit={setUnit}
               />
 
-              <Field
+              <RateField
                 label="نرخ کمیسیون هر طرف"
-                hint="نرخ مصوب اتحادیه را وارد کنید — پیش‌فرض ۰٫۲۵٪ صرفاً نمونه است"
-              >
-                <div className="relative">
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={faNum(saleRate)}
-                    onChange={(e) =>
-                      setSaleRate(normalizeDigits(e.target.value).replace(/[^\d.]/g, ''))
-                    }
-                    dir="ltr"
-                    aria-label="نرخ کمیسیون هر طرف به درصد"
-                    className={inputClass}
-                  />
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground/50">
-                    ٪
-                  </span>
-                </div>
-              </Field>
+                official={REAL_ESTATE_COMMISSION.salePerSide * 100}
+                value={saleRate}
+                onChange={setSaleRate}
+                source="تعرفهٔ اتحادیه"
+                hint="نرخ رسمی اتحادیه ۰٫۲۵٪ از هر طرف است؛ برای شهر/توافق خاص «نرخ دلخواه» را بزنید."
+              />
             </>
           ) : (
             <>
@@ -223,46 +208,25 @@ export default function KomisionAmlak() {
                 setUnit={setUnit}
               />
 
-              <Field
+              <RateField
                 label="نرخ کمیسیون (درصدی از یک ماه اجاره)"
-                hint="نرخ مصوب اتحادیه را وارد کنید — پیش‌فرض ۲۵٪ صرفاً نمونه است"
-              >
-                <div className="relative">
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={faNum(rentRate)}
-                    onChange={(e) =>
-                      setRentRate(normalizeDigits(e.target.value).replace(/[^\d.]/g, ''))
-                    }
-                    dir="ltr"
-                    aria-label="نرخ کمیسیون رهن و اجاره به درصد"
-                    className={inputClass}
-                  />
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground/50">
-                    ٪
-                  </span>
-                </div>
-              </Field>
+                official={REAL_ESTATE_COMMISSION.rentPerSide * 100}
+                value={rentRate}
+                onChange={setRentRate}
+                source="تعرفهٔ اتحادیه"
+                hint="نرخ رسمی اتحادیه ۲۵٪ یک ماه اجاره از هر طرف است؛ برای تغییر «نرخ دلخواه» را بزنید."
+              />
             </>
           )}
 
-          <Field label="مالیات بر ارزش‌افزوده" hint="نرخ جاری قابل ویرایش است — پیش‌فرض ۹٪">
-            <div className="relative">
-              <input
-                type="text"
-                inputMode="decimal"
-                value={faNum(vatRate)}
-                onChange={(e) => setVatRate(normalizeDigits(e.target.value).replace(/[^\d.]/g, ''))}
-                dir="ltr"
-                aria-label="نرخ مالیات بر ارزش‌افزوده به درصد"
-                className={inputClass}
-              />
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-muted-foreground/50">
-                ٪
-              </span>
-            </div>
-          </Field>
+          <RateField
+            label="مالیات بر ارزش‌افزوده"
+            official={REAL_ESTATE_COMMISSION.vat * 100}
+            value={vatRate}
+            onChange={setVatRate}
+            source="سازمان امور مالیاتی"
+            hint="نرخ رسمی ارزش‌افزوده ۱۰٪ است؛ در صورت تغییرِ مصوبه «نرخ دلخواه» را بزنید."
+          />
         </Panel>
 
         <VerdictPanel accent={ACCENT}>

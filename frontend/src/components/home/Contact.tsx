@@ -3,10 +3,22 @@
 import React, { useState, useTransition } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { submitContactForm } from '@/app/actions';
-import { Mail, Send, Check } from 'lucide-react';
+import { Mail, Rocket, Check } from 'lucide-react';
 import { Section, Heading } from '../ui/Layout';
 import { Button } from '../ui/Button';
 import Magnetic from '@/components/effects/Magnetic';
+
+// اثبات اجتماعی کنارِ فرم تماس (R51 — CRO): نامِ کارفرمایان/پروژه‌های واقعیِ
+// تحویل‌شده، همان‌جا که کاربر تصمیم به همکاری می‌گیرد. با نام‌های واقعی پروژه‌ها
+// (همسو با بخش «اعتماد») هم‌خوان است تا هیچ ادعای ساختگی در کار نباشد.
+const TRUSTED_CLIENTS = [
+  'سایت راورو',
+  'FIDS فرودگاه کیش',
+  'باشگاه رویال اقدسیه',
+  'سایت درسو',
+  'تیونینگ کیوانی',
+  'پلتفرم مالاتا',
+];
 
 export default function Contact() {
  const [isPending, startTransition] = useTransition();
@@ -49,7 +61,7 @@ export default function Contact() {
  });
  };
 
- const inputClass = "border-b-2 border-border bg-transparent px-2 focus:outline-none focus-visible:border-foreground focus:border-foreground transition-colors placeholder:text-muted-foreground w-full md:w-auto md:inline-block text-right md:mx-1 font-display text-[16px] md:text-xl lg:text-4xl";
+ const inputClass = "border-b-2 border-border bg-transparent px-2 focus:outline-none focus-visible:border-foreground focus:border-foreground transition-colors placeholder:text-muted-foreground/40 w-full md:w-auto md:inline-block text-right md:mx-1 font-display text-[16px] md:text-xl lg:text-4xl";
  // Persistent field label: a block caption on mobile (so the user always knows
  // what each underlined field is), collapsed to sr-only inside the md+ sentence.
  const labelClass = "block md:sr-only mb-2 md:mb-0 font-display text-xs font-bold uppercase tracking-wider text-muted-foreground";
@@ -66,6 +78,23 @@ export default function Contact() {
 
   <div className="flex flex-col items-start gap-12">
   <Heading align="right" subtitle="گفتگو">شروع یک</Heading>
+
+  {/* اثبات اجتماعی درست کنارِ فراخوانِ همکاری (R51) */}
+  <div className="-mt-8 flex flex-col gap-3.5">
+   <span className="font-display text-xs font-bold uppercase tracking-wider text-muted-foreground">
+    مورد اعتمادِ کارفرمایانی از
+   </span>
+   <div className="flex flex-wrap gap-2.5">
+    {TRUSTED_CLIENTS.map((c) => (
+     <span
+      key={c}
+      className="rounded-full border border-border bg-card/40 px-4 py-1.5 font-display text-xs font-bold text-foreground/80"
+     >
+      {c}
+     </span>
+    ))}
+   </div>
+  </div>
 
   <form onSubmit={handleSubmit} className="relative max-w-6xl w-full">
    {/* Honeypot — hidden from real users, auto-filled by bots. Do not remove. */}
@@ -122,21 +151,45 @@ export default function Contact() {
    </div>
 
    <div className="mt-16 flex flex-col items-start gap-12">
-   <Magnetic disabled={status === 'success'}>
+   <Magnetic disabled={status === 'success' || isPending}>
     <Button
     type="submit"
-    isLoading={isPending}
-    disabled={status === 'success'}
+    disabled={isPending || status === 'success'}
     className="px-12 py-6 text-lg"
     rightIcon={
      status === 'success' ? (
      <Check className="w-5 h-5 text-primary-foreground" strokeWidth={3} />
      ) : (
-     <Send className="w-5 h-5" />
+     // موشک ارسال: در حالت ارسال، موشک با شعلهٔ احتراق به‌سمت بالا-راست پرتاب می‌شود.
+     <span className="relative inline-flex h-5 w-5 items-center justify-center">
+      <motion.span
+       className="absolute"
+       animate={
+        isPending
+         ? { x: [0, 3, 16], y: [0, -4, -22], opacity: [1, 1, 0] }
+         : { x: 0, y: 0, opacity: 1 }
+       }
+       transition={
+        isPending
+         ? { duration: 0.7, ease: 'easeIn', repeat: Infinity, repeatDelay: 0.1 }
+         : { duration: 0.3 }
+       }
+      >
+       <Rocket className="h-5 w-5" />
+      </motion.span>
+      {isPending && (
+       <motion.span
+        aria-hidden="true"
+        className="absolute bottom-0 right-1 h-2.5 w-1.5 rounded-full bg-gradient-to-b from-amber-400 to-transparent blur-[1px]"
+        animate={{ opacity: [0.2, 0.9, 0], scaleY: [0.5, 1.3, 0.4], x: [0, -3, -10], y: [0, 6, 14] }}
+        transition={{ duration: 0.7, ease: 'easeIn', repeat: Infinity, repeatDelay: 0.1 }}
+       />
+      )}
+     </span>
      )
     }
     >
-    {status === 'success' ? 'ارسال شد' : 'ارسال'}
+    {status === 'success' ? 'ارسال شد' : isPending ? 'در حال ارسال…' : 'ارسال'}
     </Button>
    </Magnetic>
 

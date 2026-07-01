@@ -44,7 +44,7 @@ export default function ProjectsGrid() {
  return (
   <>
    <Section className="pt-48 pb-20">
-    <Heading subtitle="تمام آثار">پروژه‌های</Heading>
+    <Heading subtitle="ما">پروژه‌های</Heading>
 
     {VISIBLE_PROJECTS.length > 0 && categories.length > 2 && (
      <div className="mt-12 flex flex-wrap justify-center gap-2.5" dir="rtl" role="group" aria-label="فیلتر دسته‌بندی">

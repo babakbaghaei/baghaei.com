@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable react-hooks/static-components -- GalleryTile عمداً درون‌مؤلفه است چون به display بسته است */
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Image from 'next/image';
@@ -18,7 +19,6 @@ import {
  Box,
  Braces,
  Lock,
- Clock,
  Image as ImageIcon
 } from 'lucide-react';
 import Logo from '../layout/Logo';
@@ -226,7 +226,6 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
  const accentSoft = display.color;
  const hasMetrics = display.metrics && display.metrics.length > 0;
  const hasImages = !!(display.images && display.images.length > 0);
- const projectId = `PRJ-${String(display.id).padStart(3, '0')}`;
  const titleId = `project-modal-title-${display.id}`;
 
  const spec = [
@@ -236,6 +235,39 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
 
  const frameClass =
   'absolute rounded-none md:rounded-[2.5rem] border-x border-border md:border shadow-2xl bg-card overflow-hidden';
+
+ // R4 — RTL editorial gallery: the first shot is a wide hero, the rest flow as a
+ // varied-aspect masonry (CSS columns keep RTL order and let each tile keep its
+ // own aspect ratio instead of a uniform strip). Aspects cycle for visual rhythm.
+ const galleryImages = display.images ?? [];
+ const heroImage = galleryImages[0];
+ const restImages = galleryImages.slice(1);
+ const GALLERY_ASPECTS = ['aspect-[4/5]', 'aspect-[5/4]', 'aspect-[1/1]', 'aspect-[3/4]', 'aspect-[4/3]'];
+
+ const GalleryTile = ({ src, aspect, i }: { src: string; aspect: string; i: number }) => (
+  <div className={`relative ${aspect} w-full overflow-hidden rounded-2xl md:rounded-[1.75rem] border border-border bg-secondary/30`}>
+   <Image
+    src={src}
+    alt={display.imagesLocked ? '' : `${display.title} — نمای ${i + 1}`}
+    fill
+    sizes="(max-width: 768px) 100vw, 45vw"
+    draggable={false}
+    className={`object-cover ${display.imagesLocked ? 'blur-[26px] scale-150 select-none pointer-events-none' : ''}`}
+   />
+   {display.imagesLocked && (
+    <div
+     className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-background/40 backdrop-blur-2xl text-muted-foreground p-4 text-center"
+     role="img"
+     aria-label={isPublishing ? 'محرمانه' : 'تصاویر محرمانه'}
+    >
+     <Lock className="w-6 h-6" />
+     <span className="text-xs font-display font-bold">
+      {isPublishing ? 'محرمانه — قابل نمایش برای اعضا و کارفرمای پروژه' : 'تصاویر این پروژه محرمانه است'}
+     </span>
+    </div>
+   )}
+  </div>
+ );
 
  if (typeof document === 'undefined') return null;
 
@@ -292,10 +324,6 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
        >
         <X className="w-5 h-5" />
        </button>
-       {/* Latin id — the one place mono + tracking is correct */}
-       <span className="font-mono text-xs tracking-[0.3em] text-muted-foreground/60 select-none">
-        {projectId}
-       </span>
       </div>
 
       <div className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-12 md:pb-16">
@@ -349,48 +377,44 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
         </div>
        </div>
 
-       {!display.hidden && display.slug && (
-        <a
-         href={`/projects/${display.slug}`}
-         className="inline-flex items-center gap-2 mt-8 text-sm font-black font-display text-primary hover:opacity-80 transition-opacity"
-        >
-         مشاهدهٔ صفحهٔ کامل پروژه ↗
-        </a>
-       )}
+       <div className="mt-8 flex flex-wrap items-center gap-4">
+        {!display.hidden && display.slug && (
+         <a
+          href={`/projects/${display.slug}`}
+          className="inline-flex items-center gap-2 text-sm font-black font-display text-primary hover:opacity-80 transition-opacity"
+         >
+          مشاهدهٔ صفحهٔ کامل پروژه ↗
+         </a>
+        )}
+        {display.href && (
+         <a
+          href={display.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-black font-display text-background transition-transform hover:scale-[1.02]"
+          style={{ background: accent }}
+         >
+          ورود به سایت ↗
+         </a>
+        )}
+       </div>
 
-       {/* MEDIA — clearly defined slot for project imagery. The inner strip stays
-           dir="ltr" so screenshots read in filename order (01→05) and the modal
-           opens on the first image; the outer scroll container keeps dir="rtl". */}
+       {/* MEDIA — R4 RTL editorial gallery: a wide hero shot, then the remaining
+           frames flow as a varied-aspect masonry (right-to-left column order).
+           Filename order is preserved: images[0] is the hero, the rest follow. */}
        <div className="mt-10 md:mt-12">
         {hasImages ? (
-         <div className="flex gap-4 overflow-x-auto scrollbar-hide -mx-6 px-6 md:mx-0 md:px-0 snap-x" dir="ltr">
-          {display.images!.map((src, i) => (
-           <div
-            key={i}
-            className="relative flex-none w-[85%] md:w-[62%] aspect-[16/9] rounded-2xl md:rounded-[1.75rem] overflow-hidden border border-border bg-secondary/30 snap-start"
-           >
-            <Image
-             src={src}
-             alt={display.imagesLocked ? '' : `${display.title} — نمای ${i + 1}`}
-             fill
-             sizes="(max-width: 768px) 85vw, 62vw"
-             draggable={false}
-             className={`object-cover ${display.imagesLocked ? 'blur-[26px] scale-150 select-none pointer-events-none' : ''}`}
-            />
-            {display.imagesLocked && (
-             <div
-              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-background/40 backdrop-blur-2xl text-muted-foreground"
-              role="img"
-              aria-label={isPublishing ? 'در حال انتشار' : 'تصاویر محرمانه'}
-             >
-              {isPublishing ? <Clock className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
-              <span className="text-xs font-display font-bold">
-               {isPublishing ? 'تصاویر این پروژه در حال انتشار است' : 'تصاویر این پروژه محرمانه است'}
-              </span>
+         <div dir="rtl" className="space-y-4">
+          {heroImage && <GalleryTile src={heroImage} aspect="aspect-[16/9]" i={0} />}
+          {restImages.length > 0 && (
+           <div className="columns-1 sm:columns-2 gap-4">
+            {restImages.map((src, idx) => (
+             <div key={idx} className="mb-4 break-inside-avoid">
+              <GalleryTile src={src} aspect={GALLERY_ASPECTS[idx % GALLERY_ASPECTS.length]} i={idx + 1} />
              </div>
-            )}
+            ))}
            </div>
-          ))}
+          )}
          </div>
         ) : (
          <div className="relative aspect-[16/9] w-full rounded-2xl md:rounded-[1.75rem] overflow-hidden border border-border bg-secondary/20">
@@ -399,9 +423,9 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
            style={{ background: `radial-gradient(120% 100% at 50% 0%, ${accentSoft}, transparent 70%)` }}
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground/50">
-           {isPublishing ? <Clock className="w-7 h-7" /> : <ImageIcon className="w-7 h-7" />}
+           {isPublishing ? <Lock className="w-7 h-7" /> : <ImageIcon className="w-7 h-7" />}
            <span className="text-xs font-sans">
-            {isPublishing ? 'تصاویر این پروژه در حال انتشار است' : 'پیش‌نمایش پروژه به‌زودی اضافه می‌شود'}
+            {isPublishing ? 'محرمانه — قابل نمایش برای اعضا و کارفرمای پروژه' : 'پیش‌نمایش پروژه به‌زودی اضافه می‌شود'}
            </span>
           </div>
          </div>
@@ -473,7 +497,7 @@ export default function ProjectModal({ project, isOpen, onClose, originRect }: P
 
          <div className="pt-4 flex items-center gap-3 opacity-30">
           <Logo className="w-9 h-9" />
-          <span className="font-display text-sm font-bold text-foreground">گروه فناوری بقایی</span>
+          <span className="font-display text-sm font-bold text-foreground">گروه فناوری بقائی</span>
          </div>
         </div>
        </div>

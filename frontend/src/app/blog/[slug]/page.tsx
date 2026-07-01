@@ -25,7 +25,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   if (!post) return { title: 'Not Found' };
   
   return {
-    title: `${post.title} | وبلاگ گروه فناوری بقایی`,
+    title: `${post.title} | وبلاگ گروه فناوری بقائی`,
     description: post.excerpt,
     alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
@@ -74,12 +74,12 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
     image: ogImage,
     author: {
       '@type': 'Organization',
-      name: 'گروه فناوری بقایی',
+      name: 'گروه فناوری بقائی',
       url: SITE_URL,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'گروه فناوری بقایی',
+      name: 'گروه فناوری بقائی',
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.svg` },
     },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${post.slug}` },

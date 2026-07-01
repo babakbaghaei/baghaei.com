@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useInViewOnce } from '@/lib/utils/useInViewOnce';
 
 interface HeadingProps {
  children: React.ReactNode;
@@ -16,7 +17,9 @@ export const Heading: React.FC<HeadingProps> = ({
  className = "", 
  align = 'right' 
 }) => {
- const ref = useRef(null);
+ const ref = useRef<HTMLDivElement>(null);
+ // Self-healing reveal so the accent bar animates on load even above the fold.
+ const shown = useInViewOnce(ref, { once: true });
 
  const alignmentClasses = {
   right: "text-right items-start",
@@ -29,8 +32,7 @@ export const Heading: React.FC<HeadingProps> = ({
    <motion.div
     aria-hidden="true"
     initial={{ width: 0 }}
-    whileInView={{ width: 48 }}
-    viewport={{ once: true }}
+    animate={{ width: shown ? 48 : 0 }}
     className="h-[2px] bg-foreground"
    />
    <h2 className="text-[clamp(2.75rem,7vw,6rem)] font-bold font-display text-foreground leading-none uppercase">

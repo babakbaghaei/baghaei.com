@@ -42,13 +42,13 @@ npx prisma db seed        # seed admin user, services, sample projects
 
 ### Frontend (`frontend/`)
 ```bash
-npm run dev               # next dev --webpack (port 3000)
-npm run build             # next build --webpack (standalone output) + sitemap
+npm run dev               # next dev --turbopack (port 3000)
+npm run build             # next build --turbopack (standalone output) + sitemap
 npm run lint              # eslint
 npm test                  # playwright e2e (tests/ dir, baseURL http://localhost:3000)
 npx playwright test path/to/test.spec.ts   # run a single e2e test
 ```
-Note: build and dev both explicitly use `--webpack` (NOT Turbopack). Set `E2E_BACKEND=1` to also boot the backend during Playwright runs.
+Note: build and dev both use Turbopack (`--turbopack`). `next.config.mjs` keeps `turbopack.root` equal to `outputFileTracingRoot` (both the frontend dir) — they must match or Next 16 warns. Set `E2E_BACKEND=1` to also boot the backend during Playwright runs.
 
 ## Architecture
 

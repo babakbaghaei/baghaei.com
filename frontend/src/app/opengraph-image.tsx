@@ -6,7 +6,7 @@ import { join } from 'node:path';
 // auto-injects the og:image / twitter:image meta from this file, so no static
 // /og-image.png is needed. The display font is embedded so the Persian
 // wordmark renders correctly instead of falling back to tofu boxes.
-export const alt = 'گروه فناوری بقایی - معماری نرم‌افزار و هوش مصنوعی';
+export const alt = 'گروه فناوری بقائی - معماری نرم‌افزار و هوش مصنوعی';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -57,7 +57,7 @@ export default async function Image() {
             lineHeight: 1.1,
           }}
         >
-          گروه فناوری بقایی
+          گروه فناوری بقائی
         </div>
         <div
           style={{

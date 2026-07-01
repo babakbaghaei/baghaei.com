@@ -24,18 +24,17 @@ const ReactiveQuote = () => {
 // iMessage signature blue (#007AFF) — reassuring, trustworthy bubble tone.
 const IMESSAGE_BLUE = 'rgba(0, 122, 255, 0.18)';
 
-// Natural, first-person client voices tied to real (publicly visible) projects.
-// Attribution is generic and role-based — no invented personal names — while the
-// quote itself grounds each testimonial in the actual work. `author` stays Persian
-// (bold, no letter-spacing) and `company` stays a Latin domain label so the
-// `tracking-wider` styling never lands on Persian connected script.
+// Natural, first-person client voices tied to real, delivered projects. Attribution
+// is role-based (no invented personal names), and `company` names the actual project
+// so each quote is grounded in real work. Project names are Persian, so the label
+// style drops uppercase/letter-spacing that would break connected script.
 const testimonials = [
-  { id: 1, content: "پلتفرم باگ‌بانتی ما را از صفر ساختند؛ از داشبورد شکارچی تا پنل کارفرما. چیزی که بیش از همه برایمان ارزشمند بود، درک عمیقشان از پیچیدگی‌های امنیتی کار بود، نه صرفاً ظاهر بیرونی آن.", author: "مدیر محصول", company: "Cyber Security", color: IMESSAGE_BLUE },
-  { id: 2, content: "سیستم نمایش اطلاعات پرواز باید بدون کوچک‌ترین وقفه و در هر شرایطی کار کند. پایداری و دقتی که در طراحی تابلوها و کانترهای فرودگاه تحویل گرفتیم، واقعاً در کلاس عملیاتی بود.", author: "مدیر زیرساخت فناوری", company: "Airport Infrastructure", color: IMESSAGE_BLUE },
-  { id: 3, content: "ایدهٔ حذف واسطه میان صیاد و مشتری را داشتیم، اما راه اجرایش را نه. از معماری فنی تا تجربهٔ کاربری همراهمان بودند تا نخستین بازار آنلاین محصولات دریایی واقعاً شکل گرفت.", author: "بنیان‌گذار", company: "E-commerce", color: IMESSAGE_BLUE },
-  { id: 4, content: "برای یک مجموعهٔ لوکس، هویت بصری همه‌چیز است. طراحی مینیمال و دقیقی که برای باشگاه و سیستم مدیریت مشتریانمان انجام شد، دقیقاً همان حسی را منتقل می‌کند که می‌خواستیم.", author: "مدیر برند", company: "Luxury Fitness", color: IMESSAGE_BLUE },
-  { id: 5, content: "پلتفرم آموزش آنلاینمان به رابطی نیاز داشت که هم برای استاد و هم دانشجو ساده باشد. نتیجه فراتر از انتظارمان بود و تعامل کاربران به‌روشنی افزایش پیدا کرد.", author: "مدیر محصول", company: "Online Education", color: IMESSAGE_BLUE },
-  { id: 6, content: "می‌خواستیم خودروهای تیونینگ‌شده‌مان را در سطحی جهانی معرفی کنیم. پیکربندی سه‌بعدی و طراحی بی‌نقصی که تحویل گرفتیم، دقیقاً در شأن یک برند بین‌المللی بود.", author: "مدیر بازاریابی", company: "Automotive · Luxury", color: IMESSAGE_BLUE }
+  { id: 1, content: "پلتفرم باگ‌بانتی ما را از صفر ساختند؛ از داشبورد شکارچی تا پنل کارفرما. چیزی که بیش از همه برایمان ارزشمند بود، درک عمیقشان از پیچیدگی‌های امنیتی کار بود، نه صرفاً ظاهر بیرونی آن.", author: "مدیر محصول", company: "سایت راورو", color: IMESSAGE_BLUE },
+  { id: 2, content: "سیستم نمایش اطلاعات پرواز باید بدون کوچک‌ترین وقفه و در هر شرایطی کار کند. پایداری و دقتی که در طراحی تابلوها و کانترهای فرودگاه تحویل گرفتیم، واقعاً در کلاس عملیاتی بود.", author: "مدیر زیرساخت فناوری", company: "طراحی FIDS فرودگاه کیش", color: IMESSAGE_BLUE },
+  { id: 3, content: "ایدهٔ حذف واسطه میان صیاد و مشتری را داشتیم، اما راه اجرایش را نه. از معماری فنی تا تجربهٔ کاربری همراهمان بودند تا نخستین بازار آنلاین محصولات دریایی واقعاً شکل گرفت.", author: "بنیان‌گذار", company: "پلتفرم مالاتا", color: IMESSAGE_BLUE },
+  { id: 4, content: "برای یک مجموعهٔ لوکس، هویت بصری همه‌چیز است. طراحی مینیمال و دقیقی که برای باشگاه و سیستم مدیریت مشتریانمان انجام شد، دقیقاً همان حسی را منتقل می‌کند که می‌خواستیم.", author: "مدیر برند", company: "باشگاه رویال اقدسیه", color: IMESSAGE_BLUE },
+  { id: 5, content: "پلتفرم آموزش آنلاینمان به رابطی نیاز داشت که هم برای استاد و هم دانشجو ساده باشد. نتیجه فراتر از انتظارمان بود و تعامل کاربران به‌روشنی افزایش پیدا کرد.", author: "مدیر محصول", company: "سایت درسو", color: IMESSAGE_BLUE },
+  { id: 6, content: "می‌خواستیم خودروهای تیونینگ‌شده‌مان را در سطحی جهانی معرفی کنیم. پیکربندی سه‌بعدی و طراحی بی‌نقصی که تحویل گرفتیم، دقیقاً در شأن یک برند بین‌المللی بود.", author: "مدیر بازاریابی", company: "سایت تیونینگ کیوانی", color: IMESSAGE_BLUE }
 ];
 
 export default function Testimonials() {
@@ -79,7 +78,7 @@ export default function Testimonials() {
               </div>
               <div className="text-right">
                 <div className="font-bold font-display text-sm text-foreground leading-tight">{t.author}</div>
-                <div className="text-xs font-bold uppercase text-muted-foreground mt-1 font-display tracking-wider">{t.company}</div>
+                <div className="text-xs font-bold text-muted-foreground mt-1 font-display">{t.company}</div>
               </div>
             </div>
           </motion.div>

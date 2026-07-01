@@ -1,10 +1,19 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, useSpring, useMotionValue } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/lib/utils/useReducedMotion';
 
 type CursorState = 'default' | 'clickable' | 'text';
+
+// Classify what the pointer is over → drives the ring shape. Shared by the
+// mouseover fast-path AND the post-click re-check (see below).
+function classify(el: Element | null): CursorState {
+  if (!el) return 'default';
+  if (el.closest('input, textarea, [contenteditable="true"]')) return 'text';
+  if (el.closest('button, a, .clickable, [role="button"], label, select')) return 'clickable';
+  return 'default';
+}
 
 export default function CustomCursor() {
   const [state, setState] = useState<CursorState>('default');
@@ -16,6 +25,9 @@ export default function CustomCursor() {
   // the RING reads the spring-smoothed copies (lag → personality / weight).
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
+  // Last real pointer coordinates — used to re-hit-test after a click opens an
+  // overlay (modal/menu) UNDER a stationary cursor, where no mouseover fires.
+  const lastPos = useRef({ x: -100, y: -100 });
 
   const ringConfig = { stiffness: 380, damping: 30, mass: 0.6 };
   const ringX = useSpring(cursorX, ringConfig);
@@ -29,6 +41,7 @@ export default function CustomCursor() {
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
+      lastPos.current = { x: e.clientX, y: e.clientY };
       if (!isVisible) setIsVisible(true);
     };
 
@@ -41,20 +54,35 @@ export default function CustomCursor() {
       if (rafId !== null) return;
       rafId = requestAnimationFrame(() => {
         rafId = null;
-        const el = pendingTarget;
-        if (!el) return;
-        if (el.closest('input, textarea, [contenteditable="true"]')) {
-          setState('text');
-        } else if (el.closest('button, a, .clickable, [role="button"], label, select')) {
-          setState('clickable');
-        } else {
-          setState('default');
-        }
+        setState(classify(pendingTarget));
+      });
+    };
+
+    // After a click, an overlay (ProjectModal, CommandMenu, dropdown…) often
+    // mounts directly under a NOW-STATIONARY cursor. No mouseover fires, so the
+    // ring would stay stuck on its pre-click shape (e.g. the big clickable halo).
+    // Re-hit-test the real element under the last pointer position on the next
+    // two frames (once the overlay has mounted) so the ring corrects itself.
+    let reArm1: number | null = null;
+    let reArm2: number | null = null;
+    const reEvaluate = () => {
+      const { x, y } = lastPos.current;
+      setState(classify(document.elementFromPoint(x, y)));
+    };
+    const scheduleReEvaluate = () => {
+      if (reArm1 !== null) cancelAnimationFrame(reArm1);
+      if (reArm2 !== null) cancelAnimationFrame(reArm2);
+      reArm1 = requestAnimationFrame(() => {
+        reEvaluate();
+        reArm2 = requestAnimationFrame(reEvaluate);
       });
     };
 
     const handleDown = () => setIsPressed(true);
-    const handleUp = () => setIsPressed(false);
+    const handleUp = () => {
+      setIsPressed(false);
+      scheduleReEvaluate();
+    };
     const handleLeave = () => setIsVisible(false);
     const handleEnter = () => setIsVisible(true);
 
@@ -73,6 +101,8 @@ export default function CustomCursor() {
       document.removeEventListener('mouseleave', handleLeave);
       document.removeEventListener('mouseenter', handleEnter);
       if (rafId !== null) cancelAnimationFrame(rafId);
+      if (reArm1 !== null) cancelAnimationFrame(reArm1);
+      if (reArm2 !== null) cancelAnimationFrame(reArm2);
     };
   }, [cursorX, cursorY, shouldReduceMotion, isVisible]);
 
@@ -83,7 +113,7 @@ export default function CustomCursor() {
   const press = isPressed ? 0.82 : 1;
   const ringTarget =
     state === 'text'
-      ? { scaleX: 0.18 * press, scaleY: 1.4 * press, opacity: isVisible ? 0.9 : 0, borderRadius: '999px' }
+      ? { scaleX: 0.16 * press, scaleY: 1.5 * press, opacity: isVisible ? 0.9 : 0, borderRadius: '3px' }
       : state === 'clickable'
         ? { scaleX: 1.7 * press, scaleY: 1.7 * press, opacity: isVisible ? 1 : 0, borderRadius: '999px' }
         : { scaleX: 1 * press, scaleY: 1 * press, opacity: isVisible ? 0.7 : 0, borderRadius: '999px' };
@@ -93,9 +123,12 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Trailing ring — spring-followed, mix-blend so it reads on any bg. */}
+      {/* Trailing ring — spring-followed, mix-blend so it reads on any bg.
+          z sits ABOVE every overlay (ProjectModal is z-[100000], preloader
+          z-[10000]) so the cursor is never painted behind an opened modal —
+          that z-order gap was why the cursor "disappeared" on card open. */}
       <motion.div
-        className="fixed top-0 left-0 w-9 h-9 rounded-full border-2 border-primary pointer-events-none z-[9998] mix-blend-difference hidden md:block"
+        className="fixed top-0 left-0 w-9 h-9 rounded-full border-2 border-primary pointer-events-none z-[100001] mix-blend-difference hidden md:block"
         style={{
           x: ringX,
           y: ringY,
@@ -106,9 +139,10 @@ export default function CustomCursor() {
         animate={ringTarget}
         transition={{ type: 'spring', stiffness: 260, damping: 22, mass: 0.5 }}
       />
-      {/* Precision dot — locked to the raw pointer, no lag. */}
+      {/* Precision dot — locked to the raw pointer, no lag. Above the ring
+          and every overlay so it always leads the eye, even over a modal. */}
       <motion.div
-        className="fixed top-0 left-0 w-2 h-2 bg-primary rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
+        className="fixed top-0 left-0 w-2 h-2 bg-primary rounded-full pointer-events-none z-[100002] mix-blend-difference hidden md:block"
         style={{
           x: cursorX,
           y: cursorY,

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useLenis } from 'lenis/react';
 import ProjectModal from './ProjectModal';
@@ -22,7 +22,7 @@ const SELECTED_PROJECTS: Project[] = SELECTED_SLUGS
   .filter((p): p is Project => !!p && !p.hidden);
 
 // Most-used tools — shown as square Card-based tiles continuing the projects scroll.
-const FEATURED_TOOLS = TOOLS.filter((t) => t.featured && t.status !== 'soon');
+const FEATURED_TOOLS = TOOLS.filter((t) => t.featured && t.status !== 'soon' && !t.hidden);
 
 // Pack the featured tools into columns of two so a pair of square tiles fits the
 // exact height of a single project card, keeping the horizontal rhythm intact.
@@ -178,32 +178,13 @@ export default function Projects() {
 
  // ---- Native (mobile) horizontal row -----------------------------------------
  const scrollContainerRef = useRef<HTMLDivElement>(null);
- const [canScrollLeft, setCanScrollLeft] = useState(false);
- const [canScrollRight, setCanScrollRight] = useState(false);
-
- const handleScroll = useCallback(() => {
-  if (scrollContainerRef.current) {
-   const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-   const absScroll = Math.abs(scrollLeft);
-   const maxScroll = scrollWidth - clientWidth;
-   setCanScrollLeft(absScroll < maxScroll - 10);
-   setCanScrollRight(absScroll > 10);
-  }
- }, []);
-
- useLayoutEffect(() => {
-  if (mode !== 'native') return;
-  handleScroll();
-  window.addEventListener('resize', handleScroll);
-  return () => window.removeEventListener('resize', handleScroll);
- }, [mode, handleScroll]);
 
  // Shared horizontal content (projects → divider → tool columns). Used by both
  // the pinned desktop row and the native mobile row so the two never drift.
  const horizontalItems = (
   <>
    {SELECTED_PROJECTS.map((p) => (
-    <div key={p.id} data-project-frame className="w-[280px] md:w-[320px] h-[360px] md:h-[380px] shrink-0 relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
+    <div key={p.id} data-project-frame className="w-[280px] md:w-[360px] h-[360px] md:h-[380px] shrink-0 relative" style={{ zIndex: activeId === p.id ? 50 : 1 }}>
      <ProjectCard project={p} onClick={(e) => openProject(p, e)} />
     </div>
    ))}
@@ -259,13 +240,10 @@ export default function Projects() {
   ) : (
    // Mobile: native horizontal swipe row (no wheel hijack). data-lenis-prevent
    // lets native touch drive horizontal scrolling without Lenis interference.
-   <div className="relative group/projects-container mb-fib-8 -mr-fib-5 md:-mr-fib-8">
-    <div className={`absolute inset-y-0 right-0 w-20 md:w-fib-55 bg-gradient-to-l from-background via-background/80 to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
-    <div className={`absolute inset-y-0 left-0 w-20 md:w-fib-55 bg-gradient-to-r from-background via-background/80 to-transparent z-20 pointer-events-none transition-opacity duration-500 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
-
+   <div className="mb-fib-8 -mr-fib-5 md:-mr-fib-8">
+    {/* No edge-fade on mobile: native swipe row scrolls clean to the edges. */}
     <div
      ref={scrollContainerRef}
-     onScroll={handleScroll}
      data-lenis-prevent
      role="region"
      aria-label="اسکرول افقی پروژه‌ها و ابزارها"

@@ -33,7 +33,6 @@ export const ToolCard: React.FC<{
 }> = ({ tool, accent: accentProp, compact = false, showCategory = false }) => {
   const Icon = tool.icon;
   const isSoon = tool.status === 'soon';
-  const isBeta = tool.status === 'beta';
   const accent = accentProp ?? getCategoryMeta(tool.category).color;
   const CatIcon = getCategoryMeta(tool.category).icon;
   // Hover-reveal (desc expand + category) is disabled in compact tiles and for
@@ -55,16 +54,6 @@ export const ToolCard: React.FC<{
         dir="rtl"
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* «آزمایشی» corner tag — pinned to the top-leading (left) corner edge.
-            Subtle muted glass so it doesn't shout. */}
-        {isBeta && (
-          <span
-            className="absolute -top-2 -left-2 z-10 inline-flex items-center rounded-full bg-muted/70 px-2 py-0.5 text-[9px] font-bold font-display leading-tight text-muted-foreground/90 backdrop-blur-sm"
-            style={{ transform: 'translateZ(50px)' }}
-          >
-            آزمایشی
-          </span>
-        )}
         {/* top row: open affordance / soon status. The tool icon now lives at the
             BOTTOM next to the title (like the project cards' brand mark). */}
         <div
@@ -91,11 +80,8 @@ export const ToolCard: React.FC<{
         <div className="mt-auto pt-4" style={{ transform: 'translateZ(30px)' }}>
           <div className="flex items-center gap-2.5">
             <span
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-              style={{
-                background: `rgba(${accent}, 0.12)`,
-                color: `rgb(${accent})`,
-              }}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground transition-colors duration-300 group-hover:[background-color:rgba(var(--tc),0.14)] group-hover:[color:rgb(var(--tc))]"
+              style={{ '--tc': accent } as React.CSSProperties}
             >
               <Icon className="h-5 w-5" strokeWidth={1.75} />
             </span>
@@ -108,7 +94,7 @@ export const ToolCard: React.FC<{
               stay clamped so they never overflow. */}
           {canReveal ? (
             <p
-              className="mt-1.5 overflow-hidden font-sans text-xs leading-relaxed text-muted-foreground transition-[max-height] duration-300 ease-out [max-height:2.6rem] group-hover:[max-height:7rem] max-md:[max-height:7rem] motion-reduce:transition-none"
+              className="mt-1.5 overflow-hidden font-sans text-xs leading-relaxed text-muted-foreground transition-[max-height] duration-300 ease-out [max-height:2.6rem] group-hover:[max-height:7rem] motion-reduce:transition-none"
             >
               {tool.desc}
             </p>
@@ -121,7 +107,7 @@ export const ToolCard: React.FC<{
           {/* Category — hidden at rest, slides open on hover (like the project
               cards). Only for «پرطرفدار» tools. Always open on touch (max-md). */}
           {revealCategory && (
-            <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-out group-hover:grid-rows-[1fr] group-hover:opacity-100 max-md:grid-rows-[1fr] max-md:opacity-100 motion-reduce:transition-none">
+            <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-out group-hover:grid-rows-[1fr] group-hover:opacity-100 motion-reduce:transition-none">
               <div className="min-h-0 overflow-hidden">
                 <span
                   className="mt-3 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold font-display leading-tight"

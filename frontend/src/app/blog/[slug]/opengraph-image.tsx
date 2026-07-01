@@ -7,7 +7,7 @@ import { getPostBySlug, getAllPosts } from '@/lib/blog';
 // Mirrors the root src/app/opengraph-image.tsx (gradient bg, embedded YekanBakh
 // font, accent line) but shows the post TITLE so social previews are specific.
 export const runtime = 'nodejs';
-export const alt = 'وبلاگ گروه فناوری بقایی';
+export const alt = 'وبلاگ گروه فناوری بقائی';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -25,7 +25,7 @@ const yekanRegular = readFileSync(
 
 export default async function Image({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug);
-  const title = post?.title || 'وبلاگ گروه فناوری بقایی';
+  const title = post?.title || 'وبلاگ گروه فناوری بقائی';
 
   return new ImageResponse(
     (
@@ -67,7 +67,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
             marginBottom: 34,
           }}
         >
-          وبلاگ گروه فناوری بقایی
+          وبلاگ گروه فناوری بقائی
         </div>
         <div
           style={{

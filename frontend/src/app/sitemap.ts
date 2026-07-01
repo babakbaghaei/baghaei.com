@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { TOOLS } from '@/lib/data/tools';
+import { VISIBLE_TOOLS } from '@/lib/data/tools';
 import { PROJECTS_DATA } from '@/lib/data/projects';
 import { getAllPostsMeta } from '@/lib/blog';
 
@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   '/about',
   '/projects',
   '/tools',
+  '/pricing',
   '/blog',
   '/careers',
   '/privacy',
@@ -26,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
  }));
 
  // Tools — derived from the registry so the sitemap always matches the suite.
- const tools = TOOLS.map((tool) => ({
+ const tools = VISIBLE_TOOLS.map((tool) => ({
   url: `${baseUrl}/tools/${tool.slug}`,
   lastModified: new Date(),
   changeFrequency: 'weekly' as const,
